@@ -3,6 +3,7 @@
 package mov
 
 import (
+	"github.com/go-devs-ua/octagon/cfg"
 	"github.com/go-devs-ua/octagon/core"
 )
 
@@ -10,10 +11,11 @@ import (
 // responses and validations.
 type Mover struct {
 	Agent core.Agency
+	// ...
 }
 
 // NewMover will return *Mover
 // accepting Agency interface
-func NewMover(ua core.Agency) *Mover {
+func NewMover(ua core.Agency, cfg *cfg.Options) *Mover {
 	return &Mover{ua}
 }

@@ -3,11 +3,15 @@
 // agent only depends on package core.
 package agent
 
+import (
+	"github.com/go-devs-ua/octagon/core"
+)
+
 type Agent struct {
 	Repo core.Repository
 	// Log
 }
 
-func NewUserAgent(ur core.Repository) *Agent {
-	return &Agent{Repo: ur}
+func NewUserAgent(r core.Repository) *Agent {
+	return &Agent{Repo: r}
 }

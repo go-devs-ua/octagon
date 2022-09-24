@@ -5,20 +5,14 @@ package repo
 import (
 	"database/sql"
 
-	"github.com/delveper/heroes/core"
+	"github.com/go-devs-ua/octagon/cfg"
 )
-
-type User = core.User
 
 type Repo struct {
 	db *sql.DB
 }
 
-// NewRepo will initialise database.
-func NewRepo(db *sql.DB) *Repo {
-	return &Repo{db}
-}
-
-func (kpr *Repo) Add(User) error {
-	return nil
+// NewRepo will initialise database using *cfg.Options.
+func NewRepo(opt *cfg.Options) *Repo {
+	return &Repo{}
 }

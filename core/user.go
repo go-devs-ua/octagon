@@ -6,8 +6,7 @@ package core
 // User is key entity in our project
 // Entities like User are the least likely to change
 // when something external changes.
-type User struct {
-}
+type User struct{}
 
 // Using abstract interfaces without specific
 // knowledge of their implementation details
@@ -19,6 +18,7 @@ type Repository interface {
 	Add(User) error
 }
 
+// Agency is responsible registering user
 type Agency interface {
 	Signup(User) error
 }
