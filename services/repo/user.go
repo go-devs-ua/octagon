@@ -6,6 +6,6 @@ import (
 
 type User = core.User
 
-func (kpr *Repo) Add(User) error {
+func (r *Repo) Add(User) error {
 	return nil
 }

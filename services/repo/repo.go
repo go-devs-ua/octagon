@@ -8,9 +8,7 @@ import (
 	"github.com/go-devs-ua/octagon/cfg"
 )
 
-type Repo struct {
-	db *sql.DB
-}
+type Repo struct{ *sql.DB }
 
 // NewRepo will initialise database using *cfg.Options.
 func NewRepo(opt *cfg.Options) *Repo {

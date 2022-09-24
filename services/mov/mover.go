@@ -16,6 +16,6 @@ type Mover struct {
 
 // NewMover will return *Mover
 // accepting Agency interface
-func NewMover(ua core.Agency, cfg *cfg.Options) *Mover {
-	return &Mover{ua}
+func NewMover(agt core.Agency, cfg *cfg.Options) *Mover {
+	return &Mover{Agent: agt}
 }
