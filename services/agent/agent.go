@@ -12,6 +12,6 @@ type Agent struct {
 	// Log
 }
 
-func NewUserAgent(r core.Repository) *Agent {
+func NewAgent(r core.Repository) *Agent {
 	return &Agent{Repo: r}
 }
