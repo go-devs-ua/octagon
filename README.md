@@ -3,31 +3,36 @@
 ## Arch
 ```
 octagon/
-├── api/
-│   └── openapi.yml
-├── cfg/
-│   └── config.go
-├── cmd/
-│   └── srv/
-│       └── main.go 
-├── core/
-│   ├── error.go 
-│   ├── user.go 
-│   └── validation.go
-├── services/
-│   ├─ agent/
-│   │   ├── agent.go
-│   │   └── user.go
-│   ├── mov/
-│   │   ├── mover.go
-│   │   ├── response.go
+├── app/
+│   ├── ent/
 │   │   └── user.go
 │   ├── repo/
-│   │   ├── sql/
-│   │   │   └── migrations.sql
-│   │   ├── repo.go
-│   │   ├── migrate.go
-│   │   └── user.go
+│   │   └── pg/
+│   │         └── user.sql
+│   ├── trans/ 
+│   │   └── http/ 
+│   │       ├── abs.go 
+│   │       ├── handler.go
+│   │       ├── resp.go
+│   │       ├── router.go
+│   │       ├── server.go
+│   │       └── user.go
+│   └── usecase/
+│       ├── abs.go
+│       └── user.goo
+├── cfg/
+│   ├── config.go
+│   └── config.yml
+├── cmd/
+│   ├── cli/
+│   │    └── main.go 
+│   └── rest/
+│       └── main.go 
+├── migration/
+│   └── migration.sql
+├── pkg/
+│   └── dummy/ 
+│      └── app.go 
 ├── README.md
 └── .env 
 ```
