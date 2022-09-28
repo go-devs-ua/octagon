@@ -60,7 +60,7 @@ components:
           format: email
           maxLength: 256
           uniqueItems: true
-          example: john@email.com
+          example: johnDoe@email.com
         firstName:
           type: string
           example: John
