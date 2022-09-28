@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: Octagon openAPI
+  description: This is Super-Super-Heroes' code platform
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/users
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      summary: Creates new user
+      description: This endpoint for create a new user to Octagon. Request consists of user id, user first name, user last name, user password and created AT. Response may be consist of status code and response message
+      requestBody:
+        required: true
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: Successful created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "409":
+          description: User provided email that already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/409"
+        "422":
+          description: User is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/422"
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500"
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - email
+        - firstname
+        - lastname
+        - password
+      properties:
+        email:
+          description: must be @ and must be unique
+          type: string
+          format: email
+          maxLength: 256
+          uniqueItems: true
+          example: john@email.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        password:
+          description: only ASCII symbols
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 256
+          example: "123456Aa"
+    409:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    422:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    500:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
