@@ -11,6 +11,6 @@ type UserLogic interface {
 }
 
 type Router interface {
-	mapRoutes(ah *ApiHandler)
+	mapRoutes(ah *UserHandler)
 	http.Handler
 }

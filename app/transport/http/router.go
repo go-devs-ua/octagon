@@ -12,6 +12,6 @@ func NewRouter() *Mux {
 	return new(Mux)
 }
 
-func (mux *Mux) mapRoutes(ah *ApiHandler) {
-	mux.Handle("/user", ah.HandleUser())
+func (mux *Mux) mapRoutes(ah *UserHandler) {
+	mux.Handle("/user", ah.Handle())
 }
