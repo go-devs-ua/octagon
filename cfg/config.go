@@ -14,6 +14,15 @@ type ServerConfig struct {
 	IdleTimeout  time.Duration
 }
 
+// Database configuration description
+type DBConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+}
+
 // Options will keep all needful configs
 type Options struct {
 }
