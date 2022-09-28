@@ -16,9 +16,9 @@ func NewUser(repo UserRepository) User {
 
 // Signup represents business logic
 // and will take care of creating user.
-func (ul User) Signup(usr entities.User) error {
+func (u User) Signup(usr entities.User) error {
 	// TODO: Some magic
-	if err := ul.Repo.Add(usr); err != nil {
+	if err := u.Repo.Add(usr); err != nil {
 		return err
 	}
 
