@@ -16,5 +16,5 @@ func NewRouter() *Mux {
 
 // mapRoutes will take care of all endpoints
 func (m *Mux) mapRoutes(ah UserHandler) {
-	m.HandleFunc("/user", ah.CreateUser).Methods(http.MethodPost)
+	m.Handle("/user", ah.CreateUser()).Methods(http.MethodPost)
 }

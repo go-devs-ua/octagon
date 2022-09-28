@@ -7,14 +7,16 @@ import (
 )
 
 // CreateUser will handle user creation
-func (uh UserHandler) CreateUser(rw http.ResponseWriter, req *http.Request) {
-	usr := entities.User{}
+func (uh UserHandler) CreateUser() http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		usr := entities.User{}
 
-	if err := usr.Validate(); err != nil {
-		return
-	}
+		if err := usr.Validate(); err != nil {
+			return
+		}
 
-	if err := uh.usecase.Signup(usr); err != nil {
-		return
-	}
+		if err := uh.usecase.Signup(usr); err != nil {
+			return
+		}
+	})
 }
