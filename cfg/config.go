@@ -25,6 +25,8 @@ type DBConfig struct {
 
 // Options will keep all needful configs
 type Options struct {
+	DBConfig     DBConfig
+	ServerConfig ServerConfig
 }
 
 // NewOptions will create instance of Options
