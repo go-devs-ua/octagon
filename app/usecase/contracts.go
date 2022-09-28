@@ -5,11 +5,11 @@
 package usecase
 
 import (
-	"github.com/go-devs-ua/octagon/app/ent"
+	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-// Repository interface can be implemented
+// UserRepository interface can be implemented
 // in any kind of repositories like Postgres, MySQL etc.
-type Repository interface {
-	Add(ent.User) error
+type UserRepository interface {
+	Add(entities.User) error
 }

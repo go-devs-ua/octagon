@@ -4,35 +4,30 @@
 ```
 octagon/
 ├── app/
-│   ├── ent/
+│   ├── entities/
 │   │   └── user.go
-│   ├── repo/
+│   ├── repository/
 │   │   └── pg/
 │   │         └── user.sql
-│   ├── trans/ 
+│   ├── transport/ 
 │   │   └── http/ 
-│   │       ├── abs.go 
+│   │       ├── contracts.go 
 │   │       ├── handler.go
 │   │       ├── resp.go
 │   │       ├── router.go
 │   │       ├── server.go
 │   │       └── user.go
 │   └── usecase/
-│       ├── abs.go
+│       ├── contracts.go
 │       └── user.goo
 ├── cfg/
 │   ├── config.go
 │   └── config.yml
 ├── cmd/
-│   ├── cli/
-│   │    └── main.go 
 │   └── rest/
 │       └── main.go 
 ├── migration/
 │   └── migration.sql
-├── pkg/
-│   └── dummy/ 
-│      └── app.go 
 ├── README.md
 └── .env 
 ```

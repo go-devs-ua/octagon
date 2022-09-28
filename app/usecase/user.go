@@ -1,22 +1,26 @@
 package usecase
 
 import (
-	"github.com/go-devs-ua/octagon/app/ent"
+	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-type UserLogic struct { // Interactor
-	Repo Repository
+type User struct {
+	Repo UserRepository
 }
 
-// NewUseCase is a famous
-// trick with accepting interfaces and returning structs
-func NewUseCase(repo Repository) *UserLogic {
-	return &UserLogic{Repo: repo}
+// NewUser is a famous  trick with accepting
+// interfaces and returning structs.
+func NewUser(repo UserRepository) User {
+	return User{Repo: repo}
 }
 
-func (ul *UserLogic) Signup(usr ent.User) error {
+// Signup represents business logic
+// and will take care of creating user.
+func (ul User) Signup(usr entities.User) error {
+	// TODO: Some magic
 	if err := ul.Repo.Add(usr); err != nil {
 		return err
 	}
+
 	return nil
 }

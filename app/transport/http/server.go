@@ -6,26 +6,26 @@ import (
 )
 
 // Server is simple server
-type Server struct {
-	*http.Server
-}
+type Server struct{ *http.Server }
 
 // NewServer will initialize the server
 // that would be router type agnostic
 // we can switch to any router type
 // that implements Router interface
-func NewServer(logic UserLogic, mux Router) *Server {
-	srv := new(http.Server)
-	hdl := NewApiHandler(logic)
-	mux.mapRoutes(hdl)
-	// TODO: Add config and stuff
-	srv.Handler = mux
-	srv.Addr = ":8080"
+func NewServer(uu UserUsecase, r Router) *Server {
+	hdl := NewUserHandler(uu)
+	r.mapRoutes(hdl)
+	// TODO: Add config
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
 	return &Server{srv}
 }
 
 // Run will run our server
-func (srv Server) Run() error {
+func (srv *Server) Run() error {
 	if err := srv.ListenAndServe(); err != nil {
 		return fmt.Errorf("error loading the server: %w", err)
 	}

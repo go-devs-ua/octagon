@@ -5,8 +5,8 @@ package main
 import (
 	"log"
 
-	"github.com/go-devs-ua/octagon/app/repo/pg"
-	rest "github.com/go-devs-ua/octagon/app/trans/http"
+	"github.com/go-devs-ua/octagon/app/repository/pg"
+	rest "github.com/go-devs-ua/octagon/app/transport/http"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
 )
@@ -17,11 +17,12 @@ func main() {
 	}
 }
 
+// Run will bind our layers all together
 func Run() error {
-	// TODO: Handle errors gracefully
+	// TODO: Handle errors, migration, configs ...
 	opt := cfg.NewOptions()
 	repo := pg.NewRepo(opt)
-	logic := usecase.NewUseCase(repo)
+	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()
 	srv := rest.NewServer(logic, mux)
 	if err := srv.Run(); err != nil {

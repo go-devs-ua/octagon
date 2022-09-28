@@ -2,16 +2,19 @@ package http
 
 import (
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // Mux is simple router
 // that implements Router interface.
-type Mux struct{ http.ServeMux }
+type Mux struct{ mux.Router }
 
 func NewRouter() *Mux {
 	return new(Mux)
 }
 
-func (mux *Mux) mapRoutes(ah *UserHandler) {
-	mux.Handle("/user", ah.Handle())
+// mapRoutes will take care of all endpoints
+func (m *Mux) mapRoutes(ah UserHandler) {
+	m.HandleFunc("/user", ah.CreateUser).Methods(http.MethodPost)
 }
