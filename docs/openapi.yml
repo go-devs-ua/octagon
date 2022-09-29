@@ -4,7 +4,7 @@ info:
   description: This is Super-Super-Heroes' code platform
   version: 0.0.1
 servers:
-  - url: http://localhost:8080/
+  - url: http://localhost:8080
 paths:
   /users:
     post:
@@ -61,7 +61,7 @@ components:
       properties:
         email:
           {
-            description: must contains @ and must be unique,
+            description: must contains '@' and must be unique,
             type: string,
             format: email,
             maxLength: 256,
