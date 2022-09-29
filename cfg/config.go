@@ -31,6 +31,18 @@ type Options struct {
 
 // NewOptions will create instance of Options
 // that will be used im main package
-func NewOptions() Options {
-	return Options{}
+func NewOptions() *Options {
+	return &Options{
+		Server{
+			Host: "localhost",
+			Port: "8080",
+		},
+		DB{
+			Host:     "",
+			Port:     "",
+			Username: "",
+			Password: "",
+			DBName:   "",
+		},
+	}
 }
