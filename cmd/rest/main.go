@@ -3,6 +3,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
@@ -22,7 +24,14 @@ func main() {
 func Run() error {
 	// TODO: Handle errors, migration, configs ...
 	opt := cfg.NewOptions()
-	repo := pg.NewRepo(opt)
+
+	db, err := connectDB(opt)
+	if err != nil {
+		return err
+	}
+
+	repo := pg.NewRepo(db)
+
 	migration.Migrate(repo)
 	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()
@@ -31,4 +40,20 @@ func Run() error {
 		return err
 	}
 	return nil
+}
+
+func connectDB(opt *cfg.Options) (*sql.DB, error) {
+	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
+		opt.DBConfig.Host, opt.DBConfig.Port, opt.DBConfig.Username, opt.DBConfig.password, opt.DBConfig.DBName)
+
+	db, err := sql.Open("postgres", str)
+	if err != nil {
+		return nil, fmt.Errorf("sql.Open(): %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("db.Ping(): %w", err)
+	}
+
+	return db, nil
 }
