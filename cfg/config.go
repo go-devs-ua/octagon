@@ -6,7 +6,7 @@ package cfg
 import "time"
 
 // Server configuration description
-type ServerConfig struct {
+type Server struct {
 	Host         string
 	Port         string
 	ReadTimeout  time.Duration
@@ -15,7 +15,7 @@ type ServerConfig struct {
 }
 
 // Database configuration description
-type DBConfig struct {
+type DB struct {
 	Host     string
 	Port     string
 	Username string
@@ -25,8 +25,8 @@ type DBConfig struct {
 
 // Options will keep all needful configs
 type Options struct {
-	DBConfig     DBConfig
-	ServerConfig ServerConfig
+	Server Server
+	DB     DB
 }
 
 // NewOptions will create instance of Options
