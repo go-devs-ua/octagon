@@ -12,13 +12,13 @@ import (
 // Or use "migrate-down" - that will remove table
 // Example: go run main.go migrate-up
 func Migrate(repo *pg.Repo) error {
-	for _, i := range os.Args {
-		if i == "migrate-up" {
+	for _, arg := range os.Args {
+		if arg == "migrate-up" {
 			fmt.Println("Starting up")
 			execMigrationQuery(repo, "./migration/migrationsUp.sql")
 		}
 
-		if i == "migrate-down" {
+		if arg == "migrate-down" {
 			fmt.Println("Starting down")
 			execMigrationQuery(repo, "./migration/migrationsDown.sql")
 		}
