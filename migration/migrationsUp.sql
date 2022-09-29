@@ -1,0 +1,12 @@
+-- CREATE TABLE "user" ----------------------------------------
+CREATE TABLE IF NOT EXISTS "user" (
+    "id" UUid DEFAULT gen_random_uuid() NOT NULL,
+    "first_name" VARCHAR(255) NOT NULL,
+    "last_name" VARCHAR(255),
+    "email" VARCHAR(255) NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+    "created_at" Timestamp Without Time Zone NOT NULL DEFAULT NOW(),
+    PRIMARY KEY ("id"),
+    CONSTRAINT "unique_user_id" UNIQUE("id"),
+    CONSTRAINT "unique_user2_email" UNIQUE("email")
+);

@@ -9,6 +9,7 @@ import (
 	rest "github.com/go-devs-ua/octagon/app/transport/http"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
+	"github.com/go-devs-ua/octagon/migration"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func Run() error {
 	// TODO: Handle errors, migration, configs ...
 	opt := cfg.NewOptions()
 	repo := pg.NewRepo(opt)
+	migration.Migrate(repo)
 	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()
 	srv := rest.NewServer(logic, mux)
