@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS "user" (
     "created_at" Timestamp Without Time Zone NOT NULL DEFAULT NOW(),
     PRIMARY KEY ("id"),
     CONSTRAINT "unique_user_id" UNIQUE("id"),
-    CONSTRAINT "unique_user2_email" UNIQUE("email")
+    CONSTRAINT "unique_user_email" UNIQUE("email")
 );
