@@ -31,8 +31,7 @@ func Run() error {
 	}
 
 	repo := pg.NewRepo(db)
-
-	migration.Migrate(repo)
+	migration.Migrate(db)
 	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()
 	srv := rest.NewServer(logic, mux)
@@ -42,18 +41,20 @@ func Run() error {
 	return nil
 }
 
-func connectDB(opt *cfg.Options) (*sql.DB, error) {
+func connectDB(opt cfg.Options) (*sql.DB, error) {
 	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
 		opt.DBConfig.Host, opt.DBConfig.Port, opt.DBConfig.Username, opt.DBConfig.password, opt.DBConfig.DBName)
 
 	db, err := sql.Open("postgres", str)
 	if err != nil {
-		return nil, fmt.Errorf("sql.Open(): %w", err)
+		return nil, fmt.Errorf("failed to open database connection: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("db.Ping(): %w", err)
+		return nil, fmt.Errorf("ping to database failed: %w", err)
 	}
+
+	log.Println("Connected to DB")
 
 	return db, nil
 }

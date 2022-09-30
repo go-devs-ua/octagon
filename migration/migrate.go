@@ -3,6 +3,7 @@ package migration
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -13,13 +14,19 @@ import (
 func Migrate(db *sql.DB) error {
 	for _, arg := range os.Args {
 		if arg == "migrate-up" {
-			fmt.Println("Starting up")
-			execMigrationQuery(db, "./migration/migrationsUp.sql")
+			log.Println("Migration starts up")
+
+			if err := execMigrationQuery(db, "./migration/migrationsUp.sql"); err != nil {
+				return fmt.Errorf("migration up failed: %w", err)
+			}
 		}
 
 		if arg == "migrate-down" {
-			fmt.Println("Starting down")
-			execMigrationQuery(db, "./migration/migrationsDown.sql")
+			log.Println("Migration starts down")
+
+			if err := execMigrationQuery(db, "./migration/migrationsDown.sql"); err != nil {
+				return fmt.Errorf("migration down failed: %w", err)
+			}
 		}
 	}
 
@@ -28,17 +35,13 @@ func Migrate(db *sql.DB) error {
 
 func execMigrationQuery(db *sql.DB, fileName string) error {
 	byteQuery, err := os.ReadFile(fileName)
-	fmt.Println(string(byteQuery))
 	if err != nil {
 		return fmt.Errorf("read migration file: %w", err)
-	}
-
-	if err != nil {
-		return err
 	}
 
 	if _, err := db.Exec(string(byteQuery)); err != nil {
 		return fmt.Errorf("cannot exec query: %w", err)
 	}
+
 	return nil
 }
