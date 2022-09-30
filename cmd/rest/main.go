@@ -31,7 +31,11 @@ func Run() error {
 	}
 
 	repo := pg.NewRepo(db)
+
+	log.Println("Connected to DB")
+
 	migration.Migrate(db)
+
 	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()
 	srv := rest.NewServer(logic, mux)
@@ -53,8 +57,6 @@ func connectDB(opt cfg.Options) (*sql.DB, error) {
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("ping to database failed: %w", err)
 	}
-
-	log.Println("Connected to DB")
 
 	return db, nil
 }
