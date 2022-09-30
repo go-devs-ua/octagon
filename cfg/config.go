@@ -3,7 +3,20 @@
 // that will be retrieved from  .env or ./cfg/config.yml
 package cfg
 
-import "time"
+import (
+	"os"
+	"time"
+)
+
+var (
+	serverHost string = os.Getenv(SERVHOST)
+	serverPort string = os.Getenv(SERVPORT)
+	DBName     string = os.Getenv(DBNAME)
+	DBUser     string = os.Getenv(DDBUSER)
+	DBPassword string = os.Getenv(DBPASSWORD)
+	DBPort     string = os.Getenv(DBPORT)
+	DBHost     string = os.Getenv(DBHOST)
+)
 
 // Server configuration description
 type Server struct {
@@ -34,15 +47,15 @@ type Options struct {
 func NewOptions() *Options {
 	return &Options{
 		Server{
-			Host: "localhost",
-			Port: "8080",
+			Host: serverHost,
+			Port: serverPort,
 		},
 		DB{
-			Host:     "",
-			Port:     "",
-			Username: "",
-			Password: "",
-			DBName:   "",
+			Host:     DBHost,
+			Port:     DBPort,
+			Username: DBUser,
+			Password: DBPassword,
+			DBName:   DBName,
 		},
 	}
 }
