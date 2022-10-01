@@ -21,7 +21,12 @@ func LoadEnvVar() error {
 		return err
 	}
 
-	defer f.Close()
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			log.Printf("%s", err)
+		}
+	}()
 
 	lines := make([]string, 0)
 	scanner := bufio.NewScanner(f)
