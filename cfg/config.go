@@ -4,18 +4,52 @@
 package cfg
 
 import (
+	"bufio"
+	"log"
 	"os"
+	"strings"
 	"time"
 )
 
+// Load configs from a env file & sets them in environment variables .
+func LoadEnvVar() error {
+
+	f, err := os.Open(".env")
+
+	if err != nil {
+		log.Printf("%s", err)
+		return err
+	}
+
+	defer f.Close()
+
+	lines := make([]string, 0)
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Printf("%s", err)
+		return err
+	}
+
+	for _, l := range lines {
+		pair := strings.Split(l, "=")
+		os.Setenv(pair[0], pair[1])
+	}
+	return nil
+}
+
 var (
-	serverHost string = os.Getenv(SERVHOST)
-	serverPort string = os.Getenv(SERVPORT)
-	DBName     string = os.Getenv(DBNAME)
-	DBUser     string = os.Getenv(DDBUSER)
-	DBPassword string = os.Getenv(DBPASSWORD)
-	DBPort     string = os.Getenv(DBPORT)
-	DBHost     string = os.Getenv(DBHOST)
+	serverHost = os.Getenv("SERVHOST")
+	serverPort = os.Getenv("SERVPORT")
+	DBName     = os.Getenv("DBNAME")
+	DBUser     = os.Getenv("DDBUSER")
+	DBPassword = os.Getenv("DBPASSWORD")
+	DBPort     = os.Getenv("DBPORT")
+	DBHost     = os.Getenv("DBHOST")
 )
 
 // Server configuration description
@@ -48,7 +82,7 @@ func NewOptions() *Options {
 	return &Options{
 		Server{
 			Host: serverHost,
-			Port: serverPort,
+			Port: ":" + serverPort,
 		},
 		DB{
 			Host:     DBHost,
