@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Octagon openAPI
+  description: This is Super-Super-Heroes' code platform
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      summary: Creates new user
+      description: This endpoint for create a new user to Octagon. Request consists of user email, user first name, user last name and user password. Response may be consist of status code and response message
+      requestBody:
+        required: true
+        description: Passes user data to create User
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201": { $ref: "#/components/responses/created" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "409": { $ref: "#/components/responses/conflict" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+components:
+  responses:
+    created:
+      description: Successful created user.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    badRequest:
+      description: Bad Request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    conflict:
+      description: User provided email that already exists.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    internalServerError:
+      description: Unexpected error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    User:
+      type: object
+      required:
+        - email
+        - firstname
+        - lastname
+        - password
+      properties:
+        email:
+          {
+            description: must contains '@' and must be unique,
+            type: string,
+            format: email,
+            maxLength: 256,
+            uniqueItems: true,
+            example: john@email.com,
+          }
+        firstName: { type: string, example: John }
+        lastName: { type: string, example: Doe }
+        password:
+          {
+            description: only ASCII symbols,
+            type: string,
+            format: password,
+            minLength: 8,
+            maxLength: 256,
+            example: "123456Aa",
+          }
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
