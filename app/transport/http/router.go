@@ -39,7 +39,8 @@ func (m *Mux) Route() {
 	}
 }
 
-// ServeHTTP will handle HTTP (field Handler in http.Server)
+// ServeHTTP is implementations of http.Handler interface
+// that will handle HTTP (field Handler in http.Server)
 func (m *Mux) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	m.Router.ServeHTTP(rw, req)
 }
