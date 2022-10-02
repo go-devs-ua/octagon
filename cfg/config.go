@@ -42,6 +42,7 @@ func LoadEnvVar() error {
 		pair := strings.Split(l, "=")
 		os.Setenv(pair[0], pair[1])
 	}
+
 	return nil
 }
 
