@@ -47,8 +47,8 @@ func LoadEnvVar() error {
 }
 
 var (
-	serverHost = os.Getenv("SERVHOST")
-	serverPort = os.Getenv("SERVPORT")
+	serverHost = os.Getenv("SERV_HOST")
+	serverPort = os.Getenv("SERV_PORT")
 	DBName     = os.Getenv("DB_NAME")
 	DBUser     = os.Getenv("DB_USER")
 	DBPassword = os.Getenv("DB_PASSWORD")
