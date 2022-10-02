@@ -49,11 +49,11 @@ func LoadEnvVar() error {
 var (
 	serverHost = os.Getenv("SERVHOST")
 	serverPort = os.Getenv("SERVPORT")
-	DBName     = os.Getenv("DBNAME")
-	DBUser     = os.Getenv("DDBUSER")
-	DBPassword = os.Getenv("DBPASSWORD")
-	DBPort     = os.Getenv("DBPORT")
-	DBHost     = os.Getenv("DBHOST")
+	DBName     = os.Getenv("DB_NAME")
+	DBUser     = os.Getenv("DB_USER")
+	DBPassword = os.Getenv("DB_PASSWORD")
+	DBPort     = os.Getenv("DB_PORT")
+	DBHost     = os.Getenv("DB_HOST")
 )
 
 // Server configuration description
