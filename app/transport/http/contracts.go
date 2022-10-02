@@ -13,6 +13,6 @@ type UserUsecase interface {
 
 // Router represents router (multiplexer)
 type Router interface {
-	mapRoutes(UserHandler)
-	http.Handler
+	Route()
+	ServeHTTP(http.ResponseWriter, *http.Request)
 }

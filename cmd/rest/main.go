@@ -19,12 +19,15 @@ func main() {
 
 // Run will bind our layers all together
 func Run() error {
-	// TODO: Handle errors, migration, configs ...
 	opt := cfg.NewOptions()
 	repo := pg.NewRepo(opt)
-	logic := usecase.NewUser(repo)
-	mux := rest.NewRouter()
-	srv := rest.NewServer(logic, mux)
+
+	userLogic := usecase.NewUser(repo)
+	user := rest.NewUserHandler(userLogic)
+
+	mux := rest.NewRouter(user.Map()...) // here we can put other entities like admin.Map()...
+
+	srv := rest.NewServer(mux)
 	if err := srv.Run(); err != nil {
 		return err
 	}
