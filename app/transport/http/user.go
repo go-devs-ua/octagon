@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -23,7 +22,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err := usr.Validate(); err != nil {
 			return
 		}
-		fmt.Fprintf(rw, "bla bla %d", 5)
+
 		if err := uh.usecase.Signup(usr); err != nil {
 			return
 		}
