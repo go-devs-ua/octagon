@@ -13,7 +13,6 @@ import (
 
 // Load configs from a env file & sets them in environment variables .
 func LoadEnvVar() error {
-
 	f, err := os.Open(".env")
 
 	if err != nil {
