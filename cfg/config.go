@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 )
 
 // Load configs from a env file & sets them in environment variables .
@@ -46,23 +45,10 @@ func LoadEnvVar() error {
 	return nil
 }
 
-var (
-	serverHost = os.Getenv("SERV_HOST")
-	serverPort = os.Getenv("SERV_PORT")
-	DBName     = os.Getenv("DB_NAME")
-	DBUser     = os.Getenv("DB_USER")
-	DBPassword = os.Getenv("DB_PASSWORD")
-	DBPort     = os.Getenv("DB_PORT")
-	DBHost     = os.Getenv("DB_HOST")
-)
-
 // Server configuration description
 type Server struct {
-	Host         string
-	Port         string
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
+	Host string
+	Port string
 }
 
 // Database configuration description
@@ -85,15 +71,15 @@ type Options struct {
 func NewOptions() *Options {
 	return &Options{
 		Server{
-			Host: serverHost,
-			Port: ":" + serverPort,
+			Host: os.Getenv("SERV_HOST"),
+			Port: os.Getenv("SERV_PORT"),
 		},
 		DB{
-			Host:     DBHost,
-			Port:     DBPort,
-			Username: DBUser,
-			Password: DBPassword,
-			DBName:   DBName,
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			Username: os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			DBName:   os.Getenv("DB_NAME"),
 		},
 	}
 }
