@@ -5,6 +5,7 @@ package pg
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/cfg"
@@ -25,10 +26,8 @@ func (r *Repo) Add(user entities.User) error {
 	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
 	VALUES ($1, $2, $3, $4)`
 
-	_, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email,
-		user.Password)
-	if err != nil {
-		return err
+	if _, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email, user.Password); err != nil {
+		return fmt.Errorf("error inserting into database: %w", err)
 	}
 
 	return nil
