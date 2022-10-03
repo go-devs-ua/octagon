@@ -5,7 +5,6 @@ package pg
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/cfg"
@@ -22,14 +21,14 @@ func NewRepo(opt cfg.Options) *Repo {
 // Add meth implements usecase.UserRepository interface
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
-func (r *Repo) Add(usr entities.User) error {
-	sqlStatement := `
+func (r *Repo) Add(user entities.User) error {
+	const sqlStatement = `
 INSERT INTO users (first_name, last_name, email, password)
-VALUES ($1, $2, $3, $4)
-RETURNING id`
-	err := r.QueryRow(sqlStatement, usr.FirstName, usr.LastName, usr.Email, usr.Password)
+VALUES ($1, $2, $3, $4)`
+
+	_, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email, user.Password)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 
 	return nil
