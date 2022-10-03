@@ -10,7 +10,8 @@ import (
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		usr := entities.User{}
-		if err := DecodeBody(req, usr); err != nil {
+
+		if err := DecodeBody(req, &usr); err != nil {
 			return
 		}
 
