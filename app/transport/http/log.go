@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const logPath = "./log.txt"
+const logPath = "./octagon.log"
 
 type Log struct{}
 
