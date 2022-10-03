@@ -22,11 +22,11 @@ func NewRepo(opt cfg.Options) *Repo {
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
 func (r *Repo) Add(user entities.User) error {
-	const sqlStatement = `
-INSERT INTO "user" (first_name, last_name, email, password)
-VALUES ($1, $2, $3, $4)`
+	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
+	VALUES ($1, $2, $3, $4)`
 
-	_, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email, user.Password)
+	_, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email,
+		user.Password)
 	if err != nil {
 		return err
 	}
