@@ -21,7 +21,7 @@ func NewRepo(opt cfg.Options) *Repo {
 // Add meth implements usecase.UserRepository interface
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
-func (r *Repo) Add(usr entities.User) error {
+func (r *Repo) Add(user entities.User) error {
 	// INSERT INTO "users" ...
 	return nil
 }
