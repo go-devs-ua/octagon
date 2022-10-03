@@ -18,11 +18,11 @@ type User struct{}
 
 // Validate will validate User's signup data
 func (u User) Validate() error {
-	if err := checkName(u.Firstname); err != nil {
+	if err := checkName(u.FirstName); err != nil {
 		return err
 	}
-	if u.Lastname != "" {
-		if err := checkName(u.Lastname); err != nil {
+	if u.LastName != "" {
+		if err := checkName(u.LastName); err != nil {
 			return err
 		}
 	}
@@ -45,20 +45,18 @@ func checkName(name string) error {
 		invalidNameSymbols string = "!\"#$%&*+,./:;<=>?@[\\]^_`{|}~1234567890"
 	)
 	// Checking the length
-	nameRune := []rune(name)
-	nameLen := len(nameRune)
+	nameLen := len(name)
 	switch {
 	case nameLen < minNameLen:
-		return errors.New("Name is too short.\n")
+		return errors.New("Name is too short.")
 	case nameLen > maxNameLen:
-		return errors.New("Name is too long.\n")
+		return errors.New("Name is too long.")
 	}
 	// Checking for not allowed symbols
-	invalidNameSymbolsRune := []rune(invalidNameSymbols)
-	for _, v := range nameRune {
-		for _, e := range invalidNameSymbolsRune {
+	for _, v := range name {
+		for _, e := range invalidNameSymbols {
 			if v == e {
-				return errors.New("Name contains forbidden symbol: " + string(v) + ".\n")
+				return errors.New("Name contains forbidden symbol: " + string(v) + ".")
 			}
 		}
 	}
@@ -73,15 +71,13 @@ func checkMail(email string) error {
 		invalidEmailSymbols string = "\"(),:;<>[\\]"
 	)
 	// Checking the total length (allowed no more than 64+1+255=320 symbols)
-	mailRune := []rune(email)
-	mailLen := len(mailRune)
+	mailLen := len(email)
 	if mailLen > maxLocalEmailLen+1+maxDomainEmailLen {
 		return errors.New("Email contents too many symbols: " + strconv.Itoa(mailLen))
 	}
 	// Check if "at" is not first or last symbol, and it's number is 1
-	invalidMailSymbolsRune := []rune(invalidEmailSymbols)
 	var atPosition, dotPosition, atNum, dotNum int
-	for i, v := range mailRune {
+	for i, v := range email {
 		if v == '@' {
 			atPosition = i + 1
 			atNum += 1
@@ -97,11 +93,11 @@ func checkMail(email string) error {
 			}
 		}
 		if v < '!' || v > '~' { // Checking for non-ASCII symbols
-			return errors.New("Email contains non-latin or forbidden symbol: " + string(v) + ".\n")
+			return errors.New("Email contains non-latin or forbidden symbol: " + string(v) + ".")
 		}
-		for _, e := range invalidMailSymbolsRune { // Check not allowed symbols
+		for _, e := range invalidEmailSymbols { // Check not allowed symbols
 			if v == e {
-				return errors.New("Email contains forbidden symbol: " + string(v) + ".\n")
+				return errors.New("Email contains forbidden symbol: " + string(v) + ".")
 			}
 		}
 	}
@@ -126,8 +122,7 @@ func checkPass(pass string) error {
 		maxPassLen int = 256 // 256
 	)
 	// Checking the length
-	passRune := []rune(pass)
-	passLen := len(passRune)
+	passLen := len(pass)
 	if passLen < minPassLen {
 		return errors.New("Password must have at least 8 characters.")
 	}
@@ -135,7 +130,7 @@ func checkPass(pass string) error {
 		return errors.New("Password can not be more than 256 characters.")
 	}
 	// Checking for non-ASCII symbols
-	for _, v := range passRune {
+	for _, v := range pass {
 		if v < '!' || v > '~' {
 			return errors.New("Password can contain only Aa-Zz letters, 0-9 digits, and symbols !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
 		}
