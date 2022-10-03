@@ -16,3 +16,8 @@ type Router interface {
 	mapRoutes(UserHandler)
 	http.Handler
 }
+
+// Logger represents logger
+type Logger interface {
+	Printf(string, ...any)
+}
