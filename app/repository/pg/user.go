@@ -23,7 +23,7 @@ func NewRepo(opt cfg.Options) *Repo {
 // and will make our app flexible and maintainable.
 func (r *Repo) Add(user entities.User) error {
 	const sqlStatement = `
-INSERT INTO users (first_name, last_name, email, password)
+INSERT INTO "user" (first_name, last_name, email, password)
 VALUES ($1, $2, $3, $4)`
 
 	_, err := r.Exec(sqlStatement, user.FirstName, user.LastName, user.Email, user.Password)
