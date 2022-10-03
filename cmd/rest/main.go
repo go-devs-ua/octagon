@@ -47,7 +47,7 @@ func Run() error {
 
 func connectDB(opt cfg.Options) (*sql.DB, error) {
 	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
-		opt.DBConfig.Host, opt.DBConfig.Port, opt.DBConfig.Username, opt.DBConfig.password, opt.DBConfig.DBName)
+		opt.DB.Host, opt.DB.Port, opt.DB.Username, opt.DB.Password, opt.DB.DBName)
 
 	db, err := sql.Open("postgres", str)
 	if err != nil {
