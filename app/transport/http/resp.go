@@ -2,16 +2,16 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-
-	"github.com/go-devs-ua/octagon/app/entities"
 )
 
 // here we will be taking care of resp and stuff
 
-func DecodeBody(r *http.Request, u *entities.User) error {
-	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		return err
+func DecodeBody(req *http.Request, obj any) error {
+	if err := json.NewDecoder(req.Body).Decode(&obj); err != nil {
+		return fmt.Errorf("error occurred while decoding request: %w", err)
 	}
+	defer req.Body.Close()
 	return nil
 }

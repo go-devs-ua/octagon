@@ -8,12 +8,12 @@ package entities
 // Entities like User are the least likely to change
 // when something external changes.
 type User struct {
-	ID        string
-	Email     string
-	FirstName string
-	LastName  string
-	Password  string
-	CreatedAt string
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	FirstName string `json:"first-name"`
+	LastName  string `json:"last-name"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created-at"`
 }
 
 // TODO: sentinel errors
