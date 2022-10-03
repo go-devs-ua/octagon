@@ -7,7 +7,14 @@ package entities
 // User is key entity in our project
 // Entities like User are the least likely to change
 // when something external changes.
-type User struct{}
+type User struct {
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created_at"`
+}
 
 // TODO: sentinel errors
 
