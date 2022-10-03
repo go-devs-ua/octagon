@@ -7,7 +7,14 @@ package entities
 // User is key entity in our project
 // Entities like User are the least likely to change
 // when something external changes.
-type User struct{}
+type User struct {
+	ID        string
+	Email     string
+	FirstName string
+	LastName  string
+	Password  string
+	CreatedAt string
+}
 
 // TODO: sentinel errors
 
