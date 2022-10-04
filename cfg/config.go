@@ -5,17 +5,16 @@ package cfg
 
 import (
 	"bufio"
+	"errors"
 	"log"
 	"os"
 	"strings"
 )
 
-// Load configs from a env file & sets them in environment variables .
-func LoadEnvVar() error {
+// Load configs from a env file & sets them in environment variables
+func loadEnvVar() error {
 	f, err := os.Open(".env")
-
 	if err != nil {
-		log.Printf("%s", err)
 		return err
 	}
 
@@ -34,12 +33,14 @@ func LoadEnvVar() error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Printf("%s", err)
 		return err
 	}
 
 	for _, l := range lines {
 		pair := strings.Split(l, "=")
+		if len(pair) != 2 {
+			return errors.New("not enough data for the configuration in .env file")
+		}
 		os.Setenv(pair[0], pair[1])
 	}
 
@@ -67,10 +68,14 @@ type Options struct {
 	DB     DB
 }
 
-// NewOptions will create instance of Options
+// GetConfig will create instance of Options
 // that will be used im main package
-func NewOptions() *Options {
-	return &Options{
+func GetConfig() (Options, error) {
+	err := loadEnvVar()
+	if err != nil {
+		return Options{}, err
+	}
+	return Options{
 		Server{
 			Host: os.Getenv("SERV_HOST"),
 			Port: os.Getenv("SERV_PORT"),
@@ -82,5 +87,5 @@ func NewOptions() *Options {
 			Password: os.Getenv("DB_PASSWORD"),
 			DBName:   os.Getenv("DB_NAME"),
 		},
-	}
+	}, nil
 }

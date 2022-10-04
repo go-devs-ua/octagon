@@ -20,12 +20,10 @@ func main() {
 // Run will bind our layers all together
 func Run() error {
 	// TODO: Handle errors, migration, configs ...
-	err := cfg.LoadEnvVar()
+	opt, err := cfg.GetConfig()
 	if err != nil {
 		return err
 	}
-
-	opt := cfg.NewOptions()
 	repo := pg.NewRepo(opt)
 	logic := usecase.NewUser(repo)
 	mux := rest.NewRouter()

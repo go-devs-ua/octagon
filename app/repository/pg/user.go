@@ -14,7 +14,7 @@ import (
 type Repo struct{ sql.DB }
 
 // NewRepo will initialise new instance of Repo
-func NewRepo(opt *cfg.Options) *Repo {
+func NewRepo(opt cfg.Options) *Repo {
 	return &Repo{}
 }
 
