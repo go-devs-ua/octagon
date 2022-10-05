@@ -38,9 +38,8 @@ func (u User) Validate() error {
 
 func checkName(name string) error {
 	const (
-		minNameLen         int    = 2
-		maxNameLen         int    = 256
-		invalidNameSymbols string = "!\"#$%&*+,./:;<=>?@[\\]^_`{|}~1234567890"
+		minNameLen int = 2
+		maxNameLen int = 256
 	)
 	// Checking the length
 	nameLen := len(name)
@@ -51,12 +50,8 @@ func checkName(name string) error {
 		return errors.New("name is too long")
 	}
 	// Checking for forbidden symbols
-	for _, v := range name {
-		for _, e := range invalidNameSymbols {
-			if v == e {
-				return errors.New("name contains forbidden symbol: " + string(v))
-			}
-		}
+	if valid, _ := regexp.MatchString(`^[a-zA-Zа-яА-ЯҐІЇЄґіїє'\s]{2,256}$`, name); !valid {
+		return errors.New("invalid name")
 	}
 
 	return nil
@@ -64,10 +59,8 @@ func checkName(name string) error {
 
 func checkMail(email string) error {
 	const (
-		maxLocalEmailLen    int    = 64
-		maxDomainEmailLen   int    = 255
-		validEmailSymbols   string = "!#$%&'*+-/=?^_`{|}~"
-		invalidEmailSymbols string = "\"(),:;<>[\\]"
+		maxLocalEmailLen  int = 64
+		maxDomainEmailLen int = 255
 	)
 	// Checking the total length (allowed no more than 64+1+255=320 symbols)
 	mailLen := len(email)
@@ -75,7 +68,7 @@ func checkMail(email string) error {
 		return errors.New("email contents too many symbols: " + strconv.Itoa(mailLen))
 	}
 	// Checking for some email issues by regular expression
-	if valid, _ := regexp.MatchString(`^[^\.\\\(\)\@]{1,}@.{1,}[^-]$`, email); !valid {
+	if valid, _ := regexp.MatchString(`^([^\.@(),:;<>@[\\\]][\da-z!#$%&'*+-/=?^_\x60{|}~]+)@([^\-][\da-z-\.]+[^\-]+)+\.([a-z]{2,6})$`, email); !valid {
 		return errors.New("invalid email")
 	}
 
@@ -96,10 +89,8 @@ func checkPass(pass string) error {
 		return errors.New("password can not be more than 256 characters")
 	}
 	// Checking for non-ASCII symbols
-	for _, v := range pass {
-		if v < '!' || v > '~' {
-			return errors.New("password can contain only Aa-Zz letters, 0-9 digits, and symbols !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
-		}
+	if valid, _ := regexp.MatchString(`^[[:graph:]]$`, pass); !valid {
+		return errors.New("invalid password")
 	}
 
 	return nil
