@@ -5,12 +5,13 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+
 	"github.com/go-devs-ua/octagon/app/repository/pg"
 	rest "github.com/go-devs-ua/octagon/app/transport/http"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
 	"github.com/go-devs-ua/octagon/migration"
-	"log"
 )
 
 func main() {
@@ -36,7 +37,11 @@ func Run() error {
 	migration.Migrate(db)
 
 	logic := usecase.NewUser(repo)
-	h := rest.NewUserHandler(logic)
+
+	h := rest.Handlers{
+		UserHandler: rest.NewUserHandler(logic),
+	}
+
 	srv := rest.NewServer(opt, h)
 	if err := srv.Run(); err != nil {
 		return err
