@@ -12,10 +12,10 @@ import (
 type Server struct{ *http.Server }
 
 // NewServer will initialize the server
-func NewServer(opt cfg.Options, h UserHandler) *Server {
+func NewServer(opt cfg.Options, handler UserHandler) *Server {
 	r := new(mux.Router)
 
-	attachUserEndpoints(r, h)
+	attachUserEndpoints(r, handler)
 
 	return &Server{
 		Server: &http.Server{
