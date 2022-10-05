@@ -41,6 +41,7 @@ func loadEnvVar() error {
 		if len(pair) != 2 {
 			return errors.New("not enough data for the configuration in .env file")
 		}
+
 		os.Setenv(pair[0], pair[1])
 	}
 
@@ -71,10 +72,10 @@ type Options struct {
 // GetConfig will create instance of Options
 // that will be used im main package
 func GetConfig() (Options, error) {
-	err := loadEnvVar()
-	if err != nil {
+	err := loadEnvVar(); if err != nil {
 		return Options{}, err
 	}
+
 	return Options{
 		Server{
 			Host: os.Getenv("SERV_HOST"),
