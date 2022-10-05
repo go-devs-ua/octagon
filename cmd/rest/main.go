@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
 	rest "github.com/go-devs-ua/octagon/app/transport/http"
@@ -17,6 +18,7 @@ import (
 func main() {
 	if err := Run(); err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 }
 
@@ -37,8 +39,7 @@ func Run() error {
 	migration.Migrate(db)
 
 	logic := usecase.NewUser(repo)
-	mux := rest.NewRouter()
-	srv := rest.NewServer(logic, mux)
+	srv := rest.NewServer(opt, logic)
 	if err := srv.Run(); err != nil {
 		return err
 	}

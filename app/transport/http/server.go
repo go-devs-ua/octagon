@@ -2,23 +2,27 @@ package http
 
 import (
 	"fmt"
+	"github.com/go-devs-ua/octagon/cfg"
+	"github.com/gorilla/mux"
 	"net/http"
+	"time"
 )
 
 // Server is simple server
 type Server struct{ *http.Server }
 
 // NewServer will initialize the server
-// that would be router type agnostic
-// we can switch to any router type
-// that implements Router interface
-func NewServer(uu UserUsecase, r Router) *Server {
-	hdl := NewUserHandler(uu)
-	r.mapRoutes(hdl)
-	// TODO: Add config
+func NewServer(opt cfg.Options, uc UserUsecase) *Server {
+	r := mux.NewRouter()
+
+	h := NewUserHandler(uc)
+	r.Handle("/user", h.CreateUser()).Methods(http.MethodPost)
+
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: r,
+		Addr:         opt.Server.Host,
+		Handler:      http.TimeoutHandler(r, 3*time.Second, "Connection timeout"),
+		ReadTimeout:  2 * time.Second,
+		WriteTimeout: 5 * time.Second,
 	}
 
 	return &Server{srv}
