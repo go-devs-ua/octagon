@@ -72,7 +72,7 @@ type Options struct {
 // GetConfig will create instance of Options
 // that will be used im main package
 func GetConfig() (Options, error) {
-	err := loadEnvVar(); if err != nil {
+	if err := loadEnvVar(); err != nil {
 		return Options{}, err
 	}
 
