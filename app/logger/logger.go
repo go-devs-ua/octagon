@@ -31,13 +31,13 @@ func (w *Wrapper) Errorf(format string, val ...any) {
 }
 
 func (w *Wrapper) Debugf(format string, val ...any) {
-	w.log.Errorf(format, val)
+	w.log.Debugf(format, val)
 }
 
 func (w *Wrapper) Infof(format string, val ...any) {
-	w.log.Errorf(format, val)
+	w.log.Infof(format, val)
 }
 
 func (w *Wrapper) Warnf(format string, val ...any) {
-	w.log.Errorf(format, val)
+	w.log.Warnf(format, val)
 }
