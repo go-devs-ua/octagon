@@ -4,7 +4,7 @@ package http
 // which consist of embedded UserUsecase interface
 type UserHandler struct {
 	usecase UserUsecase
-	logger  Logger
+	log     Logger
 }
 
 // NewUserHandler will return a new instance
@@ -12,6 +12,6 @@ type UserHandler struct {
 func NewUserHandler(usecase UserUsecase, logger Logger) UserHandler {
 	return UserHandler{
 		usecase: usecase,
-		logger:  logger,
+		log:     logger,
 	}
 }

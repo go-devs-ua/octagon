@@ -19,8 +19,5 @@ type Router interface {
 
 // Logger represents logger
 type Logger interface {
-	Errorf(string, ...any)
-	Debugf(string, ...any)
-	Infof(string, ...any)
-	Warnf(string, ...any)
+	Printf(string, ...any)
 }
