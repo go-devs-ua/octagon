@@ -20,7 +20,6 @@ func WriteJSONResponse(rw http.ResponseWriter, statusCode int, data interface{})
 	if data == nil {
 		log.Println("Data can not be empty") // we need to log the error when we select the logger
 		WriteJSONResponse(rw, statusCode, errRespond)
-		return
 	}
 
 	if err := json.NewEncoder(rw).Encode(data); err != nil {
