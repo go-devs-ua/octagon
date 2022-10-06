@@ -40,9 +40,12 @@ func Run() error {
 	migration.Migrate(db)
 
 	logic := usecase.NewUser(repo)
-	mux := rest.NewRouter()
-  
-	srv := rest.NewServer(logic, mux)
+
+	h := rest.Handlers{
+		UserHandler: rest.NewUserHandler(logic),
+	}
+
+	srv := rest.NewServer(opt, h)
 	if err := srv.Run(); err != nil {
 		return err
 	}
