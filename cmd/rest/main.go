@@ -23,7 +23,10 @@ func main() {
 // Run will bind our layers all together
 func Run() error {
 	// TODO: Handle errors, migration, configs ...
-	opt := cfg.NewOptions()
+	opt, err := cfg.GetConfig()
+	if err != nil {
+		return err
+	}
 
 	db, err := connectDB(opt)
 	if err != nil {
@@ -46,6 +49,7 @@ func Run() error {
 	if err := srv.Run(); err != nil {
 		return err
 	}
+  
 	return nil
 }
 
