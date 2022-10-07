@@ -6,8 +6,10 @@ import (
 	"go.uber.org/zap"
 )
 
+// Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 
+// New initialize logger
 func New() *Logger {
 	// TODO: Extend config and make adjustments
 	logger, err := zap.NewDevelopment()
@@ -18,6 +20,7 @@ func New() *Logger {
 	return &Logger{logger.Sugar()}
 }
 
+// Flush will flush any buffered log entries.
 func (w *Logger) Flush() {
 	if err := w.log.Sync(); err != nil {
 		w.log.Error(err)
