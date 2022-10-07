@@ -32,7 +32,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		if err := uh.usecase.Signup(user); err != nil {
-			// TODO: Handle errors gracefully
+			// TODO: Handle errors gracefully.  We could create {"error_code": "message"} map to handle errors from repo
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict})
 				return
