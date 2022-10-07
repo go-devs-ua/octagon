@@ -1,4 +1,4 @@
-package logger
+package lgr
 
 import (
 	"log"
@@ -28,17 +28,17 @@ func (w *Logger) Flush() {
 }
 
 func (w *Logger) Errorf(format string, val ...any) {
-	w.log.Errorf(format, val)
+	w.log.Errorf(format, val...)
 }
 
 func (w *Logger) Debugf(format string, val ...any) {
-	w.log.Debugf(format, val)
+	w.log.Debugf(format, val...)
 }
 
 func (w *Logger) Infof(format string, val ...any) {
-	w.log.Infof(format, val)
+	w.log.Infof(format, val...)
 }
 
 func (w *Logger) Warnf(format string, val ...any) {
-	w.log.Warnf(format, val)
+	w.log.Warnf(format, val...)
 }

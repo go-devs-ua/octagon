@@ -2,11 +2,13 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/go-devs-ua/octagon/lgr"
 )
 
-// Response will wrap message that will be sent in JSON format
+// Response will wrap message
+// that will be sent in JSON format
 type Response struct {
 	Message string `json:"message"`
 }
@@ -18,16 +20,16 @@ type Response struct {
 //  after an error occurs
 
 // WriteJSONResponse writes JSON response
-func WriteJSONResponse(rw http.ResponseWriter, statusCode int, data interface{}) {
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(statusCode)
+func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *lgr.Logger) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
 
 	if data == nil {
-		log.Println("Data is empty") // we need to log the error when we select the logger
+		logger.Warnf("%s\n", "Data is empty")
 		return
 	}
 
-	if err := json.NewEncoder(rw).Encode(data); err != nil {
-		log.Printf("could not encode json: %v", err) // we need to log the error when we select the logge
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		logger.Errorf("could not encode json: %v", err)
 	}
 }
