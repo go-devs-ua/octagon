@@ -13,17 +13,12 @@ func WriteJSONResponse(rw http.ResponseWriter, statusCode int, data interface{})
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(statusCode)
 
-	errRespond := map[string]interface{}{
-		"error": InternalServerError,
-	}
-
 	if data == nil {
-		log.Println("Data can not be empty") // we need to log the error when we select the logger
-		WriteJSONResponse(rw, statusCode, errRespond)
+		log.Println("Data is empty") // we need to log the error when we select the logger
+		return
 	}
 
 	if err := json.NewEncoder(rw).Encode(data); err != nil {
 		log.Printf("could not encode json: %v", err) //we need to log the error when we select the logge
-		WriteJSONResponse(rw, statusCode, errRespond)
 	}
 }
