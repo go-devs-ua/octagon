@@ -19,6 +19,7 @@ func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
 		return err
 	}
+
 	if u.LastName != "" {
 		if err := checkName(u.LastName); err != nil {
 			return err
@@ -37,20 +38,7 @@ func (u User) Validate() error {
 }
 
 func checkName(name string) error {
-	const (
-		minNameLen int = 2
-		maxNameLen int = 256
-	)
-	// Checking the length
-	nameLen := len(name)
-	switch {
-	case nameLen < minNameLen:
-		return errors.New("name is too short")
-	case nameLen > maxNameLen:
-		return errors.New("name is too long")
-	}
-	// Checking for forbidden symbols
-	if valid, _ := regexp.MatchString(`^[a-zA-Zа-яА-ЯҐІЇЄґіїє'\s]{2,256}$`, name); !valid {
+	if valid, _ := regexp.MatchString(`^[\p{L}&\s-\\'’.]{2,256}$`, name); !valid {
 		return errors.New("invalid name")
 	}
 
@@ -68,28 +56,15 @@ func checkMail(email string) error {
 		return errors.New("email contents too many symbols: " + strconv.Itoa(mailLen))
 	}
 	// Checking for some email issues by regular expression
-	if valid, _ := regexp.MatchString(`^([^\.@(),:;<>@[\\\]][\da-z!#$%&'*+-/=?^_\x60{|}~]+)@([^\-][\da-z-\.]+[^\-]+)+\.([a-z]{2,6})$`, email); !valid {
-		return errors.New("invalid email")
+	if valid, _ := regexp.MatchString("(?i)"+`^([^\.@(),:;<>@[\\\]][\da-z!#$%&'*+,\-/=?^_\x60{|}~]+.)+@([^\-.][\da-z-]*[^.-]\.)+([a-z]{2,6})$`, email); !valid {
+		return errors.New("email does not match with regexp \"(?i)\"+`^([^\\.@(),:;<>@[\\\\]][\\da-z!#$%&'*+,\\-/=?^_\\x60{|}~]+.)+@([^\\-.][\\da-z-]*[^.-]\\.)+([a-z]{2,6})$`")
 	}
 
 	return nil
 }
 
 func checkPass(pass string) error {
-	const (
-		minPassLen int = 8
-		maxPassLen int = 256
-	)
-	// Checking the length
-	passLen := len(pass)
-	if passLen < minPassLen {
-		return errors.New("password must have at least 8 characters")
-	}
-	if passLen > maxPassLen {
-		return errors.New("password can not be more than 256 characters")
-	}
-	// Checking for non-ASCII symbols
-	if valid, _ := regexp.MatchString(`^[[:graph:]]$`, pass); !valid {
+	if valid, _ := regexp.MatchString(`^[[:graph:]]{2,256}$`, pass); !valid {
 		return errors.New("invalid password")
 	}
 
