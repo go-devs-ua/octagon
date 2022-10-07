@@ -27,7 +27,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}()
 
 		if err := user.Validate(); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{err.Error()})
+			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()})
 			return
 		}
 
