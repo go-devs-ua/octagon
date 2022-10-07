@@ -32,7 +32,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		if err := uh.usecase.Signup(user); err != nil {
-			// It is driving me nuts, please help. We need to decouple from pq package
+			// TODO: Handle errors gracefully
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict})
 				return
@@ -41,7 +41,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr})
 			return
 		}
-		// we could pass user here
+
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated})
 	})
 }
