@@ -34,7 +34,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		if err := uh.usecase.Signup(user); err != nil {
 			uh.logger.Debugf("%+v\n", err)
-
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict})
