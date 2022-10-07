@@ -51,20 +51,20 @@ func checkMail(email string) error {
 		maxDomainEmailLen int = 255
 	)
 	// Checking the total length (allowed no more than 64+1+255=320 symbols)
-	mailLen := len(email)
-	if mailLen > maxLocalEmailLen+1+maxDomainEmailLen {
-		return errors.New("email contents too many symbols: " + strconv.Itoa(mailLen))
+	emailLen := len(email)
+	if emailLen > maxLocalEmailLen+1+maxDomainEmailLen {
+		return errors.New("email contents too many symbols: " + strconv.Itoa(emailLen))
 	}
 	// Checking for some email issues by regular expression
-	if valid, _ := regexp.MatchString("(?i)"+`^([^\.@(),:;<>@[\\\]][\da-z!#$%&'*+,\-/=?^_\x60{|}~]+.)+@([^\-.][\da-z-]*[^.-]\.)+([a-z]{2,6})$`, email); !valid {
-		return errors.New("email does not match with regexp \"(?i)\"+`^([^\\.@(),:;<>@[\\\\]][\\da-z!#$%&'*+,\\-/=?^_\\x60{|}~]+.)+@([^\\-.][\\da-z-]*[^.-]\\.)+([a-z]{2,6})$`")
+	if valid, _ := regexp.MatchString("(?i)"+`^([^\.@(),:;<>@[\\\]]?[\da-z!#$%&'*+,\-/=?^_\x60{|}~]+.?)+@([^.-][\da-z-]*[^.-]\.?)+([a-z]{2,6})$`, email); !valid {
+		return errors.New("email does not match with regexp \"(?i)\"+`^([^\\.@(),:;<>@[\\\\\\]]?[\\da-z!#$%&'*+,\\-/=?^_\\x60{|}~]+.?)+@([^.-][\\da-z-]*[^.-]\\.?)+([a-z]{2,6})$`")
 	}
 
 	return nil
 }
 
-func checkPass(pass string) error {
-	if valid, _ := regexp.MatchString(`^[[:graph:]]{2,256}$`, pass); !valid {
+func checkPass(password string) error {
+	if valid, _ := regexp.MatchString(`^[[:graph:]]{2,256}$`, password); !valid {
 		return errors.New("invalid password")
 	}
 
