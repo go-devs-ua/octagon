@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -17,22 +16,26 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest})
+			uh.logger.Errorf("%+v\n", err)
 			return
 		}
 
 		defer func() {
 			if err := req.Body.Close(); err != nil {
-				log.Println(err)
+				uh.logger.Warnf("%+v\n", err)
 			}
 		}()
 
 		if err := user.Validate(); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()})
+			uh.logger.Errorf("%+v\n", err)
 			return
 		}
 
 		if err := uh.usecase.Signup(user); err != nil {
-			// TODO: Handle errors gracefully.  We could create {"error_code": "message"} map to handle errors from repo
+			uh.logger.Debugf("%+v\n", err)
+
+			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict})
 				return
@@ -43,5 +46,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated})
+		uh.logger.Debugf("%s :%+v\n", MsgUserCreated, user)
 	})
 }
