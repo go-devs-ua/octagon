@@ -1,8 +1,8 @@
 package http
 
 const (
-	MsgUserCreated      = "user successfully created"
-	MsgEmailConflict    = "email is already taken"
-	MsgInternalSeverErr = "internal server error"
-	MsgBadRequest       = "request is bad"
+	MsgUserCreated      = "User successfully created"
+	MsgEmailConflict    = "Email is already taken"
+	MsgInternalSeverErr = "Internal server error"
+	MsgBadRequest       = "Bad request"
 )
