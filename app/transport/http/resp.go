@@ -25,7 +25,6 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *
 	w.WriteHeader(statusCode)
 
 	if data == nil {
-		logger.Warnf("%s\n", "Data is empty")
 		return
 	}
 
