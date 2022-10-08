@@ -28,7 +28,7 @@ func Run() error {
 
 	opt, err := cfg.GetConfig()
 	if err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("Failed to get config from .env: %+v\n", err)
 		return err
 	}
 
@@ -39,7 +39,7 @@ func Run() error {
 	}
 
 	repo := pg.NewRepo(db)
-	logger.Infof("%s", "Connected to DB")
+	logger.Infof("%s\n", "Connection to database successfully created")
 
 	if err := migration.Migrate(db, logger); err != nil {
 		logger.Errorf("%+v\n", err)
