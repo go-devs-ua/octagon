@@ -22,7 +22,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		defer func() {
 			if err := req.Body.Close(); err != nil {
-				uh.logger.Warnf("%+v\n", err)
+				uh.logger.Warnf("closing request body failed: %+v\n", err)
 			}
 		}()
 
