@@ -47,19 +47,16 @@ func (l *Logger) Warnf(format string, val ...any) {
 }
 
 // LogRequest will log http.Request parameters
-func (l *Logger) LogRequest(req *http.Request) {
-	l.log.Debugf("===========================Request start=========================\n")
-	defer l.log.Debugf("===========================Request end===========================\n")
-
-	l.log.Debugf("URI: %v\n", req.RequestURI)
-	l.log.Debugf("Method: %v\n", req.Method)
-	l.log.Debugf("Headers: %v\n", req.Header)
-
+func (l *Logger) LogRequest(req *http.Request, msg string) {
 	body, err := req.GetBody()
 	if err != nil {
-		l.log.Debugf("Failed getting request body: %+v\n", err)
-		return
+		l.log.Debugf("Failed getting request body while logging: %+v\n", err)
 	}
 
-	l.log.Debugf("Body: %v\n", body)
+	l.log.Infow(msg,
+		"URI", req.RequestURI,
+		"Method", req.Method,
+		"Header", req.Header,
+		"Body", body,
+	)
 }
