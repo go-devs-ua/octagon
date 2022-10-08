@@ -39,7 +39,7 @@ func Run() error {
 	}
 
 	repo := pg.NewRepo(db)
-	logger.Infof("%s\n", "Connection to database successfully created")
+	logger.Infof("Connection to database successfully created\n")
 
 	if err := migration.Migrate(db, logger); err != nil {
 		logger.Errorf("Failed making migrations: %+v\n", err)
