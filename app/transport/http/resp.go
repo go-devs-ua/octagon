@@ -20,9 +20,9 @@ type Response struct {
 //  after an error occurs
 
 // WriteJSONResponse writes JSON response
-func WriteJSONResponse(rw http.ResponseWriter, statusCode int, data any, logger *lgr.Logger) {
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(statusCode)
+func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *lgr.Logger) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
 
 	if data == nil {
 		if statusCode != http.StatusNoContent {
@@ -31,7 +31,7 @@ func WriteJSONResponse(rw http.ResponseWriter, statusCode int, data any, logger 
 		return
 	}
 
-	if err := json.NewEncoder(rw).Encode(data); err != nil {
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		logger.Errorf("Failed encoding to JSON %+v; with status code %d: %+v\n", data, statusCode, err)
 	}
 }
