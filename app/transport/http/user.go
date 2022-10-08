@@ -55,6 +55,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
-		uh.logger.Infof("%T successfully created: %+v\n", user)
+		uh.logger.Infof("%T successfully created: %+v\n", user, user)
 	})
 }
