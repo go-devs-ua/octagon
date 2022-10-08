@@ -21,24 +21,24 @@ func New() *Logger {
 }
 
 // Flush will flush any buffered log entries.
-func (w *Logger) Flush() {
-	if err := w.log.Sync(); err != nil {
-		w.log.Error(err)
+func (l *Logger) Flush() {
+	if err := l.log.Sync(); err != nil {
+		l.log.Error(err)
 	}
 }
 
-func (w *Logger) Errorf(format string, val ...any) {
-	w.log.Errorf(format, val...)
+func (l *Logger) Errorf(format string, val ...any) {
+	l.log.Errorf(format, val...)
 }
 
-func (w *Logger) Debugf(format string, val ...any) {
-	w.log.Debugf(format, val...)
+func (l *Logger) Debugf(format string, val ...any) {
+	l.log.Debugf(format, val...)
 }
 
-func (w *Logger) Infof(format string, val ...any) {
-	w.log.Infof(format, val...)
+func (l *Logger) Infof(format string, val ...any) {
+	l.log.Infof(format, val...)
 }
 
-func (w *Logger) Warnf(format string, val ...any) {
-	w.log.Warnf(format, val...)
+func (l *Logger) Warnf(format string, val ...any) {
+	l.log.Warnf(format, val...)
 }
