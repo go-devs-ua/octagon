@@ -16,7 +16,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest}, uh.logger)
-			uh.logger.Errorf("%+v\n", err)
+			uh.logger.Errorf("JSON decode failed: %+v\n", err)
 			return
 		}
 
