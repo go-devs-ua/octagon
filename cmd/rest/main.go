@@ -42,7 +42,7 @@ func Run() error {
 	logger.Infof("%s\n", "Connection to database successfully created")
 
 	if err := migration.Migrate(db, logger); err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("Failed making migrations: %+v\n", err)
 		return err
 	}
 
@@ -52,7 +52,7 @@ func Run() error {
 
 	srv := rest.NewServer(opt, handlers)
 	if err := srv.Run(); err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("Failed loading server: %+v\n", err)
 		return err
 	}
 

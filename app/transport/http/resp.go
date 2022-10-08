@@ -25,10 +25,13 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *
 	w.WriteHeader(statusCode)
 
 	if data == nil {
+		if statusCode != http.StatusNoContent {
+			logger.Errorf("Invalid data, expected nil")
+		}
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		logger.Errorf("JSON encode failed: %+v\n", err)
+		logger.Errorf("Failed encoding JSON for object %+v; with status code %d: %+v\n", data, statusCode, err)
 	}
 }
