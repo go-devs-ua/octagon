@@ -29,6 +29,6 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *
 	}
 
 	if err := json.NewEncoder(w).Encode(data); err != nil {
-		logger.Errorf("JSON decode failed: %+v\n", err)
+		logger.Errorf("JSON encode failed: %+v\n", err)
 	}
 }
