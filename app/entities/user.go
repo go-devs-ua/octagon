@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type User struct {
@@ -47,15 +48,18 @@ func checkName(name string) error {
 
 func checkMail(email string) error {
 	const (
-		maxLocalEmailLen  int = 64
-		maxDomainEmailLen int = 255
+		maxLocalBytes  int = 64
+		maxDomainBytes int = 255
 	)
-	// Checking the total length (allowed no more than 64+1+255=320 symbols)
-	emailLen := len(email)
-	if emailLen > maxLocalEmailLen+1+maxDomainEmailLen {
-		return errors.New("email contents too many symbols: " + strconv.Itoa(emailLen))
+	// Checking the lengths of local and domain parts
+	atIndex := strings.IndexByte(email, '@')
+	if atIndex > maxLocalBytes {
+		return errors.New("local part of email contains too many bytes: " + strconv.Itoa(atIndex))
 	}
-	// Checking for some email issues by regular expression
+	if localPartLen := len(email) - atIndex - 1; localPartLen > maxDomainBytes {
+		return errors.New("domain part of email contains too many bytes: " + strconv.Itoa(localPartLen))
+	}
+	// Checking for other email issues by regular expression
 	if valid, _ := regexp.MatchString("(?i)"+`^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`, email); !valid {
 		return errors.New("invalid email (does not match ^(?:[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+)*)@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?)$")
 	}
