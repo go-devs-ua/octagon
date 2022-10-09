@@ -3,7 +3,6 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -13,35 +12,40 @@ import (
 // CreateUser will handle user creation
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		user := entities.User{}
+		var user entities.User
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest})
+			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest}, uh.logger)
+			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v\n", req, err)
 			return
 		}
 
 		defer func() {
 			if err := req.Body.Close(); err != nil {
-				log.Println(err)
+				uh.logger.Warnf("Failed closing request %+v: %+v\n", req, err)
 			}
 		}()
 
 		if err := user.Validate(); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()})
+			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()}, uh.logger)
+			uh.logger.Errorf("Failed validating %+v: %+v\n", user, err)
 			return
 		}
 
 		if err := uh.usecase.Signup(user); err != nil {
-			// TODO: Handle errors gracefully.  We could create {"error_code": "message"} map to handle errors from repo
+			uh.logger.Debugf("Failed creating %+v: %+v\n", user, err)
+
+			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
-				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict})
+				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr})
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr}, uh.logger)
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated})
+		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
+		uh.logger.Infof("%T successfully created: %+v\n", user, user)
 	})
 }

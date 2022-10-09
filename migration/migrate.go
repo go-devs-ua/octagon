@@ -3,18 +3,19 @@ package migration
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/go-devs-ua/octagon/lgr"
 )
 
-// Execute migrations.
+// Migrate executes migrations.
 // Use "migrate-up" argument after run of program. It will create new table
 // Or use "migrate-down" - that will remove table
 // Example: go run main.go migrate-up
-func Migrate(db *sql.DB) error {
+func Migrate(db *sql.DB, logger *lgr.Logger) error {
 	for _, arg := range os.Args {
 		if arg == "migrate-up" {
-			log.Println("Migration starts up")
+			logger.Infof("%s\n", "Migration starts up")
 
 			if err := execMigrationQuery(db, "./migration/migrationsUp.sql"); err != nil {
 				return fmt.Errorf("migration up failed: %w", err)
@@ -22,7 +23,7 @@ func Migrate(db *sql.DB) error {
 		}
 
 		if arg == "migrate-down" {
-			log.Println("Migration starts down")
+			logger.Infof("%s\n", "Migration starts down")
 
 			if err := execMigrationQuery(db, "./migration/migrationsDown.sql"); err != nil {
 				return fmt.Errorf("migration down failed: %w", err)

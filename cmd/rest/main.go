@@ -11,6 +11,7 @@ import (
 	rest "github.com/go-devs-ua/octagon/app/transport/http"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
+	"github.com/go-devs-ua/octagon/lgr"
 	"github.com/go-devs-ua/octagon/migration"
 )
 
@@ -22,34 +23,39 @@ func main() {
 
 // Run will bind our layers all together
 func Run() error {
-	// TODO: Handle errors, migration, configs ...
+	logger := lgr.New()
+	defer logger.Flush()
+
 	opt, err := cfg.GetConfig()
 	if err != nil {
+		logger.Errorf("Failed to get config from .env: %+v\n", err)
 		return err
 	}
 
 	db, err := connectDB(opt)
 	if err != nil {
+		logger.Errorf("%+v\n", err)
 		return err
 	}
 
 	repo := pg.NewRepo(db)
+	logger.Infof("Connection to database successfully created\n")
 
-	log.Println("Connected to DB")
-
-	migration.Migrate(db)
-
-	logic := usecase.NewUser(repo)
-
-	h := rest.Handlers{
-		UserHandler: rest.NewUserHandler(logic),
-	}
-
-	srv := rest.NewServer(opt, h)
-	if err := srv.Run(); err != nil {
+	if err := migration.Migrate(db, logger); err != nil {
+		logger.Errorf("Failed making migrations: %+v\n", err)
 		return err
 	}
-  
+
+	handlers := rest.Handlers{
+		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
+	}
+
+	srv := rest.NewServer(opt, handlers)
+	if err := srv.Run(); err != nil {
+		logger.Errorf("Failed loading server: %+v\n", err)
+		return err
+	}
+
 	return nil
 }
 
