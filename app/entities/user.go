@@ -2,8 +2,8 @@ package entities
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -50,18 +50,24 @@ func checkMail(email string) error {
 	const (
 		maxLocalBytes  int = 64
 		maxDomainBytes int = 255
+		regEx              = "(?i)" + `^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
+		regExText          = "\"(?i)\"+`^(?:[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+)*)@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?)$`"
 	)
 	// Checking the lengths of local and domain parts
 	atIndex := strings.IndexByte(email, '@')
 	if atIndex > maxLocalBytes {
-		return errors.New("local part of email contains too many bytes: " + strconv.Itoa(atIndex))
+		return fmt.Errorf("local part of email contains too many bytes: %v", atIndex)
 	}
 	if localPartLen := len(email) - atIndex - 1; localPartLen > maxDomainBytes {
-		return errors.New("domain part of email contains too many bytes: " + strconv.Itoa(localPartLen))
+		return fmt.Errorf("domain part of email contains too many bytes: %v", localPartLen)
 	}
 	// Checking for other email issues by regular expression
-	if valid, _ := regexp.MatchString("(?i)"+`^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`, email); !valid {
-		return errors.New("invalid email (does not match ^(?:[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+)*)@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?)$")
+	valid, err := regexp.MatchString(regEx, email)
+	if err != nil {
+		return fmt.Errorf("matching regex failed: %v", err)
+	}
+	if !valid {
+		return fmt.Errorf("email does not match with regex: %s", regExText)
 	}
 
 	return nil
