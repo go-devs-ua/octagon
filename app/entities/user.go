@@ -50,8 +50,7 @@ func checkMail(email string) error {
 	const (
 		maxLocalBytes  int = 64
 		maxDomainBytes int = 255
-		regEx              = "(?i)" + `^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
-		regExText          = "\"(?i)\"+`^(?:[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+)*)@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?)$`"
+		regEx              = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
 	)
 	// Checking the lengths of local and domain parts
 	atIndex := strings.IndexByte(email, '@')
@@ -67,12 +66,11 @@ func checkMail(email string) error {
 		return fmt.Errorf("matching regex failed: %v", err)
 	}
 	if !valid {
-		return fmt.Errorf("email does not match with regex: %s", regExText)
+		return fmt.Errorf("email does not match with regex: `%s`", regEx)
 	}
 
 	return nil
 }
-
 func checkPass(password string) error {
 	if valid, _ := regexp.MatchString(`^[[:graph:]]{8,256}$`, password); !valid {
 		return errors.New("invalid password")
