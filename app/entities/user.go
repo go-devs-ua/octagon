@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -16,14 +15,26 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 }
 
+const (
+	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
+	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
+	passMask = `^[[:graph:]]{8,256}$`
+)
+
+var (
+	nameRegex = regexp.MustCompile(nameMask)
+	mailRegex = regexp.MustCompile(mailMask)
+	passRegex = regexp.MustCompile(passMask)
+)
+
 func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
 		return err
 	}
 
-	if u.LastName != "" {
+	if len(u.LastName) > 1 {
 		if err := checkName(u.LastName); err != nil {
-			return err
+			return fmt.Errorf("lastname does not match with regex: `%s`", nameMask)
 		}
 	}
 
@@ -39,8 +50,8 @@ func (u User) Validate() error {
 }
 
 func checkName(name string) error {
-	if valid, _ := regexp.MatchString(`^[\p{L}&\s-\\'’.]{2,256}$`, name); !valid {
-		return errors.New("invalid name")
+	if valid := nameRegex.MatchString(name); !valid {
+		return fmt.Errorf("firstname does not match with regex: `%s`", nameMask)
 	}
 
 	return nil
@@ -50,7 +61,6 @@ func checkMail(email string) error {
 	const (
 		maxLocalBytes  int = 64
 		maxDomainBytes int = 255
-		regEx              = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
 	)
 	// Checking the lengths of local and domain parts
 	atIndex := strings.IndexByte(email, '@')
@@ -61,19 +71,16 @@ func checkMail(email string) error {
 		return fmt.Errorf("domain part of email contains too many bytes: %v", localPartLen)
 	}
 	// Checking for other email issues by regular expression
-	valid, err := regexp.MatchString(regEx, email)
-	if err != nil {
-		return fmt.Errorf("matching regex failed: %v", err)
-	}
-	if !valid {
-		return fmt.Errorf("email does not match with regex: `%s`", regEx)
+	if valid := mailRegex.MatchString(email); !valid {
+		return fmt.Errorf("email does not match with regex: `%s`", mailMask)
 	}
 
 	return nil
 }
+
 func checkPass(password string) error {
-	if valid, _ := regexp.MatchString(`^[[:graph:]]{8,256}$`, password); !valid {
-		return errors.New("invalid password")
+	if valid := passRegex.MatchString(password); !valid {
+		return fmt.Errorf("password does not match with regex: `%s`", passMask)
 	}
 
 	return nil
