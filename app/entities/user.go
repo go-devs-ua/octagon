@@ -29,12 +29,12 @@ var (
 
 func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
-		return fmt.Errorf("%v", "first"+err.Error())
+		return fmt.Errorf("invalid first name: %v", err.Error())
 	}
 
 	if len(u.LastName) > 1 {
 		if err := checkName(u.LastName); err != nil {
-			return fmt.Errorf("%v", "last"+err.Error())
+			return fmt.Errorf("invalid last name: %v", err.Error())
 		}
 	}
 
