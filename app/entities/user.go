@@ -29,12 +29,12 @@ var (
 
 func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
-		return err
+		return fmt.Errorf("%v", "first"+err.Error())
 	}
 
 	if len(u.LastName) > 1 {
 		if err := checkName(u.LastName); err != nil {
-			return fmt.Errorf("lastname does not match with regex: `%s`", nameMask)
+			return fmt.Errorf("%v", "last"+err.Error())
 		}
 	}
 
@@ -51,7 +51,7 @@ func (u User) Validate() error {
 
 func checkName(name string) error {
 	if valid := nameRegex.MatchString(name); !valid {
-		return fmt.Errorf("firstname does not match with regex: `%s`", nameMask)
+		return fmt.Errorf("name does not match with regex: `%s`", nameMask)
 	}
 
 	return nil
