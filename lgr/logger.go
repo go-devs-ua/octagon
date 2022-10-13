@@ -60,3 +60,7 @@ func (l *Logger) LogRequest(req *http.Request) {
 		"Body", body,
 	)
 }
+
+func (l *Logger) Infow(msg string, keyVal ...any) {
+	l.log.Infow(msg, keyVal...)
+}
