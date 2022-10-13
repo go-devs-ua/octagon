@@ -22,7 +22,6 @@ func WithLogRequest(logger *lgr.Logger) Middleware {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			defer logger.Infow("Request:",
-				"Header", req.Header,
 				"Method", req.Method,
 				"URL", req.URL,
 				"User-Agent", req.UserAgent(),
