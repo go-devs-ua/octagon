@@ -2,7 +2,6 @@ package lgr
 
 import (
 	"log"
-	"net/http"
 
 	"go.uber.org/zap"
 )
@@ -44,21 +43,6 @@ func (l *Logger) Infof(format string, val ...any) {
 
 func (l *Logger) Warnf(format string, val ...any) {
 	l.log.Warnf(format, val...)
-}
-
-// LogRequest will log http.Request parameters
-func (l *Logger) LogRequest(req *http.Request) {
-	body, err := req.GetBody()
-	if err != nil {
-		l.log.Debugf("Failed getting request body while logging: %+v\n", err)
-	}
-
-	l.log.Infow("Request",
-		"URI", req.RequestURI,
-		"Method", req.Method,
-		"Header", req.Header,
-		"Body", body,
-	)
 }
 
 func (l *Logger) Infow(msg string, keyVal ...any) {
