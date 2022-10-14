@@ -1,5 +1,6 @@
--- CREATE TABLE "user" ----------------------------------------
-CREATE TABLE IF NOT EXISTS "user" (
+-- +migrate Up
+-- SQL in section 'Up' is executed when this migration is applied
+CREATE TABLE "user" (
     "id" UUid DEFAULT gen_random_uuid() NOT NULL,
     "first_name" VARCHAR(255) NOT NULL,
     "last_name" VARCHAR(255),
@@ -10,3 +11,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     CONSTRAINT "unique_user_id" UNIQUE("id"),
     CONSTRAINT "unique_user_email" UNIQUE("email")
 );
+
+-- +migrate Down
+-- SQL section 'Down' is executed when this migration is rolled back
+DROP TABLE "user";

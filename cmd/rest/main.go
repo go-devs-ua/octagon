@@ -12,7 +12,6 @@ import (
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
 	"github.com/go-devs-ua/octagon/lgr"
-	"github.com/go-devs-ua/octagon/migration"
 )
 
 func main() {
@@ -40,11 +39,6 @@ func Run() error {
 
 	repo := pg.NewRepo(db)
 	logger.Infof("Connection to database successfully created\n")
-
-	if err := migration.Migrate(db, logger); err != nil {
-		logger.Errorf("Failed making migrations: %+v\n", err)
-		return err
-	}
 
 	handlers := rest.Handlers{
 		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
