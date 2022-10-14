@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"regexp"
 	"strings"
@@ -27,7 +28,7 @@ var (
 	passRegex = regexp.MustCompile(passMask)
 )
 
-func (u User) Validate() error {
+func (u *User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
 		return fmt.Errorf("invalid first name: %v", err.Error())
 	}
@@ -45,6 +46,9 @@ func (u User) Validate() error {
 	if err := checkPass(u.Password); err != nil {
 		return err
 	}
+
+	h := sha256.Sum256([]byte(u.Password))
+	u.Password = fmt.Sprintf("%x", h)
 
 	return nil
 }
