@@ -15,6 +15,12 @@ import (
 	"github.com/go-devs-ua/octagon/migration"
 )
 
+const (
+	lvlDebug = "DEBUG"
+	lvlInfo  = "INFO"
+	lvlError = "ERROR"
+)
+
 func main() {
 	if err := Run(); err != nil {
 		log.Fatal(err)
@@ -23,12 +29,15 @@ func main() {
 
 // Run will bind our layers all together
 func Run() error {
-	logger := lgr.New()
+	logger, err := lgr.New(lvlDebug)
+	if err != nil {
+		return fmt.Errorf("failed to create logger: %w", err)
+	}
 	defer logger.Flush()
 
 	opt, err := cfg.GetConfig()
 	if err != nil {
-		logger.Errorf("Failed to get config from .env: %+v\n", err)
+		logger.Errorf("Failed to get config from .env: %+v", err)
 		return err
 	}
 
@@ -39,10 +48,10 @@ func Run() error {
 	}
 
 	repo := pg.NewRepo(db)
-	logger.Infof("Connection to database successfully created\n")
+	logger.Infof("Connection to database successfully created")
 
 	if err := migration.Migrate(db, logger); err != nil {
-		logger.Errorf("Failed making migrations: %+v\n", err)
+		logger.Errorf("Failed making migrations: %+v", err)
 		return err
 	}
 
@@ -52,7 +61,7 @@ func Run() error {
 
 	srv := rest.NewServer(opt, handlers)
 	if err := srv.Run(); err != nil {
-		logger.Errorf("Failed loading server: %+v\n", err)
+		logger.Errorf("Failed loading server: %+v", err)
 		return err
 	}
 

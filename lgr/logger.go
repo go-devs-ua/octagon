@@ -1,24 +1,45 @@
 package lgr
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 
 // New initialize logger
-func New() *Logger {
-	// TODO: Extend config and make adjustments
-	logger, err := zap.NewDevelopment()
+func New(logLevel string) (*Logger, error) {
+	level, err := zapcore.ParseLevel(logLevel)
 	if err != nil {
-		log.Fatalf("Failed creating new logger: %v", err)
+		return nil, fmt.Errorf("error with logger level parsing: %w", err)
 	}
 
-	return &Logger{logger.Sugar()}
+	cfg := zap.Config{
+		Encoding:         "console",
+		Level:            zap.NewAtomicLevelAt(level),
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+		EncoderConfig: zapcore.EncoderConfig{
+			MessageKey: "message",
+
+			LevelKey:    "level",
+			EncodeLevel: zapcore.CapitalLevelEncoder,
+
+			TimeKey:    "time",
+			EncodeTime: zapcore.ISO8601TimeEncoder,
+
+			CallerKey:    "caller",
+			EncodeCaller: zapcore.ShortCallerEncoder,
+		},
+	}
+
+	logger := zap.Must(cfg.Build())
+
+	return &Logger{logger.Sugar()}, nil
 }
 
 // Flush will flush any buffered log entries.
@@ -42,6 +63,10 @@ func (l *Logger) Infof(format string, val ...any) {
 	l.log.Infof(format, val...)
 }
 
+func (l *Logger) Infow(msg string, keyVal ...any) {
+	l.log.Infow(msg, keyVal...)
+}
+
 func (l *Logger) Warnf(format string, val ...any) {
 	l.log.Warnf(format, val...)
 }
@@ -50,7 +75,7 @@ func (l *Logger) Warnf(format string, val ...any) {
 func (l *Logger) LogRequest(req *http.Request) {
 	body, err := req.GetBody()
 	if err != nil {
-		l.log.Debugf("Failed getting request body while logging: %+v\n", err)
+		l.log.Debugf("Failed getting request body while logging: %+v", err)
 	}
 
 	l.log.Infow("Request",
