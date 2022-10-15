@@ -47,9 +47,16 @@ func (u *User) Validate() error {
 		return err
 	}
 
-	h := sha256.Sum256([]byte(u.Password))
-	u.Password = fmt.Sprintf("%x", h)
+	if err := hash(&u.Password); err != nil {
+		return err
+	}
 
+	return nil
+}
+
+func hash(txt *string) error {
+	h := sha256.Sum256([]byte(*txt))
+	*txt = fmt.Sprintf("%x", h)
 	return nil
 }
 
