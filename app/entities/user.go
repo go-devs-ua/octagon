@@ -27,7 +27,7 @@ var (
 	passRegex = regexp.MustCompile(passMask)
 )
 
-func (u *User) Validate() error {
+func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
 		return fmt.Errorf("invalid first name: %v", err.Error())
 	}
