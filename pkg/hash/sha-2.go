@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func HashPassword(password string) string {
+func Hash(password string) string {
 	h := sha256.Sum256([]byte(password))
 	return fmt.Sprintf("%x", h)
 }
