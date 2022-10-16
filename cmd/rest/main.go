@@ -15,12 +15,6 @@ import (
 	"github.com/go-devs-ua/octagon/migration"
 )
 
-const (
-	lvlDebug = "DEBUG"
-	lvlInfo  = "INFO"
-	lvlError = "ERROR"
-)
-
 func main() {
 	if err := Run(); err != nil {
 		log.Fatal(err)
@@ -29,17 +23,16 @@ func main() {
 
 // Run will bind our layers all together
 func Run() error {
-	logger, err := lgr.New(lvlDebug)
+	opt, err := cfg.GetConfig()
+	if err != nil {
+		return fmt.Errorf("Failed to get config from .env: %+v", err)
+	}
+
+	logger, err := lgr.New(opt.LogLevel)
 	if err != nil {
 		return fmt.Errorf("failed to create logger: %w", err)
 	}
 	defer logger.Flush()
-
-	opt, err := cfg.GetConfig()
-	if err != nil {
-		logger.Errorf("Failed to get config from .env: %+v", err)
-		return err
-	}
 
 	db, err := connectDB(opt)
 	if err != nil {

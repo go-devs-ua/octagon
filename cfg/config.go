@@ -65,8 +65,9 @@ type DB struct {
 
 // Options will keep all needful configs
 type Options struct {
-	Server Server
-	DB     DB
+	LogLevel string
+	Server   Server
+	DB       DB
 }
 
 // GetConfig will create instance of Options
@@ -77,11 +78,12 @@ func GetConfig() (Options, error) {
 	}
 
 	return Options{
-		Server{
+		LogLevel: os.Getenv("LOG_LEVEL"),
+		Server: Server{
 			Host: os.Getenv("SERV_HOST"),
 			Port: os.Getenv("SERV_PORT"),
 		},
-		DB{
+		DB: DB{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
 			Username: os.Getenv("DB_USER"),

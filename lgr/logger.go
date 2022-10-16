@@ -10,8 +10,19 @@ import (
 // Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 
+// Allowed logger's levels.
+const (
+	lvlDebug = "DEBUG"
+	lvlInfo  = "INFO"
+	lvlError = "ERROR"
+)
+
 // New initialize logger
 func New(logLevel string) (*Logger, error) {
+	if logLevel != lvlDebug && logLevel != lvlError && logLevel != lvlInfo {
+		return nil, fmt.Errorf("\"%v\" is not allowed loger level", logLevel)
+	}
+
 	level, err := zapcore.ParseLevel(logLevel)
 	if err != nil {
 		return nil, fmt.Errorf("error with logger level parsing: %w", err)
@@ -23,14 +34,11 @@ func New(logLevel string) (*Logger, error) {
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 		EncoderConfig: zapcore.EncoderConfig{
-			MessageKey: "message",
-
-			LevelKey:    "level",
-			EncodeLevel: zapcore.CapitalLevelEncoder,
-
-			TimeKey:    "time",
-			EncodeTime: zapcore.ISO8601TimeEncoder,
-
+			MessageKey:   "message",
+			LevelKey:     "level",
+			EncodeLevel:  zapcore.CapitalLevelEncoder,
+			TimeKey:      "time",
+			EncodeTime:   zapcore.ISO8601TimeEncoder,
 			CallerKey:    "caller",
 			EncodeCaller: zapcore.ShortCallerEncoder,
 		},
