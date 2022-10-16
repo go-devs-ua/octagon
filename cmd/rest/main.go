@@ -29,7 +29,7 @@ func Run() error {
 		return err
 	}
 
-	db, err := pg.ConnectDB(opt.DB)
+	db, err := pg.ConnectDB(opt)
 	if err != nil {
 		logger.Errorf("%+v\n", err)
 		return err

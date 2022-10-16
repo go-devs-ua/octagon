@@ -9,8 +9,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	"github.com/go-devs-ua/octagon/app/repository/pg"
 )
 
 // Load configs from a env file & sets them in environment variables
@@ -50,6 +48,14 @@ func loadEnvVar() error {
 	return nil
 }
 
+type DB struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+}
+
 // Server configuration description
 type Server struct {
 	Host string
@@ -59,7 +65,7 @@ type Server struct {
 // Options will keep all needful configs
 type Options struct {
 	Server Server
-	DB     pg.DB
+	DB     DB
 }
 
 // GetConfig will create instance of Options
@@ -74,7 +80,7 @@ func GetConfig() (Options, error) {
 			Host: os.Getenv("SERV_HOST"),
 			Port: os.Getenv("SERV_PORT"),
 		},
-		pg.DB{
+		DB{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
 			Username: os.Getenv("DB_USER"),
