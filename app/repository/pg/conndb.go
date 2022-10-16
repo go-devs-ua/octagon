@@ -1,19 +1,23 @@
-// Package cfg contains structs
-// that will hold on all needful parameters for our app
-// that will be retrieved from  .env or ./cfg/config.yml
-package cfg
+package pg
 
 import (
 	"bufio"
+	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
-
-	"github.com/go-devs-ua/octagon/app/repository/pg"
 )
 
-// Load configs from a env file & sets them in environment variables
+type DB struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+}
+
 func loadEnvVar() error {
 	f, err := os.Open(".env")
 	if err != nil {
@@ -50,31 +54,17 @@ func loadEnvVar() error {
 	return nil
 }
 
-// Server configuration description
-type Server struct {
-	Host string
-	Port string
+type DBOptions struct {
+	DB DB
 }
 
-// Options will keep all needful configs
-type Options struct {
-	Server Server
-	DB     pg.DB
-}
-
-// GetConfig will create instance of Options
-// that will be used im main package
-func GetConfig() (Options, error) {
+func GetConfig() (DBOptions, error) {
 	if err := loadEnvVar(); err != nil {
-		return Options{}, err
+		return DBOptions{}, err
 	}
 
-	return Options{
-		Server{
-			Host: os.Getenv("SERV_HOST"),
-			Port: os.Getenv("SERV_PORT"),
-		},
-		pg.DB{
+	return DBOptions{
+		DB{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
 			Username: os.Getenv("DB_USER"),
@@ -82,4 +72,20 @@ func GetConfig() (Options, error) {
 			DBName:   os.Getenv("DB_NAME"),
 		},
 	}, nil
+}
+
+func ConnectDB(opt DB) (*sql.DB, error) {
+	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
+		opt.Host, opt.Port, opt.Username, opt.Password, opt.DBName)
+
+	db, err := sql.Open("postgres", str)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database connection: %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("ping to database failed: %w", err)
+	}
+
+	return db, nil
 }

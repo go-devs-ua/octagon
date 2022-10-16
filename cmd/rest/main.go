@@ -3,8 +3,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
@@ -31,7 +29,7 @@ func Run() error {
 		return err
 	}
 
-	db, err := connectDB(opt)
+	db, err := pg.ConnectDB(opt.DB)
 	if err != nil {
 		logger.Errorf("%+v\n", err)
 		return err
@@ -51,20 +49,4 @@ func Run() error {
 	}
 
 	return nil
-}
-
-func connectDB(opt cfg.Options) (*sql.DB, error) {
-	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
-		opt.DB.Host, opt.DB.Port, opt.DB.Username, opt.DB.Password, opt.DB.DBName)
-
-	db, err := sql.Open("postgres", str)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open database connection: %w", err)
-	}
-
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping to database failed: %w", err)
-	}
-
-	return db, nil
 }
