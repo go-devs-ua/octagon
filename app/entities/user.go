@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"regexp"
 	"strings"
@@ -47,16 +46,6 @@ func (u *User) Validate() error {
 		return err
 	}
 
-	if err := hash(&u.Password); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func hash(txt *string) error {
-	h := sha256.Sum256([]byte(*txt))
-	*txt = fmt.Sprintf("%x", h)
 	return nil
 }
 
