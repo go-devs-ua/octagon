@@ -88,5 +88,5 @@ func checkPass(password string) error {
 
 // Hide sensitive data while printing
 func (u User) String() string {
-	return fmt.Sprintf(`{"ID":"%v", "FirstName":"%v", "LastName":"%v"}`, u.ID, u.FirstName, u.LastName)
+	return fmt.Sprintf(`{"ID":"%v"}`, u.ID)
 }
