@@ -36,7 +36,7 @@ func main() {
 			logger.Errorf("Failed making migrations: %v\n", err)
 		}
 	} else {
-		logger.Errorf("wrong flag provided, choose '-migrate up' or '-migrate down'")
+		fmt.Println("wrong flag provided, choose '-migrate up' or '-migrate down'")
 		return
 	}
 
