@@ -33,7 +33,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		if err := uh.usecase.Signup(user); err != nil {
-			uh.logger.Debugf("Failed creating %+v: %+v", user, err)
+			uh.logger.Errorf("Failed creating %+v: %+v", user, err)
 
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
@@ -46,6 +46,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
-		uh.logger.Infof("%T successfully created: %+v", user, user)
+		uh.logger.Debugw("user successfully created", "ID", user.ID)
 	})
 }

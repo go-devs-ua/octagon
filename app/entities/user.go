@@ -85,8 +85,3 @@ func checkPass(password string) error {
 
 	return nil
 }
-
-// Hide sensitive data while printing
-func (u User) String() string {
-	return fmt.Sprintf(`{"ID":"%v"}`, u.ID)
-}

@@ -55,6 +55,10 @@ func (l *Logger) Debugf(format string, val ...any) {
 	l.log.Debugf(format, val...)
 }
 
+func (l *Logger) Debugw(format string, val ...any) {
+	l.log.Debugw(format, val...)
+}
+
 func (l *Logger) Infof(format string, val ...any) {
 	l.log.Infof(format, val...)
 }
