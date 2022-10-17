@@ -23,13 +23,13 @@ func Run() error {
 	logger := lgr.New()
 	defer logger.Flush()
 
-	opt, err := cfg.GetConfig()
+	config, err := cfg.GetConfig()
 	if err != nil {
 		logger.Errorf("Failed to get config from .env: %+v\n", err)
 		return err
 	}
 
-	db, err := pg.ConnectDB(opt)
+	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
 		logger.Errorf("%+v\n", err)
 		return err
@@ -42,7 +42,7 @@ func Run() error {
 		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
 	}
 
-	srv := rest.NewServer(opt, handlers)
+	srv := rest.NewServer(config, handlers)
 	if err := srv.Run(); err != nil {
 		logger.Errorf("Failed loading server: %+v\n", err)
 		return err

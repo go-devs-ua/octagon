@@ -13,16 +13,22 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
+const (
+	up           = "up"
+	down         = "down"
+	migrationDir = "./migration"
+)
+
 func main() {
 	logger := lgr.New()
 
-	opt, err := cfg.GetConfig()
+	config, err := cfg.GetConfig()
 	if err != nil {
-		logger.Errorf("Failed to get config from .env: %+v\n", err)
+		logger.Errorf("Failed to get config from .env: %+v", err)
 		return
 	}
 
-	db, err := pg.ConnectDB(opt)
+	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
 		logger.Errorf("%+v\n", err)
 		return
@@ -31,13 +37,13 @@ func main() {
 	direction := flag.String("migrate", "", "applying migrations 'up/down'")
 	flag.Parse()
 
-	if *direction != "up" && *direction != "down" {
-		fmt.Println("wrong flag provided, choose '-migrate up' or '-migrate down'")
+	if *direction != up && *direction != down {
+		fmt.Println("Wrong flag provided, choose '-migrate up' or '-migrate down'")
 		return
 	}
 
 	if err := migrateDB(db, logger, *direction); err != nil {
-		logger.Errorf("Failed making migrations: %v\n", err)
+		logger.Errorf("Failed making migrations: %v", err)
 	}
 
 }
@@ -45,11 +51,11 @@ func main() {
 // MigrateDB executes migrations.
 func migrateDB(db *sql.DB, logger *lgr.Logger, direction string) error {
 	migrations := &migrate.FileMigrationSource{
-		Dir: "./migration",
+		Dir: migrationDir,
 	}
 
 	var dir migrate.MigrationDirection
-	if direction == "down" {
+	if direction == down {
 		dir = 1
 	}
 
@@ -60,7 +66,7 @@ func migrateDB(db *sql.DB, logger *lgr.Logger, direction string) error {
 		return fmt.Errorf("migration up failed: %w", err)
 	}
 
-	logger.Infof("The number of applied migration is: %d\n", n)
+	logger.Infof("The number of applied migration is: %d", n)
 
 	return nil
 }
