@@ -7,6 +7,7 @@ import (
 	"github.com/go-devs-ua/octagon/cfg"
 )
 
+// ConnectDB is used to create connection to postgres DB.
 func ConnectDB(cfg cfg.DB) (*sql.DB, error) {
 	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName)
