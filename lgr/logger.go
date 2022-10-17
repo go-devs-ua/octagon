@@ -33,7 +33,10 @@ func New(logLevel string) (*Logger, error) {
 		},
 	}
 
-	logger := zap.Must(cfg.Build())
+	logger, err := cfg.Build()
+	if err != nil {
+		return nil, fmt.Errorf("Cann't build: %w", err)
+	}
 
 	return &Logger{logger.Sugar()}, nil
 }
