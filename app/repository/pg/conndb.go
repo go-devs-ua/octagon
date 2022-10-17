@@ -7,9 +7,9 @@ import (
 	"github.com/go-devs-ua/octagon/cfg"
 )
 
-func ConnectDB(cfg cfg.Options) (*sql.DB, error) {
+func ConnectDB(cfg cfg.DB) (*sql.DB, error) {
 	str := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=disable",
-		cfg.DB.Host, cfg.DB.Port, cfg.DB.Username, cfg.DB.Password, cfg.DB.DBName)
+		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName)
 
 	db, err := sql.Open("postgres", str)
 	if err != nil {
