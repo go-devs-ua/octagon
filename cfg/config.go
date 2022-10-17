@@ -12,11 +12,11 @@ import (
 	"strings"
 )
 
-// Allowed logger's levels.
 const (
-	LvlDebug = "DEBUG"
-	LvlInfo  = "INFO"
-	LvlError = "ERROR"
+	DebugLogLvl     = "DEBUG"
+	InfoLogLvl      = "INFO"
+	ErrorLogLvl     = "ERROR"
+	LogLvlConfigKey = "LOG_LEVEL"
 )
 
 // Load configs from a env file & sets them in environment variables
@@ -85,12 +85,8 @@ func GetConfig() (Options, error) {
 		return Options{}, err
 	}
 
-	if err := validate("LOG_LEVEL", os.Getenv("LOG_LEVEL")); err != nil {
-		return Options{}, fmt.Errorf("validation failed: %w", err)
-	}
-
-	return Options{
-		LogLevel: os.Getenv("LOG_LEVEL"),
+	opt := Options{
+		LogLevel: os.Getenv(LogLvlConfigKey),
 		Server: Server{
 			Host: os.Getenv("SERV_HOST"),
 			Port: os.Getenv("SERV_PORT"),
@@ -102,15 +98,20 @@ func GetConfig() (Options, error) {
 			Password: os.Getenv("DB_PASSWORD"),
 			DBName:   os.Getenv("DB_NAME"),
 		},
-	}, nil
+	}
+
+	if err := opt.validate(); err != nil {
+		return Options{}, fmt.Errorf("validation failed: %w", err)
+	}
+
+	return opt, nil
 }
 
-func validate(key, val string) error {
-	if key == "LOG_LEVEL" &&
-		strings.ToUpper(val) != LvlDebug &&
-		strings.ToUpper(val) != LvlError &&
-		strings.ToUpper(val) != LvlInfo {
-		return fmt.Errorf("\"%v\" is not allowed loger level", val)
+func (opt *Options) validate() error {
+	if strings.ToUpper(opt.LogLevel) != DebugLogLvl &&
+		strings.ToUpper(opt.LogLevel) != ErrorLogLvl &&
+		strings.ToUpper(opt.LogLevel) != InfoLogLvl {
+		return fmt.Errorf("\"%v\" is not allowed loger level", opt.LogLevel)
 	}
 
 	return nil
