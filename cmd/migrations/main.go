@@ -31,13 +31,13 @@ func main() {
 	direction := flag.String("migrate", "", "applying migrations 'up/down'")
 	flag.Parse()
 
-	if *direction == "up" || *direction == "down" {
-		if err = migrateDB(db, logger, *direction); err != nil {
-			logger.Errorf("Failed making migrations: %v\n", err)
-		}
-	} else {
+	if *direction != "up" && *direction != "down" {
 		fmt.Println("wrong flag provided, choose '-migrate up' or '-migrate down'")
 		return
+	}
+
+	if err := migrateDB(db, logger, *direction); err != nil {
+		logger.Errorf("Failed making migrations: %v\n", err)
 	}
 
 }
