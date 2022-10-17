@@ -51,6 +51,10 @@ func (l *Logger) Errorf(format string, val ...any) {
 	l.log.Errorf(format, val...)
 }
 
+func (l *Logger) Errorw(format string, val ...any) {
+	l.log.Errorw(format, val...)
+}
+
 func (l *Logger) Debugf(format string, val ...any) {
 	l.log.Debugf(format, val...)
 }
