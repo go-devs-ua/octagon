@@ -6,9 +6,17 @@ package cfg
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
+)
+
+// Allowed logger's levels.
+const (
+	LvlDebug = "DEBUG"
+	LvlInfo  = "INFO"
+	LvlError = "ERROR"
 )
 
 // Load configs from a env file & sets them in environment variables
@@ -40,6 +48,13 @@ func loadEnvVar() error {
 		pair := strings.Split(l, "=")
 		if len(pair) != 2 {
 			return errors.New("not enough data for the configuration in .env file")
+		}
+
+		if pair[0] == "LOG_LEVEL" &&
+			strings.ToUpper(pair[1]) != LvlDebug &&
+			strings.ToUpper(pair[1]) != LvlError &&
+			strings.ToUpper(pair[1]) != LvlInfo {
+			return fmt.Errorf("\"%v\" is not allowed loger level", pair[1])
 		}
 
 		os.Setenv(pair[0], pair[1])

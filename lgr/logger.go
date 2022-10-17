@@ -10,19 +10,8 @@ import (
 // Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 
-// Allowed logger's levels.
-const (
-	lvlDebug = "DEBUG"
-	lvlInfo  = "INFO"
-	lvlError = "ERROR"
-)
-
 // New initialize logger
 func New(logLevel string) (*Logger, error) {
-	if logLevel != lvlDebug && logLevel != lvlError && logLevel != lvlInfo {
-		return nil, fmt.Errorf("\"%v\" is not allowed loger level", logLevel)
-	}
-
 	level, err := zapcore.ParseLevel(logLevel)
 	if err != nil {
 		return nil, fmt.Errorf("error with logger level parsing: %w", err)
