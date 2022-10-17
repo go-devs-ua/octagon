@@ -50,13 +50,6 @@ func loadEnvVar() error {
 			return errors.New("not enough data for the configuration in .env file")
 		}
 
-		if pair[0] == "LOG_LEVEL" &&
-			strings.ToUpper(pair[1]) != LvlDebug &&
-			strings.ToUpper(pair[1]) != LvlError &&
-			strings.ToUpper(pair[1]) != LvlInfo {
-			return fmt.Errorf("\"%v\" is not allowed loger level", pair[1])
-		}
-
 		os.Setenv(pair[0], pair[1])
 	}
 
@@ -92,6 +85,10 @@ func GetConfig() (Options, error) {
 		return Options{}, err
 	}
 
+	if err := validate("LOG_LEVEL", os.Getenv("LOG_LEVEL")); err != nil {
+		return Options{}, fmt.Errorf("validation failed: %w", err)
+	}
+
 	return Options{
 		LogLevel: os.Getenv("LOG_LEVEL"),
 		Server: Server{
@@ -106,4 +103,15 @@ func GetConfig() (Options, error) {
 			DBName:   os.Getenv("DB_NAME"),
 		},
 	}, nil
+}
+
+func validate(key, val string) error {
+	if key == "LOG_LEVEL" &&
+		strings.ToUpper(val) != LvlDebug &&
+		strings.ToUpper(val) != LvlError &&
+		strings.ToUpper(val) != LvlInfo {
+		return fmt.Errorf("\"%v\" is not allowed loger level", val)
+	}
+
+	return nil
 }

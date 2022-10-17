@@ -30,7 +30,7 @@ func Run() error {
 
 	logger, err := lgr.New(opt.LogLevel)
 	if err != nil {
-		return fmt.Errorf("failed to create logger: %w", err)
+		return fmt.Errorf("Failed to create logger: %w", err)
 	}
 	defer logger.Flush()
 
