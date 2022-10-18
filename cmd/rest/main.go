@@ -42,7 +42,7 @@ func Run() error {
 		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
 	}
 
-	srv := rest.NewServer(config, handlers)
+	srv := rest.NewServer(config, handlers, logger)
 	if err := srv.Run(); err != nil {
 		logger.Errorf("Failed loading server: %+v\n", err)
 		return err

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-devs-ua/octagon/cfg"
+	"github.com/go-devs-ua/octagon/lgr"
 	"github.com/gorilla/mux"
 )
 
@@ -19,15 +20,20 @@ type Handlers struct {
 }
 
 // NewServer will initialize the server
-func NewServer(opt cfg.Options, handlers Handlers) *Server {
+func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	router := new(mux.Router)
 
 	attachUserEndpoints(router, handlers)
 
+	handler := WrapMiddleware(router,
+		WithLogRequest(logger),
+		// to be continue...
+	)
+
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(router, 3*time.Second, timeoutMsg),
+			Handler:      http.TimeoutHandler(handler, 3*time.Second, timeoutMsg),
 			ReadTimeout:  2 * time.Second,
 			WriteTimeout: 5 * time.Second,
 		},
