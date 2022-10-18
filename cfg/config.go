@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// Allowed logger levels & config key
 const (
 	DebugLogLvl     = "DEBUG"
 	InfoLogLvl      = "INFO"
@@ -107,7 +108,7 @@ func GetConfig() (Options, error) {
 	return opt, nil
 }
 
-func (opt *Options) validate() error {
+func (opt Options) validate() error {
 	if strings.ToUpper(opt.LogLevel) != DebugLogLvl &&
 		strings.ToUpper(opt.LogLevel) != ErrorLogLvl &&
 		strings.ToUpper(opt.LogLevel) != InfoLogLvl {
