@@ -28,12 +28,13 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		if err := user.Validate(); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()}, uh.logger)
-			uh.logger.Errorf("Failed validating user with ID:%v: %+v", user.ID, err)
+			uh.logger.Errorf("Failed validating user: %+v", err)
 			return
 		}
 
-		if err := uh.usecase.Signup(user); err != nil {
-			uh.logger.Errorf("Failed creating user with ID:%v: %+v", user.ID, err)
+		err := uh.usecase.Signup(&user)
+		if err != nil {
+			uh.logger.Errorf("Failed creating user: %+v", err)
 
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
