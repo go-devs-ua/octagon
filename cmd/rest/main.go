@@ -17,7 +17,7 @@ import (
 
 func main() {
 	if err := Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Cann't run server: %v", err)
 	}
 }
 
@@ -25,12 +25,12 @@ func main() {
 func Run() error {
 	opt, err := cfg.GetConfig()
 	if err != nil {
-		return fmt.Errorf("Failed to get config from .env: %+v", err)
+		return fmt.Errorf("failed to get config from .env: %+v", err)
 	}
 
 	logger, err := lgr.New(opt.LogLevel)
 	if err != nil {
-		return fmt.Errorf("Failed to create logger: %w", err)
+		return fmt.Errorf("failed to create logger: %w", err)
 	}
 	defer logger.Flush()
 
