@@ -15,7 +15,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		var user entities.User
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest + err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v\n", req, err)
 			return
 		}
@@ -41,7 +41,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr + err.Error()}, uh.logger)
 			return
 		}
 
