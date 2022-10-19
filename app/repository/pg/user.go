@@ -27,12 +27,13 @@ func NewRepo(db *sql.DB) *Repo {
 // Add meth implements usecase.UserRepository interface
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
-func (r Repo) Add(user *entities.User) error {
+func (r Repo) Add(user entities.User) (string, error) {
+	var ID string
 	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
 						  VALUES ($1, $2, $3, $4) RETURNING id`
-	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&user.ID); err != nil {
-		return fmt.Errorf("error inserting into database: %w", err)
+	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&ID); err != nil {
+		return "", fmt.Errorf("error inserting into database: %w", err)
 	}
 
-	return nil
+	return ID, nil
 }

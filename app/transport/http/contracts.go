@@ -6,5 +6,5 @@ import (
 
 // UserUsecase represents User use-case layer
 type UserUsecase interface {
-	Signup(*entities.User) error
+	Signup(entities.User) (string, error)
 }

@@ -32,7 +32,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		err := uh.usecase.Signup(&user)
+		ID, err := uh.usecase.Signup(user)
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
@@ -47,6 +47,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
-		uh.logger.Debugw("user successfully created", "ID", user.ID)
+		uh.logger.Debugw("user successfully created", "ID", ID)
 	})
 }
