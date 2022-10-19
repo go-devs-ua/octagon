@@ -57,19 +57,18 @@ func loadEnvVar() error {
 	return nil
 }
 
-// Server configuration description
-type Server struct {
-	Host string
-	Port string
-}
-
-// Database configuration description
 type DB struct {
 	Host     string
 	Port     string
 	Username string
 	Password string
 	DBName   string
+}
+
+// Server configuration description
+type Server struct {
+	Host string
+	Port string
 }
 
 // Options will keep all needful configs
