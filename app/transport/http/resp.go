@@ -13,6 +13,9 @@ type Response struct {
 	Message string `json:"message"`
 	Details string `json:"details"`
 }
+type CreateUserResponse struct {
+	Message string `json:"message"`
+}
 
 // TODO: Usually, you need to make a rollback mechanism.
 //  If there is an error, roll back the changes
