@@ -21,22 +21,26 @@ func main() {
 
 // Run will bind our layers all together
 func Run() error {
-	logger := lgr.New()
-	defer logger.Flush()
-
 	config, err := cfg.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to get config from .env: %+v", err)
 	}
 
+	logger, err := lgr.New(config.LogLevel)
+	if err != nil {
+		return fmt.Errorf("failed to create logger: %w", err)
+	}
+
+	defer logger.Flush()
+
 	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("%+v", err)
 		return err
 	}
 
 	repo := pg.NewRepo(db)
-	logger.Infof("Connection to database successfully created\n")
+	logger.Infof("Connection to database successfully created")
 
 	handlers := rest.Handlers{
 		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
