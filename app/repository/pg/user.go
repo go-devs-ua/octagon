@@ -28,12 +28,12 @@ func NewRepo(db *sql.DB) *Repo {
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
 func (r Repo) Add(user entities.User) (string, error) {
-	var ID string
+	var id string
 	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
 						  VALUES ($1, $2, $3, $4) RETURNING id`
-	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&ID); err != nil {
+	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		return "", fmt.Errorf("error inserting into database: %w", err)
 	}
 
-	return ID, nil
+	return id, nil
 }

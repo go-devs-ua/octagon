@@ -18,10 +18,10 @@ func NewUser(repo UserRepository) User {
 // and will take care of creating user.
 func (u User) Signup(user entities.User) (string, error) {
 	// TODO: Some magic
-	ID, err := u.Repo.Add(user)
+	id, err := u.Repo.Add(user)
 	if err != nil {
 		return "", err
 	}
 
-	return ID, nil
+	return id, nil
 }
