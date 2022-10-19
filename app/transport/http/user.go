@@ -41,7 +41,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr + err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalServerErr + err.Error()}, uh.logger)
 			return
 		}
 
