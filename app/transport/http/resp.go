@@ -13,8 +13,10 @@ type Response struct {
 	Message string `json:"message"`
 	Details string `json:"details"`
 }
+
 type CreateUserResponse struct {
 	Message string `json:"message"`
+	UserID  string `json:"id"`
 }
 
 // TODO: Usually, you need to make a rollback mechanism.

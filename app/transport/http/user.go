@@ -41,11 +41,11 @@ func (uh UserHandler) CreateUser() http.Handler {
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{"Details: ", err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, MsgServerErr, uh.logger)
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated, user.ID}, uh.logger)
+		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{MsgUserCreated, user.ID}, uh.logger)
 		uh.logger.Infof("%T successfully created: %+v\n", user, user)
 	})
 }
