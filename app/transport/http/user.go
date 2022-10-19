@@ -15,7 +15,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		var user entities.User
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest + err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest, err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v\n", req, err)
 			return
 		}
@@ -27,7 +27,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}()
 
 		if err := user.Validate(); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgValidationErr, err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed validating %+v: %+v\n", user, err)
 			return
 		}
@@ -37,15 +37,15 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
-				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
+				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict, err.Error()}, uh.logger)
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalServerErr + err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{"Details: ", err.Error()}, uh.logger)
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
+		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated, user.ID}, uh.logger)
 		uh.logger.Infof("%T successfully created: %+v\n", user, user)
 	})
 }
