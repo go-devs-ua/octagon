@@ -9,7 +9,6 @@ import (
 	"github.com/lib/pq"
 )
 
-
 // Response will wrap message
 // that will be sent in JSON format
 type CreateUserResponse struct {
@@ -49,7 +48,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, ServerErrMsg, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{ServerErrMsg, err.Error()}, uh.logger)
 			return
 		}
 
