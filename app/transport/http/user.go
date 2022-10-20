@@ -17,7 +17,8 @@ type Response struct {
 }
 
 type CreateUserResponse struct {
-	UserID string `json:"id"`
+	Message string `json:"message"`
+	ID      string `json:"id"`
 }
 
 // CreateUser will handle user creation
@@ -57,7 +58,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{id}, uh.logger)
-		uh.logger.Debugw("user successfully created", "ID", id)
+		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{UserCreatedMsg, id}, uh.logger)
+		uh.logger.Debugw(UserCreatedMsg, "ID", id)
 	})
 }

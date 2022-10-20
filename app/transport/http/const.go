@@ -1,6 +1,7 @@
 package http
 
 const (
-	BadRequestMsg = "Bad Request"
-	ServerErrMsg  = "Internal server error"
+	BadRequestMsg  = "Bad Request"
+	ServerErrMsg   = "Internal server error"
+	UserCreatedMsg = "User successfully created"
 )
