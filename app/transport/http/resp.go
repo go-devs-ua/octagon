@@ -7,18 +7,6 @@ import (
 	"github.com/go-devs-ua/octagon/lgr"
 )
 
-// Response will wrap message
-// that will be sent in JSON format
-type Response struct {
-	Message string `json:"message"`
-	Details string `json:"details"`
-}
-
-type CreateUserResponse struct {
-	Message string `json:"message"`
-	UserID  string `json:"id"`
-}
-
 // TODO: Usually, you need to make a rollback mechanism.
 //  If there is an error, roll back the changes
 //  from the database. But we will not do that now.
