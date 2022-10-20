@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
@@ -14,29 +15,32 @@ import (
 
 func main() {
 	if err := Run(); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Cann't run server: %v", err)
 	}
 }
 
 // Run will bind our layers all together
 func Run() error {
-	logger := lgr.New()
-	defer logger.Flush()
-
 	config, err := cfg.GetConfig()
 	if err != nil {
-		logger.Errorf("Failed to get config from .env: %+v\n", err)
-		return err
+		return fmt.Errorf("failed to get config from .env: %+v", err)
 	}
+
+	logger, err := lgr.New(config.LogLevel)
+	if err != nil {
+		return fmt.Errorf("failed to create logger: %w", err)
+	}
+
+	defer logger.Flush()
 
 	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("%+v", err)
 		return err
 	}
 
 	repo := pg.NewRepo(db)
-	logger.Infof("Connection to database successfully created\n")
+	logger.Infof("Connection to database successfully created")
 
 	handlers := rest.Handlers{
 		UserHandler: rest.NewUserHandler(usecase.NewUser(repo), logger),
@@ -44,7 +48,7 @@ func Run() error {
 
 	srv := rest.NewServer(config, handlers, logger)
 	if err := srv.Run(); err != nil {
-		logger.Errorf("Failed loading server: %+v\n", err)
+		logger.Errorf("Failed loading server: %+v", err)
 		return err
 	}
 

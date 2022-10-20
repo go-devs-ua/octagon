@@ -16,24 +16,25 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest}, uh.logger)
-			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v\n", req, err)
+			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v", req, err)
 			return
 		}
 
 		defer func() {
 			if err := req.Body.Close(); err != nil {
-				uh.logger.Warnf("Failed closing request %+v: %+v\n", req, err)
+				uh.logger.Warnf("Failed closing request %+v: %+v", req, err)
 			}
 		}()
 
 		if err := user.Validate(); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()}, uh.logger)
-			uh.logger.Errorf("Failed validating %+v: %+v\n", user, err)
+			uh.logger.Errorf("Failed validating user: %+v", err)
 			return
 		}
 
-		if err := uh.usecase.Signup(user); err != nil {
-			uh.logger.Debugf("Failed creating %+v: %+v\n", user, err)
+		id, err := uh.usecase.Signup(user)
+		if err != nil {
+			uh.logger.Errorf("Failed creating user: %+v", err)
 
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
@@ -46,6 +47,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
-		uh.logger.Infof("%T successfully created: %+v\n", user, user)
+		uh.logger.Debugw("user successfully created", "ID", id)
 	})
 }

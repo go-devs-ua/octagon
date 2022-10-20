@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
 	"github.com/go-devs-ua/octagon/cfg"
@@ -20,17 +21,21 @@ const (
 )
 
 func main() {
-	logger := lgr.New()
-
 	config, err := cfg.GetConfig()
 	if err != nil {
-		logger.Errorf("Failed to get config from .env: %+v", err)
+		log.Printf("Failed to get config from .env: %+v", err)
+		return
+	}
+
+	logger, err := lgr.New(config.LogLevel)
+	if err != nil {
+		log.Printf("failed to create logger: %v", err)
 		return
 	}
 
 	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
-		logger.Errorf("%+v\n", err)
+		logger.Errorf("%+v", err)
 		return
 	}
 
