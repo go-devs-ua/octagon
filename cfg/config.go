@@ -6,9 +6,18 @@ package cfg
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
+)
+
+// Allowed logger levels & config key
+const (
+	DebugLogLvl     = "DEBUG"
+	InfoLogLvl      = "INFO"
+	ErrorLogLvl     = "ERROR"
+	LogLvlConfigKey = "LOG_LEVEL"
 )
 
 // Load configs from a env file & sets them in environment variables
@@ -48,13 +57,6 @@ func loadEnvVar() error {
 	return nil
 }
 
-// Server configuration description
-type Server struct {
-	Host string
-	Port string
-}
-
-// Database configuration description
 type DB struct {
 	Host     string
 	Port     string
@@ -63,10 +65,17 @@ type DB struct {
 	DBName   string
 }
 
+// Server configuration description
+type Server struct {
+	Host string
+	Port string
+}
+
 // Options will keep all needful configs
 type Options struct {
-	Server Server
-	DB     DB
+	LogLevel string
+	Server   Server
+	DB       DB
 }
 
 // GetConfig will create instance of Options
@@ -76,17 +85,34 @@ func GetConfig() (Options, error) {
 		return Options{}, err
 	}
 
-	return Options{
-		Server{
+	opt := Options{
+		LogLevel: os.Getenv(LogLvlConfigKey),
+		Server: Server{
 			Host: os.Getenv("SERV_HOST"),
 			Port: os.Getenv("SERV_PORT"),
 		},
-		DB{
+		DB: DB{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
 			Username: os.Getenv("DB_USER"),
 			Password: os.Getenv("DB_PASSWORD"),
 			DBName:   os.Getenv("DB_NAME"),
 		},
-	}, nil
+	}
+
+	if err := opt.validate(); err != nil {
+		return Options{}, fmt.Errorf("validation failed: %w", err)
+	}
+
+	return opt, nil
+}
+
+func (opt Options) validate() error {
+	if strings.ToUpper(opt.LogLevel) != DebugLogLvl &&
+		strings.ToUpper(opt.LogLevel) != ErrorLogLvl &&
+		strings.ToUpper(opt.LogLevel) != InfoLogLvl {
+		return fmt.Errorf("\"%v\" is not allowed loger level", opt.LogLevel)
+	}
+
+	return nil
 }
