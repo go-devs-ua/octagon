@@ -9,16 +9,11 @@ import (
 	"github.com/lib/pq"
 )
 
+
 // Response will wrap message
 // that will be sent in JSON format
-type Response struct {
-	Message string `json:"message"`
-	Details string `json:"details"`
-}
-
 type CreateUserResponse struct {
-	Message string `json:"message"`
-	ID      string `json:"id"`
+	ID string `json:"id"`
 }
 
 // CreateUser will handle user creation
@@ -58,7 +53,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{UserCreatedMsg, id}, uh.logger)
+		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{id}, uh.logger)
 		uh.logger.Debugw(UserCreatedMsg, "ID", id)
 	})
 }
