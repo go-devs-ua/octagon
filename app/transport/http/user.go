@@ -9,13 +9,19 @@ import (
 	"github.com/lib/pq"
 )
 
+// Response will wrap message
+// that will be sent in JSON format
+type CreateUserResponse struct {
+	ID string `json:"id"`
+}
+
 // CreateUser will handle user creation
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var user entities.User
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{MsgBadRequest}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v", req, err)
 			return
 		}
@@ -27,7 +33,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}()
 
 		if err := user.Validate(); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{"Validation error: " + err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed validating user: %+v", err)
 			return
 		}
@@ -38,15 +44,15 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
-				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
+				WriteJSONResponse(w, http.StatusConflict, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: ServerErrMsg}, uh.logger)
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
-		uh.logger.Debugw("user successfully created", "ID", id)
+		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{ID: id}, uh.logger)
+		uh.logger.Debugw("User successfully created", "ID", id)
 	})
 }
