@@ -53,6 +53,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}
 
 		WriteJSONResponse(w, http.StatusCreated, CreateUserResponse{id}, uh.logger)
-		uh.logger.Debugw(UserCreatedMsg, "ID", id)
+		uh.logger.Debugw("User successfully created", "ID", id)
 	})
 }
