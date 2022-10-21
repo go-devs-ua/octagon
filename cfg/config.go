@@ -1,6 +1,6 @@
 // Package cfg contains structs
 // that will hold on all needful parameters for our app
-// that will be retrieved from  .env or ./cfg/config.yml
+// that will be retrieved from  .env or ./cfg/config.yml.
 package cfg
 
 import (
@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// Allowed logger levels & config key
+// Allowed logger levels & config key.
 const (
 	DebugLogLvl     = "DEBUG"
 	InfoLogLvl      = "INFO"
@@ -20,11 +20,11 @@ const (
 	LogLvlConfigKey = "LOG_LEVEL"
 )
 
-// Load configs from a env file & sets them in environment variables
+// Load configs from a env file & sets them in environment variables.
 func loadEnvVar() error {
 	f, err := os.Open(".env")
 	if err != nil {
-		return err
+		return fmt.Errorf("error while opening .env file: %w", err)
 	}
 
 	defer func() {
@@ -42,12 +42,12 @@ func loadEnvVar() error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		return fmt.Errorf("error while scaning .env file: %w", err)
 	}
 
 	for _, l := range lines {
 		pair := strings.Split(l, "=")
-		if len(pair) != 2 {
+		if len(pair) != 2 { //nolint:gomnd // Its not magic number
 			return errors.New("not enough data for the configuration in .env file")
 		}
 
@@ -65,13 +65,13 @@ type DB struct {
 	DBName   string
 }
 
-// Server configuration description
+// Server configuration description.
 type Server struct {
 	Host string
 	Port string
 }
 
-// Options will keep all needful configs
+// Options will keep all needful configs.
 type Options struct {
 	LogLevel string
 	Server   Server
@@ -79,7 +79,7 @@ type Options struct {
 }
 
 // GetConfig will create instance of Options
-// that will be used im main package
+// that will be used im main package.
 func GetConfig() (Options, error) {
 	if err := loadEnvVar(); err != nil {
 		return Options{}, err

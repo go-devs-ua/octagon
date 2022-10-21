@@ -17,8 +17,8 @@ type User struct {
 
 const (
 	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
-	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$`
-	passMask = `^[[:graph:]]{8,256}$`
+	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$` //nolint:lll // Regexp line can`t be changed.
+	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec // "Potential hardcoded credentials" regexp can`t be changed.
 )
 
 var (
@@ -29,12 +29,12 @@ var (
 
 func (u User) Validate() error {
 	if err := checkName(u.FirstName); err != nil {
-		return fmt.Errorf("invalid first name: %v", err.Error())
+		return fmt.Errorf("invalid first name: %w", err)
 	}
 
 	if len(u.LastName) > 1 {
 		if err := checkName(u.LastName); err != nil {
-			return fmt.Errorf("invalid last name: %v", err.Error())
+			return fmt.Errorf("invalid last name: %w", err)
 		}
 	}
 
@@ -62,17 +62,19 @@ func checkMail(email string) error {
 		maxLocalBytes  int = 64
 		maxDomainBytes int = 255
 	)
-	// Checking the lengths of local and domain parts
+	// Checking the lengths of local and domain parts.
 	atIndex := strings.IndexByte(email, '@')
 	if atIndex > maxLocalBytes {
 		return fmt.Errorf("local part of email contains too many bytes: %v", atIndex)
 	}
+
 	if localPartLen := len(email) - atIndex - 1; localPartLen > maxDomainBytes {
 		return fmt.Errorf("domain part of email contains too many bytes: %v", localPartLen)
 	}
-	// Checking for other email issues by regular expression
+
+	// Checking for other email issues by regular expression.
 	if valid := mailRegex.MatchString(email); !valid {
-		return fmt.Errorf("email does not match with regex: `%s`", mailMask)
+		return fmt.Errorf("email does not match with regex: `%v`", mailMask)
 	}
 
 	return nil

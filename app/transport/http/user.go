@@ -10,12 +10,12 @@ import (
 )
 
 // Response will wrap message
-// that will be sent in JSON format
+// that will be sent in JSON format.
 type CreateUserResponse struct {
 	ID string `json:"id"`
 }
 
-// CreateUser will handle user creation
+// CreateUser will handle user creation.
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var user entities.User
@@ -23,6 +23,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v", req, err)
+
 			return
 		}
 
@@ -35,6 +36,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err := user.Validate(); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed validating user: %+v", err)
+
 			return
 		}
 
@@ -42,13 +44,15 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			// TODO: Handle errors gracefully.
-			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
+			// Handle errors gracefully.
+			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" { //nolint:errorlint,lll // We cant change Unwrap because of use pq.Error
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
+
 				return
 			}
 
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: ServerErrMsg}, uh.logger)
+
 			return
 		}
 

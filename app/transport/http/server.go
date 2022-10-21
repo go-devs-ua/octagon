@@ -12,14 +12,14 @@ import (
 
 const timeoutMsg = "Connection timeout"
 
-// Server is simple server
+// Server is simple server.
 type Server struct{ *http.Server }
 
 type Handlers struct {
 	UserHandler UserHandler
 }
 
-// NewServer will initialize the server
+// NewServer will initialize the server.
 func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	router := new(mux.Router)
 
@@ -27,20 +27,19 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 	handler := WrapMiddleware(router,
 		WithLogRequest(logger),
-		// to be continue...
 	)
 
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, 3*time.Second, timeoutMsg),
-			ReadTimeout:  2 * time.Second,
-			WriteTimeout: 5 * time.Second,
+			Handler:      http.TimeoutHandler(handler, 3*time.Second, timeoutMsg), //nolint:gomnd //2 is not magic number
+			ReadTimeout:  2 * time.Second,                                         //nolint:gomnd //2 is not magic number
+			WriteTimeout: 5 * time.Second,                                         //nolint:gomnd //2 is not magic number
 		},
 	}
 }
 
-// Run will run our server
+// Run will run our server.
 func (srv *Server) Run() error {
 	if err := srv.ListenAndServe(); err != nil {
 		return fmt.Errorf("error loading the server: %w", err)
