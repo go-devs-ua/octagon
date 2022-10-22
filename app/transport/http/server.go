@@ -10,7 +10,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const timeoutMsg = "Connection timeout"
+const (
+	timeoutMsg  = "Connection timeout"
+	handlerTime = 3
+	readTime    = 2
+	writeTime   = 5
+)
 
 // Server is simple server.
 type Server struct{ *http.Server }
@@ -32,9 +37,9 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, 3*time.Second, timeoutMsg), //nolint:gomnd //2 is not magic number
-			ReadTimeout:  2 * time.Second,                                         //nolint:gomnd //2 is not magic number
-			WriteTimeout: 5 * time.Second,                                         //nolint:gomnd //2 is not magic number
+			Handler:      http.TimeoutHandler(handler, handlerTime*time.Second, timeoutMsg),
+			ReadTimeout:  readTime * time.Second,
+			WriteTimeout: writeTime * time.Second,
 		},
 	}
 }

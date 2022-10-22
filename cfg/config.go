@@ -18,6 +18,7 @@ const (
 	InfoLogLvl      = "INFO"
 	ErrorLogLvl     = "ERROR"
 	LogLvlConfigKey = "LOG_LEVEL"
+	lenOfLines      = 2
 )
 
 // Load configs from a env file & sets them in environment variables.
@@ -47,7 +48,7 @@ func loadEnvVar() error {
 
 	for _, l := range lines {
 		pair := strings.Split(l, "=")
-		if len(pair) != 2 { //nolint:gomnd // Its not magic number
+		if len(pair) != lenOfLines {
 			return errors.New("not enough data for the configuration in .env file")
 		}
 
