@@ -50,3 +50,28 @@ func (uh UserHandler) CreateUser() http.Handler {
 		uh.logger.Debugw("user successfully created", "ID", id)
 	})
 }
+
+// GetUserByID will handle user finding
+func (uh UserHandler) GetUserByID() http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var user entities.User
+		params := mux.Vars(req)
+		id:=params["id"]
+		user, err:=uh.usecase.GetUser(id)
+if err!=nil{
+	uh.logger.Errorf("Failed finding user: %+v", err)
+
+	if errors.Is(err, errors.New("no user found in DB with such ID")) {
+		return "", entities.ErrDuplicateEmail
+	}
+
+
+	if err==
+	WriteJSONResponse(w, http.StatusConflict, Response{MsgNoUserByID}, uh.logger)
+}
+WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr}, uh.logger)
+			return
+			
+		}
+
+}

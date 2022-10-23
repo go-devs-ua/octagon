@@ -25,3 +25,14 @@ func (u User) Signup(user entities.User) (string, error) {
 
 	return id, nil
 }
+
+// GetUser represents business logic
+// and will take care of finding user.
+func (u User) GetUser(id string) (entities.User, error) {
+	user, err := u.Repo.Find(id)
+	if err != nil {
+		return entities.User{}, err
+	}
+
+	return user, nil
+}

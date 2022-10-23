@@ -38,10 +38,18 @@ func (r Repo) Add(user entities.User) (string, error) {
 	return id, nil
 }
 
-func (r Repo) GetUserByID(id string) (entities.User, error) {
+// GetUserByID meth implements usecase.UserRepository logic
+// finding user in DB by ID.
+func (r Repo) Find(id string) (entities.User, error) {
 	row := r.DB.QueryRow("SELECT * FROM user WHERE id=$1", id)
+	var user entities.User
+
 	if row.Err() == sql.ErrNoRows {
-		return nil, sql.ErrNoRows
+		return entities.User{}, fmt.Errorf("no user found in DB with such ID: %w", row.Err())
 	}
-	err = row.Scan(&user.Id, &user.Email, &user.FullName, &user.Password, &user.CreatedAt, &user.LastUpdatedAt)
+	if err := row.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.CreatedAt); err != nil {
+		return entities.User{}, fmt.Errorf("error while scanning row %w", err)
+	}
+
+	return user, nil
 }
