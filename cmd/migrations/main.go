@@ -23,7 +23,7 @@ const (
 func main() {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		log.Printf("Failed to get config from .env: %+v", err)
+		log.Printf("Failed to get config from file: %+v", err)
 
 		return
 	}
@@ -42,11 +42,11 @@ func main() {
 		return
 	}
 
-	direction := flag.String("migrate", "", "applying migrations 'up/down'")
+	direction := flag.String("migrate", "", "applying migration direction")
 	flag.Parse()
 
 	if *direction != up && *direction != down {
-		log.Println("Wrong flag provided, choose '-migrate up' or '-migrate down'")
+		log.Printf("Wrong flag provided, choose '-migrate %s' or '-migrate %s'\n", up, down)
 
 		return
 	}

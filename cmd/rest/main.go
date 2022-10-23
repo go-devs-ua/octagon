@@ -23,7 +23,7 @@ func main() {
 func Run() error {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		return fmt.Errorf("failed to get config from .env: %+w", err)
+		return fmt.Errorf("failed to get config: %+w", err)
 	}
 
 	logger, err := lgr.New(config.LogLevel)
@@ -37,7 +37,7 @@ func Run() error {
 	if err != nil {
 		logger.Errorf("%+v", err)
 
-		return fmt.Errorf("error connecting to database: %w", err)
+		return fmt.Errorf("error connecting to database on host: %s, port: %s, with error: %w", config.DB.Host, config.DB.Port, err)
 	}
 
 	repo := pg.NewRepo(db)

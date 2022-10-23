@@ -11,10 +11,10 @@ import (
 )
 
 const (
-	timeoutMsg  = "Connection timeout"
-	handlerTime = 3
-	readTime    = 2
-	writeTime   = 5
+	timeoutMsg            = "Connection timeout"
+	handlerTimeoutSeconds = 30
+	readTimeoutSeconds    = 2
+	writeTimeoutSeconds   = 5
 )
 
 // Server is simple server.
@@ -37,9 +37,9 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, handlerTime*time.Second, timeoutMsg),
-			ReadTimeout:  readTime * time.Second,
-			WriteTimeout: writeTime * time.Second,
+			Handler:      http.TimeoutHandler(handler, handlerTimeoutSeconds*time.Second, timeoutMsg),
+			ReadTimeout:  readTimeoutSeconds * time.Second,
+			WriteTimeout: writeTimeoutSeconds * time.Second,
 		},
 	}
 }

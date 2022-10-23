@@ -19,13 +19,14 @@ const (
 	ErrorLogLvl     = "ERROR"
 	LogLvlConfigKey = "LOG_LEVEL"
 	lenOfLines      = 2
+	envFileName     = ".env"
 )
 
 // Load configs from a env file & sets them in environment variables.
 func loadEnvVar() error {
-	f, err := os.Open(".env")
+	f, err := os.Open(envFileName)
 	if err != nil {
-		return fmt.Errorf("error while opening .env file: %w", err)
+		return fmt.Errorf("error while opening %s file: %w", envFileName, err)
 	}
 
 	defer func() {
@@ -43,13 +44,13 @@ func loadEnvVar() error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error while scaning .env file: %w", err)
+		return fmt.Errorf("error while scaning %s file: %w", envFileName, err)
 	}
 
 	for _, l := range lines {
 		pair := strings.Split(l, "=")
 		if len(pair) != lenOfLines {
-			return errors.New("not enough data for the configuration in .env file")
+			return errors.New("not enough data for the configuration at the config file")
 		}
 
 		os.Setenv(pair[0], pair[1])
@@ -112,7 +113,7 @@ func (opt Options) validate() error {
 	if strings.ToUpper(opt.LogLevel) != DebugLogLvl &&
 		strings.ToUpper(opt.LogLevel) != ErrorLogLvl &&
 		strings.ToUpper(opt.LogLevel) != InfoLogLvl {
-		return fmt.Errorf("\"%v\" is not allowed loger level", opt.LogLevel)
+		return fmt.Errorf("\"%v\" is not allowed logger level", opt.LogLevel)
 	}
 
 	return nil

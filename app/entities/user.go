@@ -74,7 +74,7 @@ func checkMail(email string) error {
 
 	// Checking for other email issues by regular expression.
 	if valid := mailRegex.MatchString(email); !valid {
-		return fmt.Errorf("email does not match with regex: `%v`", mailMask)
+		return fmt.Errorf("email does not match with regex: `%s`", mailMask)
 	}
 
 	return nil
