@@ -11,6 +11,7 @@ import (
 // that will be sent in JSON format
 type Response struct {
 	Message string `json:"message"`
+	Details string `json:"details"`
 }
 
 // TODO: Usually, you need to make a rollback mechanism.
