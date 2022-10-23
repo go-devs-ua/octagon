@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/gorilla/mux"
 	"github.com/lib/pq"
 )
 
@@ -36,7 +37,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			// TODO: Handle errors gracefully.
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
 				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
 				return
@@ -48,5 +48,26 @@ func (uh UserHandler) CreateUser() http.Handler {
 
 		WriteJSONResponse(w, http.StatusCreated, Response{MsgUserCreated}, uh.logger)
 		uh.logger.Debugw("user successfully created", "ID", id)
+	})
+}
+
+func (uh UserHandler) GetUser() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		id := mux.Vars(req)["id"]
+
+		user, err := uh.usecase.GetUser(id)
+		if err != nil {
+			uh.logger.Errorf("Failed creating user: %+v", err)
+			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
+				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
+				return
+			}
+
+			WriteJSONResponse(w, http.StatusNotFound, Response{MsgNotFound}, uh.logger)
+			return
+		}
+
+		WriteJSONResponse(w, http.StatusCreated, user, uh.logger)
+		uh.logger.Debugw("User received", "ID", id)
 	})
 }

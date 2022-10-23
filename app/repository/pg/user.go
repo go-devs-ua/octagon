@@ -37,3 +37,15 @@ func (r Repo) Add(user entities.User) (string, error) {
 
 	return id, nil
 }
+
+func (r Repo) GetUserByID(id string) (entities.PublicUser, error) {
+	var user entities.PublicUser
+
+	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
+
+	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
+		return entities.PublicUser{}, fmt.Errorf("error getting from database: %w", err)
+	}
+
+	return user, nil
+}

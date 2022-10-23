@@ -17,11 +17,19 @@ func NewUser(repo UserRepository) User {
 // Signup represents business logic
 // and will take care of creating user.
 func (u User) Signup(user entities.User) (string, error) {
-	// TODO: Some magic
 	id, err := u.Repo.Add(user)
 	if err != nil {
 		return "", err
 	}
 
 	return id, nil
+}
+
+func (u User) GetUser(id string) (entities.PublicUser, error) {
+	user, err := u.Repo.GetUserByID(id)
+	if err != nil {
+		return entities.PublicUser{}, err
+	}
+
+	return user, nil
 }
