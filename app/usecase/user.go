@@ -1,7 +1,9 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
+	"github.com/go-devs-ua/octagon/app/repository/pg"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 )
@@ -21,6 +23,10 @@ func NewUser(repo UserRepository) User {
 func (u User) Signup(user entities.User) (string, error) {
 	id, err := u.Repo.Add(user)
 	if err != nil {
+		if errors.Is(err, pg.ErrDuplicateEmail) {
+			return "", ErrDuplicateEmail
+		}
+
 		return "", fmt.Errorf("error while adding user to database: %w", err)
 	}
 

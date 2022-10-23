@@ -8,10 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-devs-ua/octagon/app/entities"
-	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq" // Standart blanc import for pq.
+)
+
+var (
+	ErrDuplicateEmail = errors.New("email is already taken")
 )
 
 // Repo wraps a database handle.
@@ -38,7 +41,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
-			return "", usecase.ErrDuplicateEmail
+			return "", ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error inserting into database: %w", err)
