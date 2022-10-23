@@ -5,12 +5,13 @@ package pg
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/pkg/hash"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq" // Standart blanc import for pq.
-	"strings"
 )
 
 // Repo wraps a database handle.
@@ -35,7 +36,8 @@ func (r Repo) Add(user entities.User) (string, error) {
 						  VALUES ($1, $2, $3, $4) RETURNING id`
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
-		if strings.Contains(err.Error(), "unique_user_email") { //FIXME by Rusli4 for Andrii
+		var pqErr = new(pq.Error)
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
 			return "", usecase.ErrDuplicateEmail
 		}
 

@@ -23,7 +23,7 @@ const (
 func main() {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		log.Printf("Failed to get config from file: %+v", err)
+		log.Printf("Failed to get config: %+v", err)
 
 		return
 	}

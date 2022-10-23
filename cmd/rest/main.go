@@ -23,7 +23,7 @@ func main() {
 func Run() error {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		return fmt.Errorf("failed to get config: %+w", err)
+		return fmt.Errorf("failed to get config: %w", err)
 	}
 
 	logger, err := lgr.New(config.LogLevel)
