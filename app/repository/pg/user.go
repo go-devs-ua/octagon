@@ -37,3 +37,11 @@ func (r Repo) Add(user entities.User) (string, error) {
 
 	return id, nil
 }
+
+func (r Repo) GetUserByID(id string) (entities.User, error) {
+	row := r.DB.QueryRow("SELECT * FROM user WHERE id=$1", id)
+	if row.Err() == sql.ErrNoRows {
+		return nil, sql.ErrNoRows
+	}
+	err = row.Scan(&user.Id, &user.Email, &user.FullName, &user.Password, &user.CreatedAt, &user.LastUpdatedAt)
+}
