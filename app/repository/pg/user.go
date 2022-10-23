@@ -49,7 +49,7 @@ func (r Repo) Find(id string) (entities.PublicUser, error) {
 	}
 
 	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
-		return entities.PublicUser{}, fmt.Errorf("error while scanning row %w", err)
+		return entities.PublicUser{}, fmt.Errorf("error while scanning row: %w", err)
 	}
 
 	return user, nil

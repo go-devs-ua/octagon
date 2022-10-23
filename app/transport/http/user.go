@@ -22,7 +22,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		var user entities.User
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v", req, err)
 			return
 		}
@@ -34,7 +34,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		}()
 
 		if err := user.Validate(); err != nil {
-			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 			uh.logger.Errorf("Failed validating user: %+v", err)
 			return
 		}
@@ -44,11 +44,11 @@ func (uh UserHandler) CreateUser() http.Handler {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
 			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
-				WriteJSONResponse(w, http.StatusConflict, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
+				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 				return
 			}
 
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: ServerErrMsg}, uh.logger)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 			return
 		}
 
@@ -57,42 +57,42 @@ func (uh UserHandler) CreateUser() http.Handler {
 	})
 }
 
-func (uh UserHandler) GetUser() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		id := mux.Vars(req)["id"]
+// func (uh UserHandler) GetUser() http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+// 		id := mux.Vars(req)["id"]
 
+// 		user, err := uh.usecase.GetUser(id)
+// 		if err != nil {
+// 			WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
+// 			return
+// 		}
+
+// 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
+// 		uh.logger.Debugw("User received", "ID", id)
+// 	})
+// }
+
+// GetUserByID will handle user search
+func (uh UserHandler) GetUserByID() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var user entities.PublicUser
+		id := mux.Vars(req)["id"]
 		user, err := uh.usecase.GetUser(id)
 		if err != nil {
-			WriteJSONResponse(w, http.StatusNotFound, Response{Message: NotFoundMsg}, uh.logger)
+			uh.logger.Errorf("Failed search user: %+v", err)
+
+			if errors.Is(err, errors.New("no user found in DB with such ID:")) {
+				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
+
+				return
+			}
+
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
+
 			return
 		}
 
 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
-		uh.logger.Debugw("User received", "ID", id)
+		uh.logger.Debugw("User successfully found", "ID", id)
 	})
-}
-
-// GetUserByID will handle user finding
-func (uh UserHandler) GetUserByID() http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var user entities.User
-		params := mux.Vars(req)
-		id:=params["id"]
-		user, err:=uh.usecase.GetUser(id)
-if err!=nil{
-	uh.logger.Errorf("Failed finding user: %+v", err)
-
-	if errors.Is(err, errors.New("no user found in DB with such ID")) {
-		return "", entities.ErrDuplicateEmail
-	}
-
-
-	if err==
-	WriteJSONResponse(w, http.StatusConflict, Response{MsgNoUserByID}, uh.logger)
-
-WriteJSONResponse(w, http.StatusInternalServerError, Response{MsgInternalSeverErr}, uh.logger)
-			return
-			
-		}
-
 }

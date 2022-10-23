@@ -10,8 +10,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const timeoutMsg = "Connection timeout"
-
 // Server is simple server
 type Server struct{ *http.Server }
 
@@ -33,7 +31,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, 3*time.Second, timeoutMsg),
+			Handler:      http.TimeoutHandler(handler, 3*time.Second, MsgTimeOut),
 			ReadTimeout:  2 * time.Second,
 			WriteTimeout: 5 * time.Second,
 		},
@@ -51,5 +49,5 @@ func (srv *Server) Run() error {
 
 func attachUserEndpoints(router *mux.Router, handlers Handlers) {
 	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
-	router.Path("/users/{id:[0-9a-z-]+}").Methods(http.MethodGet).Handler(handlers.UserHandler.GetUser())
+	router.Path("/users/{id:[0-9a-z-]+}").Methods(http.MethodGet).Handler(handlers.UserHandler.GetUserByID())
 }

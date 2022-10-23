@@ -6,4 +6,5 @@ const (
 	MsgInternalSeverErr = "Internal server error"
 	MsgBadRequest       = "Bad request"
 	MsgUserNotFound     = "User not found"
+	MsgTimeOut          = "Connection timeout"
 )
