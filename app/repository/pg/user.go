@@ -41,7 +41,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 // GetUserByID meth implements usecase.UserRepository logic
 // finding user in DB by ID.
 func (r Repo) Find(id string) (entities.PublicUser, error) {
-	row := r.DB.QueryRow("SELECT id, first_name, last_name, email, created_at FROM user WHERE id=$1", id)
+	row := r.DB.QueryRow(`SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`, id)
 	var user entities.PublicUser
 
 	if row.Err() == sql.ErrNoRows {
