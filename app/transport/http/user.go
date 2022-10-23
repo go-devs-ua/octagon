@@ -63,13 +63,7 @@ func (uh UserHandler) GetUser() http.Handler {
 
 		user, err := uh.usecase.GetUser(id)
 		if err != nil {
-			uh.logger.Errorf("Failed creating user: %+v", err)
-			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" {
-				WriteJSONResponse(w, http.StatusConflict, Response{MsgEmailConflict}, uh.logger)
-				return
-			}
-
-			WriteJSONResponse(w, http.StatusNotFound, Response{MsgNotFound}, uh.logger)
+			WriteJSONResponse(w, http.StatusNotFound, Response{Message: NotFoundMsg}, uh.logger)
 			return
 		}
 
