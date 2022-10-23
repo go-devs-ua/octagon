@@ -3,12 +3,13 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"github.com/go-devs-ua/octagon/app/usecase"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-// Response will wrap message
+// CreateUserResponse will wrap message
 // that will be sent in JSON format.
 type CreateUserResponse struct {
 	ID string `json:"id"`
@@ -43,7 +44,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			if errors.Is(err, entities.ErrDuplicateEmail) {
+			if errors.Is(err, usecase.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 
 				return
