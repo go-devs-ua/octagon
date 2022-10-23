@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
-	"github.com/lib/pq"
 )
 
 // Response will wrap message
@@ -44,8 +43,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			// Handle errors gracefully.
-			if err, ok := errors.Unwrap(err).(*pq.Error); ok && err.Code.Name() == "unique_violation" { //nolint:errorlint,lll // We cant change Unwrap because of use pq.Error
+			if errors.Is(err, entities.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: BadRequestMsg, Details: err.Error()}, uh.logger)
 
 				return
