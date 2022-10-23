@@ -5,5 +5,5 @@ const (
 	MsgEmailConflict    = "Email is already taken"
 	MsgInternalSeverErr = "Internal server error"
 	MsgBadRequest       = "Bad request"
-	MsgNoUserByID       = "No user with such ID"
+	MsgUserNotFound     = "User not found"
 )

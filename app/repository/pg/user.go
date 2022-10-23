@@ -40,15 +40,16 @@ func (r Repo) Add(user entities.User) (string, error) {
 
 // GetUserByID meth implements usecase.UserRepository logic
 // finding user in DB by ID.
-func (r Repo) Find(id string) (entities.User, error) {
-	row := r.DB.QueryRow("SELECT * FROM user WHERE id=$1", id)
-	var user entities.User
+func (r Repo) Find(id string) (entities.PublicUser, error) {
+	row := r.DB.QueryRow("SELECT id, first_name, last_name, email, created_at FROM user WHERE id=$1", id)
+	var user entities.PublicUser
 
 	if row.Err() == sql.ErrNoRows {
-		return entities.User{}, fmt.Errorf("no user found in DB with such ID: %w", row.Err())
+		return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", row.Err())
 	}
-	if err := row.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.CreatedAt); err != nil {
-		return entities.User{}, fmt.Errorf("error while scanning row %w", err)
+
+	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
+		return entities.PublicUser{}, fmt.Errorf("error while scanning row %w", err)
 	}
 
 	return user, nil
