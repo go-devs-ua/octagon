@@ -35,7 +35,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 						  VALUES ($1, $2, $3, $4) RETURNING id`
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
-		if strings.Contains(err.Error(), "unique_user_email") {
+		if strings.Contains(err.Error(), "unique_user_email") { //FIXME by Rusli4 for Andrii
 			return "", usecase.ErrDuplicateEmail
 		}
 
