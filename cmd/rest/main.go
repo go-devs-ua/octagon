@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
-	rest "github.com/go-devs-ua/octagon/app/transport/http"
+	"github.com/go-devs-ua/octagon/app/transport/rest"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
 	"github.com/go-devs-ua/octagon/lgr"

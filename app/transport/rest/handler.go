@@ -1,4 +1,4 @@
-package http
+package rest
 
 import (
 	"github.com/go-devs-ua/octagon/lgr"
