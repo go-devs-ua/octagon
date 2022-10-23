@@ -67,7 +67,7 @@ func (uh UserHandler) GetUser() http.Handler {
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusCreated, user, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 		uh.logger.Debugw("User received", "ID", id)
 	})
 }
