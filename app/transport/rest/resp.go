@@ -1,4 +1,4 @@
-package http
+package rest
 
 import (
 	"encoding/json"
@@ -8,19 +8,19 @@ import (
 )
 
 // Response will wrap message
-// that will be sent in JSON format
+// that will be sent in JSON format.
 type Response struct {
 	Message string `json:"message"`
 	Details string `json:"details"`
 }
 
-// TODO: Usually, you need to make a rollback mechanism.
-//  If there is an error, roll back the changes
-//  from the database. But we will not do that now.
-//  Therefore, we will not change the status code
-//  after an error occurs
+// Usually, you need to make a rollback mechanism.
+// If there is an error, roll back the changes
+// from the database. But we will not do that now.
+// Therefore, we will not change the status code
+// after an error occurs.
 
-// WriteJSONResponse writes JSON response
+// WriteJSONResponse writes JSON response.
 func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *lgr.Logger) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
@@ -29,6 +29,7 @@ func WriteJSONResponse(w http.ResponseWriter, statusCode int, data any, logger *
 		if statusCode != http.StatusNoContent {
 			logger.Errorf("Invalid data, expected nil")
 		}
+
 		return
 	}
 

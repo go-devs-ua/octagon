@@ -1,6 +1,10 @@
 package usecase
 
 import (
+	"errors"
+	"fmt"
+	"github.com/go-devs-ua/octagon/app/repository/pg"
+
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
@@ -17,10 +21,13 @@ func NewUser(repo UserRepository) User {
 // Signup represents business logic
 // and will take care of creating user.
 func (u User) Signup(user entities.User) (string, error) {
-	// TODO: Some magic
 	id, err := u.Repo.Add(user)
 	if err != nil {
-		return "", err
+		if errors.Is(err, pg.ErrDuplicateEmail) {
+			return "", ErrDuplicateEmail
+		}
+
+		return "", fmt.Errorf("error while adding user to database: %w", err)
 	}
 
 	return id, nil
