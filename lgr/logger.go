@@ -10,7 +10,7 @@ import (
 // Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 
-// New initialize logger
+// New initialize logger.
 func New(logLevel string) (*Logger, error) {
 	level, err := zapcore.ParseLevel(logLevel)
 	if err != nil {
@@ -48,8 +48,7 @@ func (l *Logger) Flush() {
 	}
 }
 
-// Methods above will implement all needful logging behavior
-
+// Methods above will implement all needful logging behavior.
 func (l *Logger) Errorf(format string, val ...any) {
 	l.log.Errorf(format, val...)
 }

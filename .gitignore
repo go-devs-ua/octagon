@@ -1,5 +1,4 @@
 .vscode
 .idea
 .gitignore
-.golangci.yml
 .env

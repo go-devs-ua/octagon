@@ -23,34 +23,37 @@ const (
 func main() {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		log.Printf("Failed to get config from .env: %+v", err)
+		log.Printf("Failed to get config: %+v", err)
+
 		return
 	}
 
 	logger, err := lgr.New(config.LogLevel)
 	if err != nil {
 		log.Printf("failed to create logger: %v", err)
+
 		return
 	}
 
 	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
 		logger.Errorf("%+v", err)
+
 		return
 	}
 
-	direction := flag.String("migrate", "", "applying migrations 'up/down'")
+	direction := flag.String("migrate", "", "applying migration direction")
 	flag.Parse()
 
 	if *direction != up && *direction != down {
-		fmt.Println("Wrong flag provided, choose '-migrate up' or '-migrate down'")
+		log.Printf("Wrong flag provided, choose '-migrate %s' or '-migrate %s'\n", up, down)
+
 		return
 	}
 
 	if err := migrateDB(db, logger, *direction); err != nil {
 		logger.Errorf("Failed making migrations: %v", err)
 	}
-
 }
 
 // MigrateDB executes migrations.

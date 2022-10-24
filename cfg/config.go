@@ -1,6 +1,6 @@
 // Package cfg contains structs
 // that will hold on all needful parameters for our app
-// that will be retrieved from  .env or ./cfg/config.yml
+// that will be retrieved from  .env or ./cfg/config.yml.
 package cfg
 
 import (
@@ -12,19 +12,21 @@ import (
 	"strings"
 )
 
-// Allowed logger levels & config key
+// Allowed logger levels & config key.
 const (
 	DebugLogLvl     = "DEBUG"
 	InfoLogLvl      = "INFO"
 	ErrorLogLvl     = "ERROR"
 	LogLvlConfigKey = "LOG_LEVEL"
+	lenOfLines      = 2
+	envFileName     = ".env"
 )
 
-// Load configs from a env file & sets them in environment variables
+// Load configs from a env file & sets them in environment variables.
 func loadEnvVar() error {
-	f, err := os.Open(".env")
+	f, err := os.Open(envFileName)
 	if err != nil {
-		return err
+		return fmt.Errorf("error while opening %s file: %w", envFileName, err)
 	}
 
 	defer func() {
@@ -42,13 +44,13 @@ func loadEnvVar() error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		return fmt.Errorf("error while scaning %s file: %w", envFileName, err)
 	}
 
 	for _, l := range lines {
 		pair := strings.Split(l, "=")
-		if len(pair) != 2 {
-			return errors.New("not enough data for the configuration in .env file")
+		if len(pair) != lenOfLines {
+			return errors.New("not enough data for the configuration at the config file")
 		}
 
 		os.Setenv(pair[0], pair[1])
@@ -65,13 +67,13 @@ type DB struct {
 	DBName   string
 }
 
-// Server configuration description
+// Server configuration description.
 type Server struct {
 	Host string
 	Port string
 }
 
-// Options will keep all needful configs
+// Options will keep all needful configs.
 type Options struct {
 	LogLevel string
 	Server   Server
@@ -79,7 +81,7 @@ type Options struct {
 }
 
 // GetConfig will create instance of Options
-// that will be used im main package
+// that will be used im main package.
 func GetConfig() (Options, error) {
 	if err := loadEnvVar(); err != nil {
 		return Options{}, err
@@ -111,7 +113,7 @@ func (opt Options) validate() error {
 	if strings.ToUpper(opt.LogLevel) != DebugLogLvl &&
 		strings.ToUpper(opt.LogLevel) != ErrorLogLvl &&
 		strings.ToUpper(opt.LogLevel) != InfoLogLvl {
-		return fmt.Errorf("\"%v\" is not allowed loger level", opt.LogLevel)
+		return fmt.Errorf("\"%v\" is not allowed logger level", opt.LogLevel)
 	}
 
 	return nil

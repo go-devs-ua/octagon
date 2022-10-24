@@ -1,5 +1,5 @@
 // Package main is key entry point
-// of our awesome app
+// of our awesome app.
 package main
 
 import (
@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
-	rest "github.com/go-devs-ua/octagon/app/transport/http"
+	"github.com/go-devs-ua/octagon/app/transport/rest"
 	"github.com/go-devs-ua/octagon/app/usecase"
 	"github.com/go-devs-ua/octagon/cfg"
 	"github.com/go-devs-ua/octagon/lgr"
@@ -19,11 +19,11 @@ func main() {
 	}
 }
 
-// Run will bind our layers all together
+// Run will bind our layers all together.
 func Run() error {
 	config, err := cfg.GetConfig()
 	if err != nil {
-		return fmt.Errorf("failed to get config from .env: %+v", err)
+		return fmt.Errorf("failed to get config: %w", err)
 	}
 
 	logger, err := lgr.New(config.LogLevel)
@@ -36,10 +36,12 @@ func Run() error {
 	db, err := pg.ConnectDB(config.DB)
 	if err != nil {
 		logger.Errorf("%+v", err)
-		return err
+
+		return fmt.Errorf("error connecting to database on host: %s, port: %s, with error: %w", config.DB.Host, config.DB.Port, err)
 	}
 
 	repo := pg.NewRepo(db)
+
 	logger.Infof("Connection to database successfully created")
 
 	handlers := rest.Handlers{
@@ -49,7 +51,8 @@ func Run() error {
 	srv := rest.NewServer(config, handlers, logger)
 	if err := srv.Run(); err != nil {
 		logger.Errorf("Failed loading server: %+v", err)
-		return err
+
+		return fmt.Errorf("error loading server: %w", err)
 	}
 
 	return nil
