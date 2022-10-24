@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
@@ -53,15 +54,15 @@ func (r Repo) Add(user entities.User) (string, error) {
 // GetUserByID meth implements usecase.UserRepository logic
 // finding user in DB by ID.
 func (r Repo) Find(id string) (entities.PublicUser, error) {
-	row := r.DB.QueryRow(`SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`, id)
 	var user entities.PublicUser
 
-	if row.Err() == sql.ErrNoRows {
-		return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", row.Err())
-	}
+	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
 
-	if err := row.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
-		return entities.PublicUser{}, fmt.Errorf("error while scanning row: %w", err)
+	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", err)
+		}
+		return entities.PublicUser{}, fmt.Errorf("internal error while scanning row: %w", err)
 	}
 
 	return user, nil

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -62,21 +63,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 	})
 }
 
-// func (uh UserHandler) GetUser() http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-// 		id := mux.Vars(req)["id"]
-
-// 		user, err := uh.usecase.GetUser(id)
-// 		if err != nil {
-// 			WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
-// 			return
-// 		}
-
-// 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
-// 		uh.logger.Debugw("User received", "ID", id)
-// 	})
-// }
-
 // GetUserByID will handle user search
 func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -86,7 +72,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed search user: %+v", err)
 
-			if errors.Is(err, errors.New("no user found in DB with such ID:")) {
+			if errors.Is(err, sql.ErrNoRows) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
 
 				return
