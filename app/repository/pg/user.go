@@ -16,7 +16,6 @@ import (
 
 var (
 	ErrDuplicateEmail = errors.New("email is already taken")
-	ErrInvalidID      = errors.New("invalid ID")
 )
 
 // Repo wraps a database handle.
@@ -60,12 +59,6 @@ func (r Repo) Find(id string) (entities.PublicUser, error) {
 	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
 
 	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
-		var pqErr = new(pq.Error)
-
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == InvalidTextRepresentation {
-			return entities.PublicUser{}, ErrInvalidID
-		}
-
 		if err == sql.ErrNoRows {
 			return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", err)
 		}

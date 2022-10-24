@@ -69,15 +69,16 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		var user entities.PublicUser
 		id := mux.Vars(req)["id"]
 
+		if err := validateID(id); err != nil {
+			uh.logger.Debugw("Invalid ID in the request", "ID", id)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
+
+			return
+		}
+
 		user, err := uh.usecase.GetUser(id)
 		if err != nil {
 			uh.logger.Errorf("Failed search user: %+v", err)
-
-			if errors.Is(err, usecase.ErrInvalidID) {
-				WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
-
-				return
-			}
 
 			if errors.Is(err, sql.ErrNoRows) {
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
