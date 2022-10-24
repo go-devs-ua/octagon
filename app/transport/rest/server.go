@@ -21,7 +21,7 @@ type Handlers struct {
 func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	router := new(mux.Router)
 
-	attachUserEndpoints(router, handlers)
+	attachUserEndpoints(router, handlers, logger)
 
 	handler := WrapMiddleware(router,
 		WithLogRequest(logger),
@@ -46,6 +46,13 @@ func (srv *Server) Run() error {
 	return nil
 }
 
-func attachUserEndpoints(router *mux.Router, handlers Handlers) {
-	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
+func attachUserEndpoints(router *mux.Router, handlers Handlers, logger *lgr.Logger) {
+	router.Path("/users").Methods(http.MethodPost).
+		Handler(handlers.UserHandler.CreateUser())
+
+	router.Path("/users").Methods(http.MethodGet).
+		Handler(WrapMiddleware(
+			handlers.UserHandler.GetUsers(),
+			WithValidateQuery(logger, queryParamsRegexp, queryArgsRegexp),
+		))
 }

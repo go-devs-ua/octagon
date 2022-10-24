@@ -5,6 +5,7 @@
 package usecase
 
 import (
+	"context"
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
@@ -12,4 +13,5 @@ import (
 // in any kind of repositories like Postgres, MySQL etc.
 type UserRepository interface {
 	Add(entities.User) (string, error)
+	GetAll(context.Context, map[string]any) ([]*entities.PublicUser, error)
 }

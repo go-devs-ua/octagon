@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/go-devs-ua/octagon/app/repository/pg"
@@ -31,4 +32,14 @@ func (u User) Signup(user entities.User) (string, error) {
 	}
 
 	return id, nil
+}
+
+// Fetch retrieves all suitable users from repository.
+func (u User) Fetch(ctx context.Context, params map[string]any) ([]*entities.PublicUser, error) {
+	users, err := u.Repo.GetAll(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching users: %w", err)
+	}
+
+	return users, nil
 }

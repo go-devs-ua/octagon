@@ -4,6 +4,7 @@
 package pg
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -35,10 +36,10 @@ func NewRepo(db *sql.DB) *Repo {
 func (r Repo) Add(user entities.User) (string, error) {
 	var id string
 
-	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
+	const SQl = `INSERT INTO "user" (first_name, last_name, email, password)
 						  VALUES ($1, $2, $3, $4) RETURNING id`
 
-	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
+	if err := r.DB.QueryRow(SQl, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
 			return "", ErrDuplicateEmail
@@ -48,4 +49,40 @@ func (r Repo) Add(user entities.User) (string, error) {
 	}
 
 	return id, nil
+}
+
+// GetAll fetches all existing (not deleted) users without sensitive data.
+func (r Repo) GetAll(ctx context.Context, params map[string]any) ([]*entities.PublicUser, error) {
+	var users []*entities.PublicUser
+	const SQl = `
+			SELECT id, first_name, last_name, created_at
+			FROM "user" 
+			WHERE deleted_at IS NULL
+			ORDER BY $1 
+			OFFSET $2 
+			LIMIT $3;
+	`
+	rows, err := r.DB.QueryContext(ctx, SQl, params["sort"], params["offset"], params["limit"])
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %w", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var user = new(entities.PublicUser)
+
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("error scaning object from query: %w", err)
+		}
+
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error occured during iteration: %w", err)
+	}
+
+	return users, nil
 }
