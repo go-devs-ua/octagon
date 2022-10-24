@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	uniqueViolationErrCode = "unique_violation"
+	uniqueViolationErrCode    = "unique_violation"
+	InvalidTextRepresentation = "invalid_text_representation"
 )
 
 // ConnectDB is used to create connection to postgres DB.
