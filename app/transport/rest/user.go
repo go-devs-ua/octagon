@@ -78,14 +78,14 @@ func (uh UserHandler) GetUserByID() http.Handler {
 
 		user, err := uh.usecase.GetUser(id)
 		if err != nil {
-			uh.logger.Errorf("Failed search user: %+v", err)
-
 			if errors.Is(err, sql.ErrNoRows) {
+				uh.logger.Warnf("Failed search user: %+v", err)
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
 
 				return
 			}
 
+			uh.logger.Errorf("Failed search user: %+v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
 			return
