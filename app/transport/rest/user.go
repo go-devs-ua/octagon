@@ -73,7 +73,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			uh.logger.Errorf("Failed search user: %+v", err)
 
 			if errors.Is(err, sql.ErrNoRows) {
-				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
+				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
 
 				return
 			}

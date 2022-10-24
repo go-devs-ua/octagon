@@ -54,6 +54,6 @@ func Run() error {
 
 		return fmt.Errorf("error loading server: %w", err)
 	}
-
+	logger.Infof("Server starts on port:", config.DB.Port)
 	return nil
 }
