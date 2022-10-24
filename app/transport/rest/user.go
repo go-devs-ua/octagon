@@ -70,7 +70,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		id := mux.Vars(req)["id"]
 
 		if err := validateID(id); err != nil {
-			uh.logger.Debugw("Invalid ID in the request", "ID", id)
+			uh.logger.Warnf("Invalid ID in the request: %s", id)
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 			return
@@ -79,13 +79,13 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		user, err := uh.usecase.GetUser(id)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				uh.logger.Warnf("Failed search user: %+v", err)
+				uh.logger.Debugf("No user found by ID: %s, error: %+v", id, err)
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
 
 				return
 			}
 
-			uh.logger.Errorf("Failed search user: %+v", err)
+			uh.logger.Errorf("Internal error while searching user in DB: %+v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
 			return
