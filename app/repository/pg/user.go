@@ -62,6 +62,7 @@ func (r Repo) Find(id string) (entities.PublicUser, error) {
 		if err == sql.ErrNoRows {
 			return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", err)
 		}
+
 		return entities.PublicUser{}, fmt.Errorf("internal error while scanning row: %w", err)
 	}
 

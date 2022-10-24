@@ -63,7 +63,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 	})
 }
 
-// GetUserByID will handle user search
+// GetUserByID will handle user search.
 func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var user entities.PublicUser
