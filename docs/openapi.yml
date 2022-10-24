@@ -27,7 +27,7 @@ paths:
   /users/{id}:
     get:
       summary: Return user
-      description: The endpoint return an user by the id if the id exists in the database.  Request consists of id specified in url. Response consists of a status code and of a response body. The response body may consist an error message or an entity of PublicUser
+      description: The endpoint return an user by the id if the id exists in the database.  Request consists of id specified in url. Response consists of a status code and a response body. The response body may consist an error message or an entity of PublicUser
       responses:
         "200": { $ref: "#/components/responses/ok" }
         "404": { $ref: "#/components/responses/notFound" }
@@ -87,8 +87,8 @@ components:
       type: object
       required:
         - email
-        - firstname
-        - lastname
+        - first_name
+        - last_name
         - password
       properties:
         email:
@@ -116,12 +116,12 @@ components:
       required:
         - id
         - email
-        - firstname
-        - lastname
+        - first_name
+        - last_name
         - created_at
       properties:
         id: {
-            description: unique identifier of the user entetie ,
+            description: unique identifier of the user entity ,
             type: string,
             format: id,
             uniqueItems: true,
