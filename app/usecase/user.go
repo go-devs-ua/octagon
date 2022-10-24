@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
+
 	"github.com/go-devs-ua/octagon/app/repository/pg"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -38,7 +39,11 @@ func (u User) Signup(user entities.User) (string, error) {
 func (u User) GetUser(id string) (entities.PublicUser, error) {
 	user, err := u.Repo.Find(id)
 	if err != nil {
-		return entities.PublicUser{}, err
+		if errors.Is(err, pg.ErrInvalidID) {
+			return entities.PublicUser{}, ErrInvalidID
+		}
+
+		return entities.PublicUser{}, fmt.Errorf("error while searching user in database: %w", err)
 	}
 
 	return user, nil
