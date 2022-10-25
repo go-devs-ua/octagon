@@ -81,12 +81,11 @@ func (uh UserHandler) CreateUser() http.Handler {
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var (
-			users    []entities.PublicUser
-			params   = entities.QueryParams{Offset: defaultOffset, Limit: defaultLimit, Sort: defaultSort}
-			numUsers int
-			next     *url.URL
-			query    url.Values
-			err      error
+			users  []entities.PublicUser
+			params = entities.QueryParams{Offset: defaultOffset, Limit: defaultLimit, Sort: defaultSort}
+			next   *url.URL
+			query  url.Values
+			err    error
 		)
 
 		for param, arg := range req.URL.Query() {

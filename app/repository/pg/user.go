@@ -64,7 +64,7 @@ func (r Repo) GetAllUsers(ctx context.Context, params entities.QueryParams) ([]e
 			OFFSET $2 
 			LIMIT $3;
 	`
-	rows, err := r.DB.QueryContext(ctx, SQl, params)
+	rows, err := r.DB.QueryContext(ctx, SQl, params.Sort, params.Offset, params.Limit)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
 	}
