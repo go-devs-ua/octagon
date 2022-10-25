@@ -4,12 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/go-devs-ua/octagon/app/achtung"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
-
-	"github.com/go-devs-ua/octagon/app/usecase"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 )
@@ -57,7 +56,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			if errors.Is(err, usecase.ErrDuplicateEmail) {
+			if errors.Is(err, achtung.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 				return
