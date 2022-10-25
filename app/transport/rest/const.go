@@ -7,6 +7,7 @@ const (
 	MsgBadRequest       = "Bad request"
 	MsgNoContent        = "Nothing to show"
 	MsgUserNotFound     = "User not found"
+	MsgPanic            = "Server has recovered from panic"
 	MsgTimeOut          = "Connection timeout"
 	MsgParam            = "Parameter"
 	MsgArg              = "Argument"
