@@ -51,7 +51,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 	return id, nil
 }
 
-// GetUserByID meth implements usecase.UserRepository logic
+// Find method implements usecase.UserRepository logic
 // finding user in DB by ID.
 func (r Repo) Find(id string) (entities.User, error) {
 	var user entities.User
