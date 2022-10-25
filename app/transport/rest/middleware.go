@@ -69,7 +69,7 @@ func WithoutPanic(h http.Handler, logger *lgr.Logger) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, logger)
-				logger.Errorf(MsgPanic,
+				logger.Errorw(MsgPanic,
 					MsgErr, err)
 			}
 		}()

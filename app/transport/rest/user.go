@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -86,7 +87,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 			next   string
 			err    error
 		)
-
+		fmt.Println(users[10])
 		for param, arg := range req.URL.Query() {
 			val := strings.Join(arg, "")
 
