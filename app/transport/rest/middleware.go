@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-devs-ua/octagon/lgr"
 )
@@ -75,4 +76,9 @@ func WithoutPanic(h http.Handler, logger *lgr.Logger) http.Handler {
 
 		h.ServeHTTP(w, req)
 	})
+}
+
+// WithHandlerTimeout set up handler timout.
+func WithHandlerTimeout(h http.Handler, logger *lgr.Logger) http.Handler {
+	return http.TimeoutHandler(h, handlerTimeoutSeconds*time.Second, MsgTimeOut)
 }
