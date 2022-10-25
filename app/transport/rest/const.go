@@ -8,6 +8,9 @@ const (
 	MsgNoContent        = "Nothing to show"
 	MsgUserNotFound     = "User not found"
 	MsgTimeOut          = "Connection timeout"
+	MsgParam            = "Parameter"
+	MsgArg              = "Argument"
+	MsgErr              = "Err"
 )
 
 const (

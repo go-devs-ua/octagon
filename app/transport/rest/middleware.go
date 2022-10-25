@@ -40,14 +40,20 @@ func WithValidateQuery(logger *lgr.Logger, allowedParams, allowedArgs *regexp.Re
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			for param, arg := range req.URL.Query() {
 				if !allowedParams.MatchString(param) {
-					logger.Errorf("Unacceptable parameter %v in query", param)
+					logger.Errorw("Unacceptable parameter.",
+						MsgParam, param,
+						MsgArg, arg,
+					)
 					WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: "query params should match regex: " + allowedParams.String()}, logger)
 
 					return
 				}
 
 				if !allowedArgs.MatchString(strings.Join(arg, "")) {
-					logger.Errorf("Unacceptable argument in query parameter: %v", arg)
+					logger.Errorw("Unacceptable argument.",
+						MsgParam, param,
+						MsgArg, arg,
+					)
 					WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: "query arguments should match regex: " + allowedArgs.String()}, logger)
 
 					return

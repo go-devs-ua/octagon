@@ -101,11 +101,12 @@ func (uh UserHandler) GetUsers() http.Handler {
 
 			if err != nil {
 				uh.logger.Errorw("Failed parsing query.",
-					"Parameter", param,
-					"Argument", val,
-					"Error", err,
+					MsgParam, param,
+					MsgArg, val,
+					MsgErr, err,
 				)
-				WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "error parsing query param: " + val}, uh.logger)
+				WriteJSONResponse(w, http.StatusInternalServerError,
+					Response{Message: MsgInternalSeverErr, Details: "error parsing query argument: " + val}, uh.logger)
 
 				return
 			}
