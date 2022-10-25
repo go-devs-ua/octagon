@@ -24,7 +24,7 @@ type CreateUserResponse struct {
 // ListPublicUsers holds on all public users ready to present.
 type ListPublicUsers struct {
 	Results []entities.PublicUser `json:"results"`
-	Next    *url.URL              `json:"next,omitempty"`
+	Next    string                `json:"next,omitempty"`
 }
 
 // CreateUser will handle user creation.
@@ -75,7 +75,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 // GetUsers retrieves all entities.User by given parameters.
 //
 // `offset` specified in request, if none was specified, default is defaultOffset
-// `limit` specified in request, if none was specified, defaultLimit is pagination limit default.
+// `limit` specified in request, if none was specified, defaultLimit is pagination limit default that is also request limit.
 // `next` link is present if only `offset` and `limit` is less than total number of objects.
 // defaultSort will be used if no params were specified.
 func (uh UserHandler) GetUsers() http.Handler {
@@ -83,8 +83,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 		var (
 			users  []entities.PublicUser
 			params = entities.QueryParams{Offset: defaultOffset, Limit: defaultLimit, Sort: defaultSort}
-			next   *url.URL
-			query  url.Values
+			next   string
 			err    error
 		)
 
@@ -113,10 +112,12 @@ func (uh UserHandler) GetUsers() http.Handler {
 		}
 
 		if params.Limit-params.Offset > defaultLimit {
-			next = req.URL
-			query.Set(offset, strconv.Itoa(params.Offset+defaultLimit))
-			query.Set(limit, strconv.Itoa(params.Limit+defaultLimit))
-			next.RawQuery = query.Encode()
+			u := req.URL
+			q := &url.Values{}
+			q.Set(offset, strconv.Itoa(params.Offset+defaultLimit))
+			q.Set(limit, strconv.Itoa(params.Limit+defaultLimit))
+			u.RawQuery = q.Encode()
+			next = u.String()
 
 			params.Limit = defaultLimit
 		}
