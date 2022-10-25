@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -76,18 +75,18 @@ func (uh UserHandler) CreateUser() http.Handler {
 // GetUsers retrieves all entities.User by given parameters.
 //
 // `offset` specified in request, if none was specified, default is defaultOffset
-// `limit` specified in request, if none was specified, defaultLimit is pagination limit default that is also request limit.
+// `limit` specified in request, if none was specified, maxLimit is pagination limit default that is also request limit.
 // `next` link is present if only `offset` and `limit` is less than total number of objects.
 // defaultSort will be used if no params were specified.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var (
 			users  []entities.PublicUser
-			params = entities.QueryParams{Offset: defaultOffset, Limit: defaultLimit, Sort: defaultSort}
+			params = entities.QueryParams{Sort: defaultSort}
 			next   string
 			err    error
 		)
-		fmt.Println(users[10])
+
 		for param, arg := range req.URL.Query() {
 			val := strings.Join(arg, "")
 
@@ -101,7 +100,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 			}
 
 			if err != nil {
-				uh.logger.Errorw("Failed parsing query.",
+				uh.logger.Errorw("Failed parsing query argument.",
 					MsgParam, param,
 					MsgArg, val,
 					MsgErr, err,
@@ -113,15 +112,15 @@ func (uh UserHandler) GetUsers() http.Handler {
 			}
 		}
 
-		if params.Limit-params.Offset > defaultLimit {
+		if params.Limit > maxLimit {
 			u := req.URL
 			q := &url.Values{}
-			q.Set(offset, strconv.Itoa(params.Offset+defaultLimit))
-			q.Set(limit, strconv.Itoa(params.Limit+defaultLimit))
+			q.Set(offset, strconv.Itoa(params.Offset+maxLimit))
+			q.Set(limit, strconv.Itoa(params.Limit-maxLimit))
 			u.RawQuery = q.Encode()
 			next = u.String()
 
-			params.Limit = defaultLimit
+			params.Limit = maxLimit
 		}
 
 		ctx, cancel := context.WithTimeout(req.Context(), queryTimeoutSeconds*time.Second)

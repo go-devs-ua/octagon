@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/go-devs-ua/octagon/app/alerts"
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -52,6 +53,13 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 	return id, nil
 }
 
+func checkNull(val any) any {
+	if reflect.ValueOf(val).IsZero() {
+		return sql.NullString{}
+	}
+	return val
+}
+
 // GetAllUsers fetches all existing (not deleted) users without sensitive data.
 func (r Repo) GetAllUsers(ctx context.Context, params entities.QueryParams) ([]entities.PublicUser, error) {
 	var users []entities.PublicUser
@@ -64,6 +72,7 @@ func (r Repo) GetAllUsers(ctx context.Context, params entities.QueryParams) ([]e
 			OFFSET $2 
 			LIMIT $3;
 	`
+
 	rows, err := r.DB.QueryContext(ctx, SQl, params.Sort, params.Offset, params.Limit)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
