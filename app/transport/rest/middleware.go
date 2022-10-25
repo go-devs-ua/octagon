@@ -9,34 +9,32 @@ import (
 )
 
 // Middleware is simple decorator.
-type Middleware func(http.Handler) http.Handler
+type Middleware func(http.Handler, *lgr.Logger) http.Handler
 
 // WrapMiddleware will build middleware chain.
-func WrapMiddleware(h http.Handler, middleware ...Middleware) http.Handler {
+func WrapMiddleware(h http.Handler, logger *lgr.Logger, middleware ...Middleware) http.Handler {
 	for _, mw := range middleware {
-		h = mw(h)
+		h = mw(h, logger)
 	}
 
 	return h
 }
 
 // WithLogRequest will log detailed request info.
-func WithLogRequest(logger *lgr.Logger) Middleware {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			logger.Infow("Request:",
-				"Method", req.Method,
-				"URL", req.URL,
-				"User-Agent", req.UserAgent(),
-			)
-			h.ServeHTTP(w, req)
-		})
-	}
+func WithLogRequest(h http.Handler, logger *lgr.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger.Infow("Request:",
+			"Method", req.Method,
+			"URL", req.URL,
+			"User-Agent", req.UserAgent(),
+		)
+		h.ServeHTTP(w, req)
+	})
 }
 
 // WithValidateQuery check if query params is valid.
-func WithValidateQuery(logger *lgr.Logger, allowedParams, allowedArgs *regexp.Regexp) Middleware {
-	return func(h http.Handler) http.Handler {
+func WithValidateQuery(allowedParams, allowedArgs *regexp.Regexp) Middleware {
+	return func(h http.Handler, logger *lgr.Logger) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			for param, arg := range req.URL.Query() {
 				if !allowedParams.MatchString(param) {
@@ -65,18 +63,16 @@ func WithValidateQuery(logger *lgr.Logger, allowedParams, allowedArgs *regexp.Re
 }
 
 // WithoutPanic will recover server from panic.
-func WithoutPanic(logger *lgr.Logger) Middleware {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			defer func() {
-				if err := recover(); err != nil {
-					WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, logger)
-					logger.Errorf(MsgPanic,
-						MsgErr, err)
-				}
-			}()
+func WithoutPanic(h http.Handler, logger *lgr.Logger) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, logger)
+				logger.Errorf(MsgPanic,
+					MsgErr, err)
+			}
+		}()
 
-			h.ServeHTTP(w, req)
-		})
-	}
+		h.ServeHTTP(w, req)
+	})
 }

@@ -23,9 +23,9 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 	attachUserEndpoints(router, handlers, logger)
 
-	handler := WrapMiddleware(router,
-		WithoutPanic(logger),
-		WithLogRequest(logger),
+	handler := WrapMiddleware(router, logger,
+		WithoutPanic,
+		WithLogRequest,
 	)
 
 	return &Server{
@@ -48,12 +48,10 @@ func (srv *Server) Run() error {
 }
 
 func attachUserEndpoints(router *mux.Router, handlers Handlers, logger *lgr.Logger) {
-	router.Path("/users").Methods(http.MethodPost).
-		Handler(handlers.UserHandler.CreateUser())
+	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
 
-	router.Path("/users").Methods(http.MethodGet).
-		Handler(WrapMiddleware(
-			handlers.UserHandler.GetUsers(),
-			WithValidateQuery(logger, queryParamsRegexp, queryArgsRegexp),
+	router.Path("/users").Methods(http.MethodGet).Handler(
+		WrapMiddleware(handlers.UserHandler.GetUsers(), logger,
+			WithValidateQuery(queryParamsRegexp, queryArgsRegexp),
 		))
 }
