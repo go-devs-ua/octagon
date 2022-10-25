@@ -8,7 +8,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/go-devs-ua/octagon/app/achtung"
+
+	"github.com/go-devs-ua/octagon/app/alerts"
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
@@ -42,7 +43,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 	if err := r.DB.QueryRow(SQl, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
-			return "", achtung.ErrDuplicateEmail
+			return "", alerts.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error inserting into database: %w", err)
@@ -52,8 +53,9 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 }
 
 // GetAllUsers fetches all existing (not deleted) users without sensitive data.
-func (r Repo) GetAllUsers(ctx context.Context, params map[string]any) ([]*entities.PublicUser, error) {
-	var users []*entities.PublicUser
+func (r Repo) GetAllUsers(ctx context.Context, params entities.QueryParams) ([]entities.PublicUser, error) {
+	var users []entities.PublicUser
+
 	const SQl = `
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
@@ -62,7 +64,7 @@ func (r Repo) GetAllUsers(ctx context.Context, params map[string]any) ([]*entiti
 			OFFSET $2 
 			LIMIT $3;
 	`
-	rows, err := r.DB.QueryContext(ctx, SQl, params["sort"], params["offset"], params["limit"])
+	rows, err := r.DB.QueryContext(ctx, SQl, params)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
 	}
@@ -70,7 +72,7 @@ func (r Repo) GetAllUsers(ctx context.Context, params map[string]any) ([]*entiti
 	defer rows.Close()
 
 	for rows.Next() {
-		var user = new(entities.PublicUser)
+		var user entities.PublicUser
 
 		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt)
 		if err != nil {

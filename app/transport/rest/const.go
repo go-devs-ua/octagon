@@ -1,13 +1,16 @@
 package rest
 
 const (
-	MsgUserCreated        = "User created successfully"
-	MsgEmailConflict      = "Email is already taken"
-	MsgInternalSeverErr   = "Internal server error"
-	MsgBadRequest         = "Bad request"
-	MsgNoContent          = "Nothing to show"
-	MsgUserNotFound       = "User not found"
-	MsgTimeOut            = "Connection timeout"
+	MsgUserCreated      = "User created successfully"
+	MsgEmailConflict    = "Email is already taken"
+	MsgInternalSeverErr = "Internal server error"
+	MsgBadRequest       = "Bad request"
+	MsgNoContent        = "Nothing to show"
+	MsgUserNotFound     = "User not found"
+	MsgTimeOut          = "Connection timeout"
+)
+
+const (
 	handlerTimeoutSeconds = 30
 	readTimeoutSeconds    = 2
 	writeTimeoutSeconds   = 5
@@ -24,6 +27,5 @@ const (
 	sort          = "sort"
 	defaultOffset = 0
 	defaultLimit  = 10
-	maxLimit      = 100
 	defaultSort   = "first_name,last_name"
 )

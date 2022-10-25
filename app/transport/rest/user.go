@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/go-devs-ua/octagon/app/achtung"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/go-devs-ua/octagon/app/alerts"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 )
@@ -21,11 +23,9 @@ type CreateUserResponse struct {
 
 // ListPublicUsers holds on all public users ready to present.
 type ListPublicUsers struct {
-	Results []*entities.PublicUser `json:"results"`
-	Next    *url.URL               `json:"next,omitempty"`
+	Results []entities.PublicUser `json:"results"`
+	Next    *url.URL              `json:"next,omitempty"`
 }
-
-type QueryParams map[string]any
 
 // CreateUser will handle user creation.
 func (uh UserHandler) CreateUser() http.Handler {
@@ -52,11 +52,11 @@ func (uh UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		id, err := uh.usecase.Signup(user)
+		id, err := uh.usecase.SignupUser(user)
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			if errors.Is(err, achtung.ErrDuplicateEmail) {
+			if errors.Is(err, alerts.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 				return
@@ -81,30 +81,51 @@ func (uh UserHandler) CreateUser() http.Handler {
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var (
-			users       []*entities.PublicUser
-			queryParams = QueryParams{offset: defaultOffset, limit: defaultLimit, sort: defaultSort}
-			err         error
-			val         any
-			numUsers    int
-			next        *url.URL
-			query       url.Values
+			users    []entities.PublicUser
+			params   = entities.QueryParams{Offset: defaultOffset, Limit: defaultLimit, Sort: defaultSort}
+			numUsers int
+			next     *url.URL
+			query    url.Values
+			err      error
 		)
 
 		for param, arg := range req.URL.Query() {
-			if param == offset || param == limit {
-				val, err = strconv.Atoi(arg[0])
-				if err != nil {
-					WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: err.Error()}, uh.logger)
-					uh.logger.Errorf("Failed parsing query params: %v+", err)
-				}
+			val := strings.Join(arg, "")
+
+			switch param {
+			case offset:
+				params.Offset, err = strconv.Atoi(val)
+			case limit:
+				params.Limit, err = strconv.Atoi(val)
+			case sort:
+				params.Sort = val
 			}
-			queryParams[param] = val
+
+			if err != nil {
+				uh.logger.Errorw("Failed parsing query.",
+					"Parameter", param,
+					"Argument", val,
+					"Error", err,
+				)
+				WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "error parsing query param: " + val}, uh.logger)
+
+				return
+			}
+		}
+
+		if params.Limit-params.Offset > defaultLimit {
+			next = req.URL
+			query.Set(offset, strconv.Itoa(params.Offset+defaultLimit))
+			query.Set(limit, strconv.Itoa(params.Limit+defaultLimit))
+			next.RawQuery = query.Encode()
+
+			params.Limit = defaultLimit
 		}
 
 		ctx, cancel := context.WithTimeout(req.Context(), queryTimeoutSeconds*time.Second)
 		defer cancel()
 
-		users, err = uh.usecase.Fetch(ctx, queryParams)
+		users, err = uh.usecase.FetchUsers(ctx, params)
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not get all users"}, uh.logger)
@@ -112,25 +133,11 @@ func (uh UserHandler) GetUsers() http.Handler {
 			return
 		}
 
-		// TODO: Pagination.
-		_, _ = numUsers, query
-		//numUsers = len(users)
-		//if numUsers == 0 {
-		//	WriteJSONResponse(w, http.StatusNoContent, Response{Message: MsgNoContent}, uh.logger)
-		//
-		//	return
-		//}
-		//
-		//nextIs := (queryParams[offset].(int) + queryParams[limit].(int)) < numUsers
-		//
-		//if nextIs {
-		//	next = req.URL
-		//	query.Set(offset, offset+limit)
-		//	query.Set(limit, limit+limit)
-		//	next.RawQuery = query.Encode()
-		//}
+		if len(users) == 0 {
+			WriteJSONResponse(w, http.StatusNoContent, Response{Message: MsgNoContent}, uh.logger)
 
-		//w.Header().Set("Content-Range", fmt.Sprintf("objects %v-%v/%d", offset, limit, numUsers))
+			return
+		}
 
 		WriteJSONResponse(w, http.StatusOK, ListPublicUsers{Results: users, Next: next}, uh.logger)
 	})
