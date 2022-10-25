@@ -13,18 +13,25 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Password  string `json:"password"`
 	CreatedAt string `json:"created_at"`
+	DeletedAt string `json:"deleted_at"`
+}
+
+type UserID struct {
+	ID string `json:"id"`
 }
 
 const (
 	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
 	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$` //nolint:lll // Regexp line can`t be changed.
 	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec // "Potential hardcoded credentials" regexp can`t be changed.
+	IDMask   = `^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$`
 )
 
 var (
 	nameRegex = regexp.MustCompile(nameMask)
 	mailRegex = regexp.MustCompile(mailMask)
 	passRegex = regexp.MustCompile(passMask)
+	IDRegex   = regexp.MustCompile(IDMask)
 )
 
 func (u User) Validate() error {
@@ -83,6 +90,14 @@ func checkMail(email string) error {
 func checkPass(password string) error {
 	if valid := passRegex.MatchString(password); !valid {
 		return fmt.Errorf("password does not match with regex: `%s`", passMask)
+	}
+
+	return nil
+}
+
+func (u User) ValidateUUID() error {
+	if valid := IDRegex.MatchString(u.ID); !valid {
+		return fmt.Errorf("ID does not match with regex: `%s`", IDMask)
 	}
 
 	return nil

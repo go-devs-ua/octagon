@@ -49,3 +49,30 @@ func (r Repo) Add(user entities.User) (string, error) {
 
 	return id, nil
 }
+
+func (r Repo) IsUserExists(user entities.User) (bool, error) {
+	var err error
+	var id string
+
+	const sqlStatement = `SELECT id FROM "user" WHERE id = $1 AND deleted_at IS NULL`
+
+	if err = r.DB.QueryRow(sqlStatement, user.ID).Scan(&id); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("internal error while querying: %w", err)
+	}
+
+	return true, nil
+}
+
+func (r Repo) Delete(user entities.User) error {
+	const sqlStatement = `UPDATE "user" SET deleted_at = NOW() WHERE id = $1`
+
+	if _, err := r.DB.Exec(sqlStatement, user.ID); err != nil {
+		return fmt.Errorf("error inserting into database: %w", err)
+	}
+
+	return nil
+}

@@ -32,3 +32,25 @@ func (u User) Signup(user entities.User) (string, error) {
 
 	return id, nil
 }
+
+// Delete represents business logic
+// and will take care of deleting user.
+func (u User) Delete(user entities.User) error {
+	err := u.Repo.Delete(user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete represents business logic
+// and will take care of deleting user.
+func (u User) IsUserExists(user entities.User) (bool, error) {
+	isExists, err := u.Repo.IsUserExists(user)
+	if err != nil {
+		return isExists, err
+	}
+
+	return isExists, nil
+}
