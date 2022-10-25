@@ -92,7 +92,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 				return
 			}
 
-			uh.logger.Errorw("Internal error while searching user.", "error", err.Error())
+			uh.logger.Errorw("Internal error while searching user.", "ID", id, "error", err.Error())
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
 			return
