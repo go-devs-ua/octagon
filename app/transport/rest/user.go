@@ -3,10 +3,11 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
-	"github.com/go-devs-ua/octagon/app/globs"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/gorilla/mux"
 )
 
@@ -49,11 +50,11 @@ func (uh UserHandler) CreateUser() http.Handler {
 			return
 		}
 
-		id, err := uh.usecase.Signup(user)
+		id, err := uh.usecase.SignUp(user)
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			if errors.Is(err, globs.ErrDuplicateEmail) {
+			if errors.Is(err, globals.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 				return
@@ -74,7 +75,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		id := mux.Vars(req)["id"]
 
-		if err := validateUUID(id); err != nil {
+		if err := entities.ValidateUUID(id); err != nil {
 			uh.logger.Warnw("Invalid request", "ID", id)
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
@@ -83,9 +84,9 @@ func (uh UserHandler) GetUserByID() http.Handler {
 
 		entUser, err := uh.usecase.GetUser(id)
 		if err != nil {
-			if errors.Is(err, globs.ErrNotFound) {
+			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
-				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
+				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: fmt.Sprintf("User with id: %s not found", id)}, uh.logger)
 
 				return
 			}

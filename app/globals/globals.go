@@ -1,4 +1,4 @@
-package globs
+package globals
 
 import "errors"
 

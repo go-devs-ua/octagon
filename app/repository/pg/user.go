@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-devs-ua/octagon/app/entities"
-	"github.com/go-devs-ua/octagon/app/globs"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq" // Standart blanc import for pq.
@@ -29,7 +29,7 @@ func NewRepo(db *sql.DB) *Repo {
 	}
 }
 
-// Add meth implements usecase.UserRepository interface
+// Add method implements usecase.UserRepository interface
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
 func (r Repo) AddUser(user entities.User) (string, error) {
@@ -40,8 +40,8 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == globs.UniqueViolationErrCode {
-			return "", globs.ErrDuplicateEmail
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == globals.UniqueViolationErrCode {
+			return "", globals.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error inserting into database: %w", err)
@@ -59,7 +59,7 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 
 	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, globs.ErrNotFound
+			return nil, globals.ErrNotFound
 		}
 
 		return nil, fmt.Errorf("internal error while scanning row: %w", err)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/go-devs-ua/octagon/app/globals"
 )
 
 type User struct {
@@ -84,6 +86,16 @@ func checkMail(email string) error {
 func checkPass(password string) error {
 	if valid := passRegex.MatchString(password); !valid {
 		return fmt.Errorf("password does not match with regex: `%s`", passMask)
+	}
+
+	return nil
+}
+
+var idRegex = regexp.MustCompile(IDMask)
+
+func ValidateUUID(id string) error {
+	if valid := idRegex.MatchString(id); !valid {
+		return globals.ErrInvalidID
 	}
 
 	return nil
