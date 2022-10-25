@@ -95,7 +95,7 @@ func checkPass(password string) error {
 	return nil
 }
 
-func (u User) ValidateUUID() error {
+func (u UserID) ValidateUUID() error {
 	if valid := IDRegex.MatchString(u.ID); !valid {
 		return fmt.Errorf("ID does not match with regex: `%s`", IDMask)
 	}

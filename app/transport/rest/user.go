@@ -66,7 +66,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 // DeleteUser will handle user creation
 func (uh UserHandler) DeleteUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var user entities.User
+		var user entities.UserID
 
 		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)

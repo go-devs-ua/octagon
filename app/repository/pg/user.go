@@ -50,7 +50,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 	return id, nil
 }
 
-func (r Repo) IsUserExists(user entities.User) (bool, error) {
+func (r Repo) IsUserExists(user entities.UserID) (bool, error) {
 	var err error
 	var id string
 
@@ -67,7 +67,7 @@ func (r Repo) IsUserExists(user entities.User) (bool, error) {
 	return true, nil
 }
 
-func (r Repo) Delete(user entities.User) error {
+func (r Repo) Delete(user entities.UserID) error {
 	const sqlStatement = `UPDATE "user" SET deleted_at = NOW() WHERE id = $1`
 
 	if _, err := r.DB.Exec(sqlStatement, user.ID); err != nil {

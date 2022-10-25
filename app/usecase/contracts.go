@@ -12,6 +12,6 @@ import (
 // in any kind of repositories like Postgres, MySQL etc.
 type UserRepository interface {
 	Add(entities.User) (string, error)
-	Delete(entities.User) error
-	IsUserExists(entities.User) (bool, error)
+	Delete(entities.UserID) error
+	IsUserExists(entities.UserID) (bool, error)
 }

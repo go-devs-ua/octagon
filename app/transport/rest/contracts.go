@@ -7,6 +7,6 @@ import (
 // UserUsecase represents User use-case layer.
 type UserUsecase interface {
 	Signup(entities.User) (string, error)
-	IsUserExists(entities.User) (bool, error)
-	Delete(entities.User) error
+	IsUserExists(entities.UserID) (bool, error)
+	Delete(entities.UserID) error
 }
