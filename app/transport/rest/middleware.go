@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -39,7 +38,6 @@ func WithLogRequest(logger *lgr.Logger) Middleware {
 func WithValidateQuery(logger *lgr.Logger, allowedParams, allowedArgs *regexp.Regexp) Middleware {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			log.Println(req.URL.Query())
 			for param, arg := range req.URL.Query() {
 				if !allowedParams.MatchString(param) {
 					logger.Errorf("Unacceptable parameter %v in query", param)

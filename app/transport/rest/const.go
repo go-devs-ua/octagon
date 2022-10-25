@@ -26,6 +26,6 @@ const (
 	limit         = "limit"
 	sort          = "sort"
 	defaultOffset = 0
-	defaultLimit  = 10
+	defaultLimit  = 5
 	defaultSort   = "first_name,last_name"
 )
