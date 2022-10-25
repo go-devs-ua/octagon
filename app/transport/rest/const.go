@@ -25,7 +25,7 @@ const (
 	// Allowed and default query params and args
 	// in query that are used to fetch all users from repo:
 	maskParams    = "^limit|offset|sort$"
-	maskArgs      = "^(first_name|last_name|created_at)([,]*(first_name|last_name|created_at))*$|^[0-9]+$"
+	maskArgs      = "^(first_name|last_name|created_at)([,]{1}(first_name|last_name|created_at))*$|^[0-9]+$"
 	offset        = "offset"
 	limit         = "limit"
 	sort          = "sort"
