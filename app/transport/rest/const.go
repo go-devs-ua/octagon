@@ -11,7 +11,7 @@ const (
 	MsgTimeOut          = "Connection timeout"
 	MsgParam            = "Parameter"
 	MsgArg              = "Argument"
-	MsgErr              = "Err"
+	MsgErr              = "Error"
 )
 
 const (
