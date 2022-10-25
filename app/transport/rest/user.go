@@ -87,7 +87,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				uh.logger.Debugw("No user found.", "ID", id)
-				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
+				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
 
 				return
 			}
