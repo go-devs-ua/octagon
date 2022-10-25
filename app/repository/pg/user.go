@@ -58,7 +58,7 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
 
 	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, globals.ErrNotFound
 		}
 
