@@ -106,7 +106,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			CreatedAt: entUser.CreatedAt,
 		}
 
-		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 		uh.logger.Debugw("User successfully found", "ID", id)
+		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 	})
 }
