@@ -36,10 +36,10 @@ func (u User) Signup(user entities.User) (string, error) {
 
 // GetUser represents business logic
 // and will take care of finding user.
-func (u User) GetUser(id string) (entities.PublicUser, error) {
+func (u User) GetUser(id string) (entities.User, error) {
 	user, err := u.Repo.Find(id)
 	if err != nil {
-		return entities.PublicUser{}, fmt.Errorf("error while searching user in database: %w", err)
+		return entities.User{}, fmt.Errorf("error while searching user in database: %w", err)
 	}
 
 	return user, nil

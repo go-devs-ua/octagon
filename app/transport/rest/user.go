@@ -18,6 +18,14 @@ type CreateUserResponse struct {
 	ID string `json:"id"`
 }
 
+type User struct {
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	CreatedAt string `json:"created_at"`
+}
+
 // CreateUser will handle user creation.
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -66,7 +74,6 @@ func (uh UserHandler) CreateUser() http.Handler {
 // GetUserByID will handle user search.
 func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var user entities.PublicUser
 		id := mux.Vars(req)["id"]
 
 		if err := validateID(id); err != nil {
@@ -76,19 +83,27 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		user, err := uh.usecase.GetUser(id)
+		entUser, err := uh.usecase.GetUser(id)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				uh.logger.Debugf("No user found by ID: %s, error: %+v", id, err)
+				uh.logger.Debugw("No user found.", "ID", id)
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound, Details: err.Error()}, uh.logger)
 
 				return
 			}
 
-			uh.logger.Errorf("Internal error while searching user in DB: %+v", err)
+			uh.logger.Errorw("Internal error while searching user.", "error", err.Error())
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
 			return
+		}
+
+		user := User{
+			ID:        entUser.ID,
+			FirstName: entUser.FirstName,
+			LastName:  entUser.LastName,
+			Email:     entUser.Email,
+			CreatedAt: entUser.CreatedAt,
 		}
 
 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)

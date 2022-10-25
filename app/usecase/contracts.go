@@ -12,5 +12,5 @@ import (
 // in any kind of repositories like Postgres, MySQL etc.
 type UserRepository interface {
 	Add(entities.User) (string, error)
-	Find(string) (entities.PublicUser, error)
+	Find(string) (entities.User, error)
 }

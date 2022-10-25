@@ -53,17 +53,17 @@ func (r Repo) Add(user entities.User) (string, error) {
 
 // GetUserByID meth implements usecase.UserRepository logic
 // finding user in DB by ID.
-func (r Repo) Find(id string) (entities.PublicUser, error) {
-	var user entities.PublicUser
+func (r Repo) Find(id string) (entities.User, error) {
+	var user entities.User
 
 	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
 
 	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
-			return entities.PublicUser{}, fmt.Errorf("no user found in DB with such ID: %w", err)
+			return entities.User{}, fmt.Errorf("no user found in DB with such ID: %w", err)
 		}
 
-		return entities.PublicUser{}, fmt.Errorf("internal error while scanning row: %w", err)
+		return entities.User{}, fmt.Errorf("internal error while scanning row: %w", err)
 	}
 
 	return user, nil
