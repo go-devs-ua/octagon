@@ -12,7 +12,7 @@ var (
 	idRegex      = regexp.MustCompile(entities.IdMask)
 )
 
-func validateID(id string) error {
+func validateUUID(id string) error {
 	if valid := idRegex.MatchString(id); !valid {
 		return ErrInvalidID
 	}

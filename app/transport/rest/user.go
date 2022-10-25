@@ -76,7 +76,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		id := mux.Vars(req)["id"]
 
-		if err := validateID(id); err != nil {
+		if err := validateUUID(id); err != nil {
 			uh.logger.Warnf("Invalid ID in the request: %s", id)
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
