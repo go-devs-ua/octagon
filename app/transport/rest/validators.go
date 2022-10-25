@@ -3,11 +3,13 @@ package rest
 import (
 	"errors"
 	"regexp"
+
+	"github.com/go-devs-ua/octagon/app/entities"
 )
 
 var (
 	ErrInvalidID = errors.New("invalid ID")
-	idRegex      = regexp.MustCompile(idMask)
+	idRegex      = regexp.MustCompile(entities.IdMask)
 )
 
 func validateID(id string) error {
