@@ -4,9 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-devs-ua/octagon/app/repository/pg"
-
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globs"
 )
 
 type User struct {
@@ -22,10 +21,10 @@ func NewUser(repo UserRepository) User {
 // Signup represents business logic
 // and will take care of creating user.
 func (u User) Signup(user entities.User) (string, error) {
-	id, err := u.Repo.Add(user)
+	id, err := u.Repo.AddUser(user)
 	if err != nil {
-		if errors.Is(err, pg.ErrDuplicateEmail) {
-			return "", ErrDuplicateEmail
+		if errors.Is(err, globs.ErrDuplicateEmail) {
+			return "", globs.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error while adding user to database: %w", err)
@@ -36,10 +35,10 @@ func (u User) Signup(user entities.User) (string, error) {
 
 // GetUser represents business logic
 // and will take care of finding user.
-func (u User) GetUser(id string) (entities.User, error) {
-	user, err := u.Repo.Find(id)
+func (u User) GetUser(id string) (*entities.User, error) {
+	user, err := u.Repo.FindUser(id)
 	if err != nil {
-		return entities.User{}, fmt.Errorf("error while searching user in database: %w", err)
+		return nil, fmt.Errorf("error while searching user in database: %w", err)
 	}
 
 	return user, nil

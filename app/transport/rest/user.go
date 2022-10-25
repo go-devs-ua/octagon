@@ -1,15 +1,13 @@
 package rest
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/go-devs-ua/octagon/app/usecase"
-	"github.com/gorilla/mux"
-
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globs"
+	"github.com/gorilla/mux"
 )
 
 // CreateUserResponse will wrap message
@@ -55,7 +53,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 		if err != nil {
 			uh.logger.Errorf("Failed creating user: %+v", err)
 
-			if errors.Is(err, usecase.ErrDuplicateEmail) {
+			if errors.Is(err, globs.ErrDuplicateEmail) {
 				WriteJSONResponse(w, http.StatusConflict, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 				return
@@ -85,13 +83,12 @@ func (uh UserHandler) GetUserByID() http.Handler {
 
 		entUser, err := uh.usecase.GetUser(id)
 		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
+			if errors.Is(err, globs.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
 
 				return
 			}
-
 			uh.logger.Errorw("Internal error while searching user.", "ID", id, "error", err.Error())
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
@@ -105,8 +102,6 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			Email:     entUser.Email,
 			CreatedAt: entUser.CreatedAt,
 		}
-
-		uh.logger.Debugw("User successfully found", "ID", id)
 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 	})
 }
