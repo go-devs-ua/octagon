@@ -128,7 +128,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 
 		users, err = uh.usecase.FetchUsers(ctx, params)
 		if err != nil {
-			uh.logger.Errorf("Failed fetching users from repository: %v", err)
+			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not get all users"}, uh.logger)
 
 			return
