@@ -29,7 +29,7 @@ func NewRepo(db *sql.DB) *Repo {
 	}
 }
 
-// Add method implements usecase.UserRepository interface
+// AddUser method implements usecase.UserRepository interface
 // without even knowing it that allow us to decouple our layers
 // and will make our app flexible and maintainable.
 func (r Repo) AddUser(user entities.User) (string, error) {
