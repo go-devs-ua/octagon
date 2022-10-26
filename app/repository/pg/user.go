@@ -15,8 +15,6 @@ import (
 	_ "github.com/lib/pq" // Standart blanc import for pq.
 )
 
-var ()
-
 // Repo wraps a database handle.
 type Repo struct {
 	DB *sql.DB
