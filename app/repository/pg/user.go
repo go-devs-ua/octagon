@@ -27,9 +27,7 @@ func NewRepo(db *sql.DB) *Repo {
 	}
 }
 
-// AddUser method implements usecase.UserRepository interface
-// without even knowing it that allow us to decouple our layers
-// and will make our app flexible and maintainable.
+// AddUser methodmethod implements storing the user in the database.
 func (r Repo) AddUser(user entities.User) (string, error) {
 	var id string
 
@@ -48,7 +46,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 	return id, nil
 }
 
-// FindUser method implements logic of finding user in DB by ID.
+// FindUser method implements logic of finding user in the database by ID.
 func (r Repo) FindUser(id string) (*entities.User, error) {
 	var user entities.User
 
