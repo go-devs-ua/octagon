@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -77,7 +76,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		id := mux.Vars(req)["id"]
 
 		if _, err := uuid.Parse(id); err != nil {
-			uh.logger.Warnw("Invalid request", "ID", id)
+			uh.logger.Warnw("Invalid uuid", "ID", id)
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
 			return
@@ -87,8 +86,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
-				WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest,
-					Details: fmt.Sprintf("User with id: %s not found", id)}, uh.logger)
+				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgUserNotFound}, uh.logger)
 
 				return
 			}
