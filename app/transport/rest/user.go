@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/app/globals"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -75,7 +76,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		id := mux.Vars(req)["id"]
 
-		if err := entities.ValidateUUID(id); err != nil {
+		if _, err := uuid.Parse(id); err != nil {
 			uh.logger.Warnw("Invalid request", "ID", id)
 			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
 
