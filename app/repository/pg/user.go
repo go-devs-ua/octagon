@@ -50,8 +50,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 	return id, nil
 }
 
-// FindUser method implements usecase.UserRepository logic
-// finding user in DB by ID.
+// FindUser method implements logic of finding user in DB by ID.
 func (r Repo) FindUser(id string) (*entities.User, error) {
 	var user entities.User
 
