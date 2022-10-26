@@ -29,4 +29,4 @@ jobs:
           only-new-issues: true
           
           # Optional: golangci-lint command line arguments.
-          args: --out-format=colored-line-number --sort-results
+          args: --sort-results --print-issued-lines --verbose
