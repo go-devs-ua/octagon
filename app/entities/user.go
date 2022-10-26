@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-
-	"github.com/go-devs-ua/octagon/app/globals"
 )
 
 type User struct {
@@ -21,7 +19,6 @@ const (
 	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
 	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$` //nolint:lll // Regexp line can`t be changed.
 	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec,lll // "Potential hardcoded credentials" regexp can`t be changed.
-	IDMask   = "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$"                                                         //nolint:gosec,lll // "Potential hardcoded credentials" regexp can`t be changed.
 )
 
 var (
@@ -86,16 +83,6 @@ func checkMail(email string) error {
 func checkPass(password string) error {
 	if valid := passRegex.MatchString(password); !valid {
 		return fmt.Errorf("password does not match with regex: `%s`", passMask)
-	}
-
-	return nil
-}
-
-var idRegex = regexp.MustCompile(IDMask)
-
-func ValidateUUID(id string) error {
-	if valid := idRegex.MatchString(id); !valid {
-		return globals.ErrInvalidID
 	}
 
 	return nil
