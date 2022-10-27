@@ -52,5 +52,38 @@ func (r Repo) Add(user entities.User) (string, error) {
 }
 
 func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
-	return nil, nil
+	const sqlStatement = `
+			SELECT id, first_name, last_name, created_at
+			FROM "user" 
+			WHERE deleted_at IS NULL
+			ORDER BY $1 
+			OFFSET $2 
+			LIMIT $3;
+	`
+
+	rows, err := r.DB.Query(sqlStatement, sort, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %w", err)
+	}
+
+	defer rows.Close()
+
+	var users []entities.User
+
+	for rows.Next() {
+		var user entities.User
+
+		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt)
+		if err != nil {
+			return nil, fmt.Errorf("error scaning object from query: %w", err)
+		}
+
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error occured during iteration: %w", err)
+	}
+
+	return users, nil
 }
