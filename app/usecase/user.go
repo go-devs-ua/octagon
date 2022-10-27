@@ -34,6 +34,7 @@ func (u User) Signup(user entities.User) (string, error) {
 	return id, nil
 }
 
+// Fetch retrieves all suitable users from repository.
 func (u User) Fetch(offset, limit, sort string) ([]entities.User, error) {
 	users, err := u.Repo.GetUsers(offset, limit, sort)
 	if err != nil {
