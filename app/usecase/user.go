@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
@@ -35,6 +34,6 @@ func (u User) Signup(user entities.User) (string, error) {
 	return id, nil
 }
 
-func (u User) Fetch(ctx context.Context, offset, limit uint, sort string) ([]entities.User, error) {
+func (u User) Fetch(offset, limit, sort string) ([]entities.User, error) {
 	return nil, nil
 }
