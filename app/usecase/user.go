@@ -35,5 +35,10 @@ func (u User) Signup(user entities.User) (string, error) {
 }
 
 func (u User) Fetch(offset, limit, sort string) ([]entities.User, error) {
-	return nil, nil
+	users, err := u.Repo.GetUsers(offset, limit, sort)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching users: %w", err)
+	}
+
+	return users, nil
 }
