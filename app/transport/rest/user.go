@@ -16,6 +16,15 @@ type CreateUserResponse struct {
 	ID string `json:"id"`
 }
 
+// User is entities.User version without sensitive data
+type User struct {
+	ID        string `json:"id"`
+	Email     string `json:"email"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	CreatedAt string `json:"created_at"`
+}
+
 // CreateUser will handle user creation.
 func (uh UserHandler) CreateUser() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
