@@ -51,6 +51,6 @@ func (r Repo) Add(user entities.User) (string, error) {
 	return id, nil
 }
 
-func (r Repo) GetAll(offset, limit, sort string) ([]entities.User, error) {
+func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	return nil, nil
 }
