@@ -7,7 +7,4 @@ var (
 	ErrNotFound       = errors.New("no user found in DB")
 )
 
-const (
-	UniqueViolationErrCode    = "unique_violation"
-	InvalidTextRepresentation = "invalid_text_representation"
-)
+const InvalidTextRepresentation = "invalid_text_representation"

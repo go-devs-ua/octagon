@@ -15,6 +15,8 @@ import (
 	_ "github.com/lib/pq" // Standart blanc import for pq.
 )
 
+const uniqueViolationErrCode = "unique_violation"
+
 // Repo wraps a database handle.
 type Repo struct {
 	DB *sql.DB
@@ -36,7 +38,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == globals.UniqueViolationErrCode {
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
 			return "", globals.ErrDuplicateEmail
 		}
 
