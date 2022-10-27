@@ -1,8 +1,10 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"fmt"
+
 	"github.com/go-devs-ua/octagon/app/repository/pg"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -31,4 +33,8 @@ func (u User) Signup(user entities.User) (string, error) {
 	}
 
 	return id, nil
+}
+
+func (u User) Fetch(ctx context.Context, offset, limit uint, sort string) ([]entities.User, error) {
+	return nil, nil
 }

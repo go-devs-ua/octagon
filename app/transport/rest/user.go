@@ -60,3 +60,14 @@ func (uh UserHandler) CreateUser() http.Handler {
 		uh.logger.Debugw("User successfully created", "ID", id)
 	})
 }
+
+// GetUsers retrieves all entities.User by given parameters.
+//
+// `offset` specified in request, if none was specified, default is defaultOffset
+// `limit` specified in request, if none was specified, maxLimit is pagination limit default that is also request limit.
+// `next` link is present if only `offset` and `limit` is less than total number of objects.
+// defaultSort will be used if no params were specified.
+func (uh UserHandler) GetUsers() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	})
+}
