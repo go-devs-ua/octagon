@@ -66,11 +66,7 @@ func (uh UserHandler) CreateUser() http.Handler {
 // GetUsers retrieves all entities.User by given parameters.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var params = map[string]string{
-			sort:   firstName + "," + lastName,
-			offset: "",
-			limit:  "",
-		}
+		var params = map[string]string{sort: firstName + "," + lastName}
 
 		for k, v := range req.URL.Query() {
 			params[k] = strings.Join(v, "")
