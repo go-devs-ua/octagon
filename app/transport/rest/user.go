@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"strings"
 
@@ -66,13 +65,16 @@ func (uh UserHandler) CreateUser() http.Handler {
 // GetUsers retrieves all entities.User by given parameters.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var params = map[string]string{sort: firstName + "," + lastName}
+		var params = map[string]string{
+			sort:   firstName + "," + lastName,
+			offset: "",
+			limit:  "",
+		}
 
 		for k, v := range req.URL.Query() {
 			params[k] = strings.Join(v, "")
 		}
 
-		log.Printf("%+v", params)
 		users, err := uh.usecase.Fetch(params[offset], params[limit], params[sort])
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
