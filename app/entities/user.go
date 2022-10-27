@@ -18,7 +18,7 @@ type User struct {
 const (
 	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
 	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$` //nolint:lll // Regexp line can`t be changed.
-	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec // "Potential hardcoded credentials" regexp can`t be changed.
+	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec,lll // "Potential hardcoded credentials" regexp can`t be changed.
 )
 
 var (

@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "08c5d715-c82e-458e-a04e-4987878b944b",
+		"_postman_id": "48eb117a-dab0-48af-aa01-aafbbf89583d",
 		"name": "Octagon openAPI",
 		"description": "This is Super-Super-Heroes' code platform",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "23242031"
+		"_exporter_id": "6069470"
 	},
 	"item": [
 		{
@@ -41,7 +41,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"john@email.com\",\n  \"password\": \"123456Aa\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\"\n}",
+					"raw": "{\n  \"email\": \"john1@email.com\",\n  \"password\": \"123456Aa\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2228,7 +2228,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"john2@email.com\",\n  \"password\": \"123456Aa\",\n  \"first_name\": \"John\",\n  \"last_name\": \"\"\n}",
+					"raw": "{\n  \"email\": \"john6@email.com\",\n  \"password\": \"123456Aa\",\n  \"first_name\": \"John\",\n  \"last_name\": \"\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2591,6 +2591,54 @@
 					"body": "{\n  \"code\": -97413178,\n  \"message\": \"voluptate cillum\"\n}"
 				}
 			]
+		},
+		{
+			"name": "Get Existed User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/297a80a4-ea77-4f9e-8d0c-ca03cb263625",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"297a80a4-ea77-4f9e-8d0c-ca03cb263625"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Not Existed User",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get User with invalid ID",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	],
 	"variable": [

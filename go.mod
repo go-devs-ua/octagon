@@ -11,6 +11,7 @@ require (
 
 require (
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/rubenv/sql-migrate v1.2.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
