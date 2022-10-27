@@ -63,7 +63,7 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 
 	rows, err := r.DB.Query(sqlStatement, sort, offset, limit)
 	if err != nil {
-		return nil, fmt.Errorf("error executing query: %w", err)
+		return nil, fmt.Errorf("error occurred while executing query: %w", err)
 	}
 
 	defer rows.Close()
@@ -75,14 +75,14 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 
 		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt)
 		if err != nil {
-			return nil, fmt.Errorf("error scaning object from query: %w", err)
+			return nil, fmt.Errorf("error occurred while scaning object from query: %w", err)
 		}
 
 		users = append(users, user)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("error occured during iteration: %w", err)
+		return nil, fmt.Errorf("error occurred during iteration: %w", err)
 	}
 
 	return users, nil

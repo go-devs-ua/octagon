@@ -13,8 +13,6 @@ const (
 )
 
 const (
-	// Allowed and default query params and args
-	// in query that are used to fetch all users from repo:
 	offset    = "offset"
 	limit     = "limit"
 	sort      = "sort"

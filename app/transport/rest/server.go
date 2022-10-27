@@ -47,10 +47,10 @@ func (srv *Server) Run() error {
 	return nil
 }
 
-var allowedSortArgs = strings.Join([]string{firstName, lastName, createdAt}, "|")
-
 func attachUserEndpoints(router *mux.Router, handlers Handlers) {
 	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
+
+	var allowedSortArgs = strings.Join([]string{firstName, lastName, createdAt}, "|")
 	router.Path("/users").Methods(http.MethodGet).
 		Queries(offset, "{"+offset+":[0-9]+}").
 		Queries(limit, "{"+limit+":[0-9]+}").
