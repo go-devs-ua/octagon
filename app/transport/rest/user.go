@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -75,6 +76,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 			params[k] = strings.Join(v, "")
 		}
 
+		fmt.Printf("%+v", params)
 		users, err := uh.usecase.Fetch(params[offset], params[limit], params[sort])
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)

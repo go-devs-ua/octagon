@@ -48,4 +48,9 @@ func (srv *Server) Run() error {
 
 func attachUserEndpoints(router *mux.Router, handlers Handlers) {
 	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
+	router.Path("/users").Methods(http.MethodGet).
+		Queries(offset, "{offset:[0-9]+}").
+		Queries(limit, "{limit:[0-9]+}").
+		Queries(sort, "{sort:(?:first_name|last_name|created_at)(?:[,]{1}(?:first_name|last_name|created_at)*)*}").
+		Handler(handlers.UserHandler.GetUsers())
 }
