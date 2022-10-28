@@ -24,7 +24,8 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 	attachUserEndpoints(router, handlers)
 
-	handler := WrapMiddleware(router, WithLogRequest(logger))
+	handler := WrapMiddleware(router,
+		WithLogRequest(logger))
 
 	return &Server{
 		Server: &http.Server{
@@ -38,7 +39,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 // Run will run our server.
 func (srv *Server) Run() error {
-	if err := srv.ListenAndServe(); err != nil {
+	if err := srv.ListenAndServe(); err != nil { //nolint:typecheck
 		return fmt.Errorf("error loading the server: %w", err)
 	}
 
