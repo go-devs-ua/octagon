@@ -28,6 +28,7 @@ type User struct {
 	CreatedAt string `json:"created_at"`
 }
 
+// UsersResponse holds on array of Users are going to be rendered.
 type UsersResponse struct {
 	Results []User `json:"results"`
 }
