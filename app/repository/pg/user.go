@@ -48,6 +48,24 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 	return id, nil
 }
 
+// FindUser method implements logic of finding user in the database by ID.
+func (r Repo) FindUser(id string) (*entities.User, error) {
+	var user entities.User
+
+	const sqlStatement = `SELECT id, first_name, last_name, email, created_at FROM "user" WHERE id=$1`
+
+	if err := r.DB.QueryRow(sqlStatement, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, globals.ErrNotFound
+		}
+
+		return nil, fmt.Errorf("internal error while scanning row: %w", err)
+	}
+
+	return &user, nil
+}
+
+// GetUsers retrieves list of users from database.
 func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	const sqlStatement = `
 			SELECT id, first_name, last_name, created_at

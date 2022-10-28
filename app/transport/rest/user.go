@@ -7,6 +7,9 @@ import (
 	"strings"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 // CreateUserResponse will wrap message
@@ -80,7 +83,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		entUser, err := uh.usecase.GetUser(id)
+		entUser, err := uh.usecase.Get(id)
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)

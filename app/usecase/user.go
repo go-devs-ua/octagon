@@ -4,9 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-devs-ua/octagon/app/repository/pg"
-	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 )
 
 type User struct {
@@ -32,6 +31,16 @@ func (u User) SignUp(user entities.User) (string, error) {
 	}
 
 	return id, nil
+}
+
+// Get takes care of finding user by ID.
+func (u User) Get(id string) (*entities.User, error) {
+	user, err := u.Repo.FindUser(id)
+	if err != nil {
+		return nil, fmt.Errorf("error while searching user in database: %w", err)
+	}
+
+	return user, nil
 }
 
 // Fetch retrieves all suitable users from repository.
