@@ -73,6 +73,10 @@ func (l *Logger) Warnf(format string, val ...any) {
 	l.log.Warnf(format, val...)
 }
 
+func (l *Logger) Warnw(format string, val ...any) {
+	l.log.Warnw(format, val...)
+}
+
 func (l *Logger) Infow(msg string, keyVal ...any) {
 	l.log.Infow(msg, keyVal...)
 }

@@ -9,14 +9,13 @@ import (
 	"fmt"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq" // Standart blanc import for pq.
 )
 
-var (
-	ErrDuplicateEmail = errors.New("email is already taken")
-)
+const uniqueViolationErrCode = "unique_violation"
 
 // Repo wraps a database handle.
 type Repo struct {
@@ -30,10 +29,8 @@ func NewRepo(db *sql.DB) *Repo {
 	}
 }
 
-// Add meth implements usecase.UserRepository interface
-// without even knowing it that allow us to decouple our layers
-// and will make our app flexible and maintainable.
-func (r Repo) Add(user entities.User) (string, error) {
+// AddUser method implements storing the user in the database.
+func (r Repo) AddUser(user entities.User) (string, error) {
 	var id string
 
 	const sqlStatement = `INSERT INTO "user" (first_name, last_name, email, password)
@@ -42,7 +39,7 @@ func (r Repo) Add(user entities.User) (string, error) {
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
-			return "", ErrDuplicateEmail
+			return "", globals.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error inserting into database: %w", err)

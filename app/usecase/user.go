@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-devs-ua/octagon/app/repository/pg"
-
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
@@ -14,18 +14,18 @@ type User struct {
 }
 
 // NewUser is a famous  trick with accepting
-// interfaces and returning structs.
+// interfaces and returning struct.
 func NewUser(repo UserRepository) User {
 	return User{Repo: repo}
 }
 
-// Signup represents business logic
+// SignUp represents business logic
 // and will take care of creating user.
-func (u User) Signup(user entities.User) (string, error) {
-	id, err := u.Repo.Add(user)
+func (u User) SignUp(user entities.User) (string, error) {
+	id, err := u.Repo.AddUser(user)
 	if err != nil {
-		if errors.Is(err, pg.ErrDuplicateEmail) {
-			return "", ErrDuplicateEmail
+		if errors.Is(err, globals.ErrDuplicateEmail) {
+			return "", globals.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error while adding user to database: %w", err)
