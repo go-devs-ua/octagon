@@ -18,12 +18,35 @@ type CreateUserResponse struct {
 	ID string `json:"id"`
 }
 
+// User represents model of entities.User
+// specific to transport layer.
 type User struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	CreatedAt string `json:"created_at"`
+}
+
+type UsersResponse struct {
+	Results []User `json:"results"`
+}
+
+func cropUsers(solidUsers []entities.User) []User {
+	var users = make([]User, 0, len(solidUsers))
+
+	for _, su := range solidUsers {
+		user := User{
+			ID:        su.ID,
+			Email:     su.Email,
+			FirstName: su.FirstName,
+			LastName:  su.LastName,
+			CreatedAt: su.CreatedAt,
+		}
+		users = append(users, user)
+	}
+
+	return users
 }
 
 // CreateUser will handle user creation.
@@ -83,7 +106,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		entUser, err := uh.usecase.Get(id)
+		solidUser, err := uh.usecase.Get(id)
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
@@ -98,11 +121,11 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		}
 
 		user := User{
-			ID:        entUser.ID,
-			FirstName: entUser.FirstName,
-			LastName:  entUser.LastName,
-			Email:     entUser.Email,
-			CreatedAt: entUser.CreatedAt,
+			ID:        solidUser.ID,
+			FirstName: solidUser.FirstName,
+			LastName:  solidUser.LastName,
+			Email:     solidUser.Email,
+			CreatedAt: solidUser.CreatedAt,
 		}
 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 	})
@@ -129,10 +152,6 @@ func (uh UserHandler) GetUsers() http.Handler {
 			return
 		}
 
-		res := struct {
-			Results []entities.User `json:"results"`
-		}{Results: users}
-
-		WriteJSONResponse(w, http.StatusOK, res, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: cropUsers(users)}, uh.logger)
 	})
 }
