@@ -18,11 +18,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/CreateUserRequest"
       responses:
         "201": { $ref: "#/components/responses/created" }
         "400": { $ref: "#/components/responses/badRequest" }
         "409": { $ref: "#/components/responses/conflict" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+    delete:
+      summary: Deletes user by ID
+      description: For delete user by ID. Request should by consist of ID in UUID format. We use soft delete. Response should be consist of 204 status without body.
+      requestBody:
+        required: true
+        description: Passes user ID to delete user.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteUserRequest"
+      responses:
+        "204": { $ref: "#/components/responses/noContent" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "404": { $ref: "#/components/responses/notFound" }
         "500": { $ref: "#/components/responses/internalServerError" }
   /users/{id}:
     get:
@@ -41,10 +56,8 @@ paths:
         schema:
           type: array
           items:
-            type: string  
+            type: string
         style: simple
-     
-
 components:
   responses:
     ok:
@@ -52,9 +65,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PublicUser"
+            $ref: "#/components/schemas/PublicUserResponse"
     notFound:
-      description: User not found. 
+      description: User not found.
       content:
         application/json:
           schema:
@@ -64,9 +77,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/CreateUserResponse"
     badRequest:
-      description: Bad Request. 
+      description: Bad Request.
       content:
         application/json:
           schema:
@@ -83,8 +96,10 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    noContent:
+      description: User was deleted successfully. No content found.
   schemas:
-    User:
+    CreateUserRequest:
       type: object
       required:
         - email
@@ -97,7 +112,7 @@ components:
             description: must contains '@' and must be unique,
             type: string,
             format: email,
-            maxLength: 256,
+            maxLength: 320,
             uniqueItems: true,
             example: john@email.com,
           }
@@ -112,7 +127,19 @@ components:
             maxLength: 256,
             example: "123456Aa",
           }
-    PublicUser:
+    DeleteUserRequest:
+      type: object
+      required:
+        - ID
+      properties:
+        ID:
+          {
+            description: UUID,
+            type: string,
+            format: UUID,
+            example: "c0f01e3a-2dc3-4ea2-8d99-893b443697f9",
+          }
+    PublicUserResponse:
       type: object
       required:
         - id
@@ -121,19 +148,20 @@ components:
         - last_name
         - created_at
       properties:
-        id: {
-            description: unique identifier of the user entity ,
+        id:
+          {
+            description: unique identifier of the user entity,
             type: string,
             format: id,
             uniqueItems: true,
             example: "297a80a4-ea77-4f9e-8d0c-ca03cb263625",
-        }
+          }
         email:
           {
             description: must contains '@' and must be unique,
             type: string,
             format: email,
-            maxLength: 256,
+            maxLength: 320,
             uniqueItems: true,
             example: john@email.com,
           }
@@ -145,6 +173,18 @@ components:
             type: string,
             format: created_at,
             example: "2022-10-23T10:47:28.896701Z",
+          }
+    CreateUserResponse:
+      type: object
+      required:
+        - ID
+      properties:
+        ID:
+          {
+            description: UUID,
+            type: string,
+            format: UUID,
+            example: "c0f01e3a-2dc3-4ea2-8d99-893b443697f9",
           }
     ErrorResponse:
       type: object
