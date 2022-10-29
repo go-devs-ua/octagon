@@ -33,7 +33,7 @@ type UsersResponse struct {
 	Results []User `json:"results"`
 }
 
-func makeUsersREST(users []entities.User) []User {
+func makeUsersRESTful(users []entities.User) []User {
 	var userArr = make([]User, 0, len(users))
 
 	for _, u := range users {
@@ -146,8 +146,10 @@ func (uh UserHandler) GetUsers() http.Handler {
 		var params QueryParams
 
 		if err := schema.NewDecoder().Decode(&params, req.URL.Query()); err != nil {
-			uh.logger.Errorf("Failed parsing query parameters: %+v", err)
+			uh.logger.Errorf("Failed parsing query %+v: %+v", req.URL.Query(), err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not parse query"}, uh.logger)
+
+			return
 		}
 
 		users, err := uh.usecase.GetAll(params.Offset, params.Limit, params.Sort)
@@ -165,6 +167,6 @@ func (uh UserHandler) GetUsers() http.Handler {
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: makeUsersREST(users)}, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: makeUsersRESTful(users)}, uh.logger)
 	})
 }
