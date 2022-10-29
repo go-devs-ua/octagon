@@ -11,7 +11,7 @@ import (
 // UserRepository interface can be implemented
 // in any kind of repositories like Postgres, MySQL etc.
 type UserRepository interface {
-	Add(entities.User) (string, error)
-	Delete(entities.UserID) error
-	IsUserExists(entities.UserID) (bool, error)
+	AddUser(entities.User) (string, error)
+	FindUser(string) (*entities.User, error)
+	Delete(entities.User) error
 }

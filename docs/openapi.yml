@@ -24,8 +24,41 @@ paths:
         "400": { $ref: "#/components/responses/badRequest" }
         "409": { $ref: "#/components/responses/conflict" }
         "500": { $ref: "#/components/responses/internalServerError" }
+  /users/{id}:
+    get:
+      summary: Return user
+      description: The endpoint returns an user by the ID if the ID exists in the database.  Request consists of the ID specified in the url. Response consists of a status code and of a response body. The response body may consist an error message or an entity of PublicUser
+      responses:
+        "200": { $ref: "#/components/responses/ok" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "404": { $ref: "#/components/responses/notFound" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+    parameters:
+      - name: id
+        in: path
+        description: ID of user to use
+        required: true
+        schema:
+          type: array
+          items:
+            type: string  
+        style: simple
+     
+
 components:
   responses:
+    ok:
+      description: Success.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PublicUser"
+    notFound:
+      description: User not found. 
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     created:
       description: Successful created user.
       content:
@@ -33,7 +66,7 @@ components:
           schema:
             $ref: "#/components/schemas/User"
     badRequest:
-      description: Bad Request.
+      description: Bad Request. 
       content:
         application/json:
           schema:
@@ -55,8 +88,8 @@ components:
       type: object
       required:
         - email
-        - firstname
-        - lastname
+        - first_name
+        - last_name
         - password
       properties:
         email:
@@ -78,6 +111,40 @@ components:
             minLength: 8,
             maxLength: 256,
             example: "123456Aa",
+          }
+    PublicUser:
+      type: object
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+        - created_at
+      properties:
+        id: {
+            description: unique identifier of the user entity ,
+            type: string,
+            format: id,
+            uniqueItems: true,
+            example: "297a80a4-ea77-4f9e-8d0c-ca03cb263625",
+        }
+        email:
+          {
+            description: must contains '@' and must be unique,
+            type: string,
+            format: email,
+            maxLength: 256,
+            uniqueItems: true,
+            example: john@email.com,
+          }
+        firstName: { type: string, example: John }
+        lastName: { type: string, example: Doe }
+        created_at:
+          {
+            description: Indicates date and time of user creation,
+            type: string,
+            format: created_at,
+            example: "2022-10-23T10:47:28.896701Z",
           }
     ErrorResponse:
       type: object

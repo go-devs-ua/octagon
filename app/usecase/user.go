@@ -3,9 +3,9 @@ package usecase
 import (
 	"errors"
 	"fmt"
-	"github.com/go-devs-ua/octagon/app/repository/pg"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 )
 
 type User struct {
@@ -13,18 +13,18 @@ type User struct {
 }
 
 // NewUser is a famous  trick with accepting
-// interfaces and returning structs.
+// interfaces and returning struct.
 func NewUser(repo UserRepository) User {
 	return User{Repo: repo}
 }
 
-// Signup represents business logic
+// SignUp represents business logic
 // and will take care of creating user.
-func (u User) Signup(user entities.User) (string, error) {
-	id, err := u.Repo.Add(user)
+func (u User) SignUp(user entities.User) (string, error) {
+	id, err := u.Repo.AddUser(user)
 	if err != nil {
-		if errors.Is(err, pg.ErrDuplicateEmail) {
-			return "", ErrDuplicateEmail
+		if errors.Is(err, globals.ErrDuplicateEmail) {
+			return "", globals.ErrDuplicateEmail
 		}
 
 		return "", fmt.Errorf("error while adding user to database: %w", err)
@@ -33,24 +33,24 @@ func (u User) Signup(user entities.User) (string, error) {
 	return id, nil
 }
 
-// Delete represents business logic
-// and will take care of deleting user.
-func (u User) Delete(user entities.UserID) error {
-	err := u.Repo.Delete(user)
+// GetUser represents business logic
+// and will take care of finding user.
+func (u User) GetUser(id string) (*entities.User, error) {
+	user, err := u.Repo.FindUser(id)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error while searching user in database: %w", err)
 	}
 
-	return nil
+	return user, nil
 }
 
 // Delete represents business logic
 // and will take care of deleting user.
-func (u User) IsUserExists(user entities.UserID) (bool, error) {
-	isExists, err := u.Repo.IsUserExists(user)
+func (u User) Delete(user entities.User) error {
+	err := u.Repo.Delete(user)
 	if err != nil {
-		return isExists, err
+		return fmt.Errorf("error while deleting user in database: %w", err)
 	}
 
-	return isExists, nil
+	return nil
 }
