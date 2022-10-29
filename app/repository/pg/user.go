@@ -15,8 +15,6 @@ import (
 	_ "github.com/lib/pq" // Standart blanc import for pq.
 )
 
-const uniqueViolationErrCode = "unique_violation"
-
 // Repo wraps a database handle.
 type Repo struct {
 	DB *sql.DB
@@ -38,7 +36,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
 		var pqErr = new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeUniqueViolation {
 			return "", globals.ErrDuplicateEmail
 		}
 
@@ -67,6 +65,20 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 
 // GetUsers retrieves list of users from database.
 func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
+	{ // set default query params if no param was specified.
+		if offset == "" {
+			offset = defaultParamOffset
+		}
+
+		if limit == "" {
+			limit = defaultParamLimit
+		}
+
+		if sort == "" {
+			sort = defaultParamSort
+		}
+	}
+
 	const sqlStatement = `
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
@@ -75,9 +87,13 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 			OFFSET $2 
 			LIMIT $3;
 	`
-
 	rows, err := r.DB.Query(sqlStatement, sort, offset, limit)
 	if err != nil {
+		var pqErr = new(pq.Error)
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeInvalidTextRepresentation {
+			return nil, fmt.Errorf("error occured inserting query arguments: %w", globals.ErrBadQuery)
+		}
+
 		return nil, fmt.Errorf("error occurred while executing query: %w", err)
 	}
 

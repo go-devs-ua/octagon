@@ -153,6 +153,13 @@ func (uh UserHandler) GetUsers() http.Handler {
 		users, err := uh.usecase.GetAll(params.Offset, params.Limit, params.Sort)
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
+
+			if errors.Is(err, globals.ErrBadQuery) {
+				WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgInternalSeverErr, Details: "invalid query"}, uh.logger)
+
+				return
+			}
+
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not fetch users"}, uh.logger)
 
 			return
