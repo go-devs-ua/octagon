@@ -88,8 +88,7 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	for rows.Next() {
 		var user entities.User
 
-		err = rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt)
-		if err != nil {
+		if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt); err != nil {
 			return nil, fmt.Errorf("error occurred while scaning object from query: %w", err)
 		}
 
@@ -101,4 +100,16 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	}
 
 	return users, nil
+}
+
+type GetUsersParams struct {
+	Offset string
+	Limit  string
+	Sort   string
+}
+
+func setGetUsersParams(offset, limit, sort string) GetUsersParams {
+	return GetUsersParams{
+		Sort: "first_name,last_name",
+	}
 }

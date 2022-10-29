@@ -3,7 +3,6 @@ package rest
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-devs-ua/octagon/cfg"
@@ -49,11 +48,5 @@ func (srv *Server) Run() error {
 func attachUserEndpoints(router *mux.Router, handlers Handlers) {
 	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
 	router.Path("/users/{id}").Methods(http.MethodGet).Handler(handlers.UserHandler.GetUserByID())
-
-	var allowedSortArgs = strings.Join([]string{firstName, lastName, createdAt}, "|")
-	router.Path("/users").Methods(http.MethodGet).
-		Queries(offset, "{"+offset+":[0-9]+}").
-		Queries(limit, "{"+limit+":[0-9]+}").
-		Queries(sort, "{"+sort+":(?:"+allowedSortArgs+")(?:[,]{1}(?:"+allowedSortArgs+")*)*}").
-		Handler(handlers.UserHandler.GetUsers())
+	router.Path("/users").Methods(http.MethodGet).Handler(handlers.UserHandler.GetUsers())
 }

@@ -23,10 +23,8 @@ func WithLogRequest(logger *lgr.Logger) Middleware {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			logger.Debugw("Request:",
-				"Method",
-				req.Method, "URL",
-				req.URL,
-				"User-Agent", req.UserAgent())
+				"Method", req.Method, "URL",
+				req.URL, "User-Agent", req.UserAgent())
 			h.ServeHTTP(w, req)
 		})
 	}

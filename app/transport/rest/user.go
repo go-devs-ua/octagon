@@ -33,21 +33,22 @@ type UsersResponse struct {
 	Results []User `json:"results"`
 }
 
-func cropUsers(solidUsers []entities.User) []User {
-	var users = make([]User, 0, len(solidUsers))
+func makeUsersREST(users []entities.User) []User {
+	var userArr = make([]User, 0, len(users))
 
-	for _, su := range solidUsers {
+	for _, u := range users {
 		user := User{
-			ID:        su.ID,
-			Email:     su.Email,
-			FirstName: su.FirstName,
-			LastName:  su.LastName,
-			CreatedAt: su.CreatedAt,
+			ID:        u.ID,
+			Email:     u.Email,
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			CreatedAt: u.CreatedAt,
 		}
-		users = append(users, user)
+
+		userArr = append(userArr, user)
 	}
 
-	return users
+	return userArr
 }
 
 // CreateUser will handle user creation.
@@ -107,7 +108,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		solidUser, err := uh.usecase.Get(id)
+		user, err := uh.usecase.Get(id)
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
@@ -121,14 +122,14 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		user := User{
-			ID:        solidUser.ID,
-			FirstName: solidUser.FirstName,
-			LastName:  solidUser.LastName,
-			Email:     solidUser.Email,
-			CreatedAt: solidUser.CreatedAt,
+		userResp := User{
+			ID:        user.ID,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
 		}
-		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, userResp, uh.logger)
 	})
 }
 
@@ -145,7 +146,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 			params[k] = strings.Join(v, "")
 		}
 
-		users, err := uh.usecase.Fetch(params[offset], params[limit], params[sort])
+		users, err := uh.usecase.GetAll(params[offset], params[limit], params[sort])
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not fetch users"}, uh.logger)
@@ -153,6 +154,6 @@ func (uh UserHandler) GetUsers() http.Handler {
 			return
 		}
 
-		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: cropUsers(users)}, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: makeUsersREST(users)}, uh.logger)
 	})
 }
