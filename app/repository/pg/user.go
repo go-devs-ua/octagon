@@ -64,7 +64,7 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 	return &user, nil
 }
 
-func setDefaultIfZeroValue(name string, value any, defaultValue any) sql.NamedArg {
+func setDefaultIfValueIsZero(name string, value any, defaultValue any) sql.NamedArg {
 	if reflect.ValueOf(value).IsZero() {
 		value = defaultValue
 	}
@@ -85,9 +85,9 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	var null sql.NullString
 
 	rows, err := r.DB.Query(sqlStatement,
-		setDefaultIfZeroValue("sort", sort, defaultSort),
-		setDefaultIfZeroValue("offset", offset, null),
-		setDefaultIfZeroValue("limit", limit, null),
+		setDefaultIfValueIsZero("sort", sort, defaultSort),
+		setDefaultIfValueIsZero("offset", offset, null),
+		setDefaultIfValueIsZero("limit", limit, null),
 	)
 
 	if err != nil {
