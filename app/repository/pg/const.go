@@ -6,7 +6,5 @@ const (
 )
 
 const (
-	defaultParamSort   = "first_name,last_name"
-	defaultParamLimit  = "NULL"
-	defaultParamOffset = "0"
+	defaultSort = "first_name,last_name"
 )

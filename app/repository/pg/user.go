@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/app/globals"
@@ -63,35 +64,36 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 	return &user, nil
 }
 
-// GetUsers retrieves list of users from database.
-func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
-	{ // set default query params if no param was specified.
-		if offset == "" {
-			offset = defaultParamOffset
-		}
-
-		if limit == "" {
-			limit = defaultParamLimit
-		}
-
-		if sort == "" {
-			sort = defaultParamSort
-		}
+func setDefaultIfZeroValue(name string, value any, defaultValue any) sql.NamedArg {
+	if reflect.ValueOf(value).IsZero() {
+		value = defaultValue
 	}
 
+	return sql.Named(name, value)
+}
+
+// GetUsers retrieves list of users from database.
+func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	const sqlStatement = `
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
 			WHERE deleted_at IS NULL
-			ORDER BY $1 
+			ORDER BY $1
 			OFFSET $2 
-			LIMIT $3;
+			LIMIT $3 
 	`
-	rows, err := r.DB.Query(sqlStatement, sort, offset, limit)
+	var null sql.NullString
+
+	rows, err := r.DB.Query(sqlStatement,
+		setDefaultIfZeroValue("sort", sort, defaultSort),
+		setDefaultIfZeroValue("offset", offset, null),
+		setDefaultIfZeroValue("limit", limit, null),
+	)
+
 	if err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeInvalidTextRepresentation {
-			return nil, fmt.Errorf("error occured inserting query arguments: %w", globals.ErrBadQuery)
+			return nil, fmt.Errorf("error occured while inserting query arguments: %w", globals.ErrBadQuery)
 		}
 
 		return nil, fmt.Errorf("error occurred while executing query: %w", err)

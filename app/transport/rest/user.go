@@ -155,7 +155,7 @@ func (uh UserHandler) GetUsers() http.Handler {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
 
 			if errors.Is(err, globals.ErrBadQuery) {
-				WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgInternalSeverErr, Details: "invalid query"}, uh.logger)
+				WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: globals.ErrBadQuery.Error()}, uh.logger)
 
 				return
 			}
