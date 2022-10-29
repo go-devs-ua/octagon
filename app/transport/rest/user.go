@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 )
 
 // CreateUserResponse will wrap message
@@ -133,20 +133,24 @@ func (uh UserHandler) GetUserByID() http.Handler {
 	})
 }
 
+// QueryParams represent request query params.
+type QueryParams struct {
+	Offset string `schema:"offset"`
+	Limit  string `schema:"limit"`
+	Sort   string `schema:"sort"`
+}
+
 // GetUsers retrieves all entities.User by given parameters.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var params = map[string]string{
-			sort:   firstName + "," + lastName,
-			offset: "",
-			limit:  "",
+		var params QueryParams
+
+		if err := schema.NewDecoder().Decode(&params, req.URL.Query()); err != nil {
+			uh.logger.Errorf("Failed parsing query parameters: %+v", err)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not parse query"}, uh.logger)
 		}
 
-		for k, v := range req.URL.Query() {
-			params[k] = strings.Join(v, "")
-		}
-
-		users, err := uh.usecase.GetAll(params[offset], params[limit], params[sort])
+		users, err := uh.usecase.GetAll(params.Offset, params.Limit, params.Sort)
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
 			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not fetch users"}, uh.logger)

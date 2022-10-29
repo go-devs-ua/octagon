@@ -11,10 +11,11 @@ const (
 )
 
 const (
-	offset    = "offset"
-	limit     = "limit"
-	sort      = "sort"
-	firstName = "first_name"
-	lastName  = "last_name"
-	createdAt = "created_at"
+	offset      string = "offset"
+	limit       string = "limit"
+	sort        string = "sort"
+	firstName   string = "first_name"
+	lastName    string = "last_name"
+	createdAt   string = "created_at"
+	defaultSort        = firstName + "," + lastName
 )

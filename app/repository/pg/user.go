@@ -101,15 +101,3 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 
 	return users, nil
 }
-
-type GetUsersParams struct {
-	Offset string
-	Limit  string
-	Sort   string
-}
-
-func setGetUsersParams(offset, limit, sort string) GetUsersParams {
-	return GetUsersParams{
-		Sort: "first_name,last_name",
-	}
-}
