@@ -18,16 +18,57 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/entities.User"
       responses:
         "201": { $ref: "#/components/responses/created" }
         "400": { $ref: "#/components/responses/badRequest" }
         "409": { $ref: "#/components/responses/conflict" }
         "500": { $ref: "#/components/responses/internalServerError" }
+    get:
+      tags:
+        - users
+      operationId: GetAllUsers
+      parameters:
+        - name: sort
+          in: query
+          description: Sorting options for result array that could be passed sequentially
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - first_name
+                - last_name
+                - created_at
+              default: first_name,last_name
+            minItems: 1
+            uniqueItems: true
+          style: simple
+        - name: offset
+          in: query
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          description: The numbers of items to return in result set
+          required: false
+          schema:
+            type: integer
+            default: NULL
+      summary: Get list of users
+      description: Retrieve not-sensitive data from users by given parameters
+      responses:
+        "200": { $ref: "#/components/responses/okResults" }
+        "400": { $ref: "#/components/responses/badRequest"}
+        "500": {$ref: "#/components/responses/internalServerError"}
   /users/{id}:
     get:
       summary: Return user
-      description: The endpoint returns an user by the ID if the ID exists in the database.  Request consists of the ID specified in the url. Response consists of a status code and of a response body. The response body may consist an error message or an entity of PublicUser
+      description: The endpoint returns an user by the ID if the ID exists in the database.  Request consists of the ID specified in the url. Response consists of a status code and of a response body. The response body may consist an error message or an entity of rest.User
       responses:
         "200": { $ref: "#/components/responses/ok" }
         "400": { $ref: "#/components/responses/badRequest" }
@@ -41,9 +82,8 @@ paths:
         schema:
           type: array
           items:
-            type: string  
+            type: string
         style: simple
-     
 
 components:
   responses:
@@ -52,9 +92,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PublicUser"
+            $ref: "#/components/schemas/rest.User"
     notFound:
-      description: User not found. 
+      description: User not found.
       content:
         application/json:
           schema:
@@ -64,9 +104,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/entities.User"
     badRequest:
-      description: Bad Request. 
+      description: Bad Request.
       content:
         application/json:
           schema:
@@ -83,8 +123,14 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    okResults:
+      description: Successful users fetching
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UsersResponse"
   schemas:
-    User:
+    entities.User:
       type: object
       required:
         - email
@@ -101,8 +147,8 @@ components:
             uniqueItems: true,
             example: john@email.com,
           }
-        firstName: { type: string, example: John }
-        lastName: { type: string, example: Doe }
+        first_name: { type: string, example: John }
+        last_name: { type: string, example: Doe }
         password:
           {
             description: only ASCII symbols,
@@ -112,7 +158,7 @@ components:
             maxLength: 256,
             example: "123456Aa",
           }
-    PublicUser:
+    rest.User:
       type: object
       required:
         - id
@@ -122,11 +168,11 @@ components:
         - created_at
       properties:
         id: {
-            description: unique identifier of the user entity ,
-            type: string,
-            format: id,
-            uniqueItems: true,
-            example: "297a80a4-ea77-4f9e-8d0c-ca03cb263625",
+          description: unique identifier of the user entity ,
+          type: string,
+          format: id,
+          uniqueItems: true,
+          example: "297a80a4-ea77-4f9e-8d0c-ca03cb263625",
         }
         email:
           {
@@ -137,8 +183,8 @@ components:
             uniqueItems: true,
             example: john@email.com,
           }
-        firstName: { type: string, example: John }
-        lastName: { type: string, example: Doe }
+        first_name: { type: string, example: John }
+        last_name: { type: string, example: Doe }
         created_at:
           {
             description: Indicates date and time of user creation,
@@ -156,3 +202,12 @@ components:
           type: integer
         message:
           type: string
+    UsersResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/rest.User"
