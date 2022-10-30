@@ -82,6 +82,7 @@ func (r Repo) GetAllUsers(offset, limit, sort string) ([]entities.User, error) {
 			OFFSET $2 
 			LIMIT $3 
 	`
+
 	var null sql.NullString
 
 	rows, err := r.DB.Query(sqlStatement,
