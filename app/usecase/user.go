@@ -9,12 +9,12 @@ import (
 )
 
 type User struct {
-	Repo UserRepository
+	Repo Repository
 }
 
 // NewUser is a famous  trick with accepting
 // interfaces and returning struct.
-func NewUser(repo UserRepository) User {
+func NewUser(repo Repository) User {
 	return User{Repo: repo}
 }
 
