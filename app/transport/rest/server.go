@@ -31,7 +31,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, handlerTimeoutSeconds*time.Second, MsgTimeOut),
+			Handler:      handler,
 			ReadTimeout:  readTimeoutSeconds * time.Second,
 			WriteTimeout: writeTimeoutSeconds * time.Second,
 		},

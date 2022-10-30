@@ -34,6 +34,8 @@ func WithLogRequest(h http.Handler, logger *lgr.Logger) http.Handler {
 // WithHandlerTimeout set handler timeout.
 func WithHandlerTimeout(h http.Handler, logger *lgr.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		logger.Infow("Handler timeout was set.",
+			MsgTimeOut, handlerTimeoutSeconds*time.Second)
 		h = http.TimeoutHandler(h, handlerTimeoutSeconds*time.Second, MsgTimeOut)
 		h.ServeHTTP(w, req)
 	})
