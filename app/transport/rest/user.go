@@ -132,8 +132,7 @@ func (uh UserHandler) DeleteUser() http.Handler {
 			return
 		}
 
-		err := uh.usecase.Delete(user)
-		if err != nil {
+		if err := uh.usecase.Delete(user); err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", user.ID)
 				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgNotFound, Details: err.Error()}, uh.logger)
