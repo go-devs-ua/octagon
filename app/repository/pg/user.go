@@ -13,7 +13,7 @@ import (
 	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/pkg/hash"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq" // Standart blanc import for pq.
+	_ "github.com/lib/pq" // Standard blanc import for pq.
 )
 
 // Repo wraps a database handle.
@@ -93,7 +93,7 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 	if err != nil {
 		var pqErr = new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeInvalidTextRepresentation {
-			return nil, fmt.Errorf("error occured while inserting query arguments: %w", globals.ErrBadQuery)
+			return nil, fmt.Errorf("error occurred while inserting query arguments: %w", globals.ErrBadQuery)
 		}
 
 		return nil, fmt.Errorf("error occurred while executing query: %w", err)
