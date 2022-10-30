@@ -25,6 +25,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 	handler := WrapMiddleware(router, logger,
 		WithLogRequest,
+		WithHandlerTimeout,
 	)
 
 	return &Server{
