@@ -8,5 +8,5 @@ import (
 type UserUsecase interface {
 	SignUp(entities.User) (string, error)
 	GetAll(offset string, limit string, sort string) ([]entities.User, error)
-	Get(id string) (*entities.User, error)
+	GetByID(id string) (*entities.User, error)
 }

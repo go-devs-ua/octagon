@@ -33,10 +33,10 @@ type UsersResponse struct {
 	Results []User `json:"results"`
 }
 
-func makeUsersRESTful(users []entities.User) []User {
-	var userArr = make([]User, 0, len(users))
+func makeUsersRESTful(userArr []entities.User) []User {
+	var users = make([]User, 0, len(userArr))
 
-	for _, u := range users {
+	for _, u := range userArr {
 		user := User{
 			ID:        u.ID,
 			Email:     u.Email,
@@ -45,10 +45,10 @@ func makeUsersRESTful(users []entities.User) []User {
 			CreatedAt: u.CreatedAt,
 		}
 
-		userArr = append(userArr, user)
+		users = append(users, user)
 	}
 
-	return userArr
+	return users
 }
 
 // CreateUser will handle user creation.
@@ -108,7 +108,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		user, err := uh.usecase.Get(id)
+		user, err := uh.usecase.GetByID(id)
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)

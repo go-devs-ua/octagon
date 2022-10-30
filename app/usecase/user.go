@@ -33,8 +33,8 @@ func (u User) SignUp(user entities.User) (string, error) {
 	return id, nil
 }
 
-// Get takes care of finding user by ID.
-func (u User) Get(id string) (*entities.User, error) {
+// GetByID takes care of finding user by ID.
+func (u User) GetByID(id string) (*entities.User, error) {
 	user, err := u.Repo.FindUser(id)
 	if err != nil {
 		return nil, fmt.Errorf("error while searching user in database: %w", err)
@@ -45,7 +45,7 @@ func (u User) Get(id string) (*entities.User, error) {
 
 // GetAll retrieves all suitable users from repository.
 func (u User) GetAll(offset, limit, sort string) ([]entities.User, error) {
-	users, err := u.Repo.GetUsers(offset, limit, sort)
+	users, err := u.Repo.GetAllUsers(offset, limit, sort)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching users: %w", err)
 	}

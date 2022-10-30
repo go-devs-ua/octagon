@@ -1,10 +1,8 @@
 package pg
 
 const (
-	ErrCodeUniqueViolation           = "unique_violation"
-	ErrCodeInvalidTextRepresentation = "invalid_text_representation"
+	ErrCodeUniqueViolation    = "unique_violation"
+	ErrCodeTextRepresentation = "invalid_text_representation"
 )
 
-const (
-	defaultSort = "first_name,last_name"
-)
+const defaultSort = "first_name,last_name"

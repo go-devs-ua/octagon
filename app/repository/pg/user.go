@@ -72,8 +72,8 @@ func setDefaultIfValueIsZero(name string, value any, defaultValue any) sql.Named
 	return sql.Named(name, value)
 }
 
-// GetUsers retrieves list of users from database.
-func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
+// GetAllUsers retrieves list of users from database.
+func (r Repo) GetAllUsers(offset, limit, sort string) ([]entities.User, error) {
 	const sqlStatement = `
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
@@ -92,7 +92,7 @@ func (r Repo) GetUsers(offset, limit, sort string) ([]entities.User, error) {
 
 	if err != nil {
 		var pqErr = new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeInvalidTextRepresentation {
+		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeTextRepresentation {
 			return nil, fmt.Errorf("error occurred while inserting query arguments: %w", globals.ErrBadQuery)
 		}
 

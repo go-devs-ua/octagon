@@ -13,5 +13,5 @@ import (
 type UserRepository interface {
 	AddUser(entities.User) (string, error)
 	FindUser(string) (*entities.User, error)
-	GetUsers(offset string, limit string, sort string) ([]entities.User, error)
+	GetAllUsers(offset string, limit string, sort string) ([]entities.User, error)
 }
