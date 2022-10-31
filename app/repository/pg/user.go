@@ -15,6 +15,8 @@ import (
 	_ "github.com/lib/pq" // Standard blanc import for pq.
 )
 
+const ErrCodeUniqueViolation = "unique_violation"
+
 // Repo wraps a database handle.
 type Repo struct {
 	DB *sql.DB
@@ -77,11 +79,6 @@ func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) 
 	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Limit, params.Offset)
 
 	if err != nil {
-		var pqErr = new(pq.Error)
-		if errors.As(err, &pqErr) && pqErr.Code.Name() == ErrCodeTextRepresentation {
-			return nil, fmt.Errorf("error occurred while inserting query arguments: %w", globals.ErrBadQuery)
-		}
-
 		return nil, fmt.Errorf("error occurred while executing query: %w", err)
 	}
 
