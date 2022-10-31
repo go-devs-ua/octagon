@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/app/globals"
@@ -64,16 +63,8 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 	return &user, nil
 }
 
-func setDefaultIfValueIsZero(name string, value any, defaultValue any) sql.NamedArg {
-	if reflect.ValueOf(value).IsZero() {
-		value = defaultValue
-	}
-
-	return sql.Named(name, value)
-}
-
 // GetAllUsers retrieves list of users from database.
-func (r Repo) GetAllUsers(offset, limit, sort string) ([]entities.User, error) {
+func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) {
 	const sqlStatement = `
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
@@ -83,13 +74,7 @@ func (r Repo) GetAllUsers(offset, limit, sort string) ([]entities.User, error) {
 			LIMIT $3 
 	`
 
-	var null sql.NullString
-
-	rows, err := r.DB.Query(sqlStatement,
-		setDefaultIfValueIsZero("sort", sort, defaultSort),
-		setDefaultIfValueIsZero("offset", offset, null),
-		setDefaultIfValueIsZero("limit", limit, null),
-	)
+	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Limit, params.Offset)
 
 	if err != nil {
 		var pqErr = new(pq.Error)

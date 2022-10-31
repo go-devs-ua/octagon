@@ -9,7 +9,6 @@ import (
 	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/schema"
 )
 
 // CreateUserResponse will wrap message
@@ -136,16 +135,15 @@ func (uh UserHandler) GetUserByID() http.Handler {
 // GetUsers retrieves all entities.User by given parameters.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var params QueryParams
+		var params entities.QueryParams
 
-		if err := schema.NewDecoder().Decode(&params, req.URL.Query()); err != nil {
-			uh.logger.Errorf("Failed parsing query %+v: %+v", req.URL.Query(), err)
-			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not parse query"}, uh.logger)
+		reqParams := req.URL.Query()
 
-			return
-		}
+		params.Offset = reqParams.Get("offset")
+		params.Limit = reqParams.Get("limit")
+		params.Sort = reqParams.Get("sort")
 
-		users, err := uh.usecase.GetAll(params.Offset, params.Limit, params.Sort)
+		users, err := uh.usecase.GetAll(params)
 		if err != nil {
 			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
 
