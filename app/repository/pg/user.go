@@ -72,7 +72,7 @@ func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) 
 			FROM "user" 
 			WHERE deleted_at IS NULL
 			ORDER BY CASE WHEN $1 = '' THEN 'first_name, last_name' ELSE $1 END
-			LIMIT CASE WHEN $2 = 0 THEN NULL ELSE $2 END
+			LIMIT  $2
 			OFFSET $3
 	`
 

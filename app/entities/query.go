@@ -16,11 +16,11 @@ type QueryParams struct {
 
 // Validate checks if QueryParameter fields are valid.
 func (qp QueryParams) Validate() error {
-	if _, err := strconv.Atoi(qp.Limit); err != nil && qp.Limit != "" {
+	if _, err := strconv.Atoi(qp.Limit); err != nil {
 		return fmt.Errorf("limit argument has to be a number")
 	}
 
-	if _, err := strconv.Atoi(qp.Offset); err != nil && qp.Offset != "" {
+	if _, err := strconv.Atoi(qp.Offset); err != nil {
 		return fmt.Errorf("offset argument has to be a number")
 	}
 
