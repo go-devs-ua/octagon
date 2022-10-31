@@ -72,6 +72,8 @@ func (r Repo) Delete(user entities.User) error {
 		if errors.Is(err, sql.ErrNoRows) {
 			return globals.ErrNotFound
 		}
+
+		return fmt.Errorf("internal error while scanning row: %w", err)
 	}
 
 	return nil
