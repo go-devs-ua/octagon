@@ -137,11 +137,16 @@ func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var params entities.QueryParams
 
-		reqParams := req.URL.Query()
+		params.Offset = req.URL.Query().Get("offset")
+		params.Limit = req.URL.Query().Get("limit")
+		params.Sort = req.URL.Query().Get("sort")
 
-		params.Offset = reqParams.Get("offset")
-		params.Limit = reqParams.Get("limit")
-		params.Sort = reqParams.Get("sort")
+		if err := params.Validate(); err != nil {
+			uh.logger.Errorf("Failed validating query: %+v", err)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
+
+			return
+		}
 
 		users, err := uh.usecase.GetAll(params)
 		if err != nil {

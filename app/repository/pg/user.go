@@ -74,7 +74,7 @@ func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) 
 			LIMIT $3 
 	`
 
-	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Limit, params.Offset)
+	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Offset, params.Limit)
 
 	if err != nil {
 		var pqErr = new(pq.Error)
