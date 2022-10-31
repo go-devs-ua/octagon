@@ -13,4 +13,5 @@ import (
 type UserRepository interface {
 	AddUser(entities.User) (string, error)
 	FindUser(string) (*entities.User, error)
+	Delete(entities.User) error
 }

@@ -15,12 +15,12 @@ import (
 	_ "github.com/lib/pq" // Standart blanc import for pq.
 )
 
-const uniqueViolationErrCode = "unique_violation"
-
 // Repo wraps a database handle.
 type Repo struct {
 	DB *sql.DB
 }
+
+const uniqueViolationErrCode = "unique_violation"
 
 // NewRepo will initialise new instance of Repo.
 func NewRepo(db *sql.DB) *Repo {
@@ -37,7 +37,7 @@ func (r Repo) AddUser(user entities.User) (string, error) {
 						  VALUES ($1, $2, $3, $4) RETURNING id`
 
 	if err := r.DB.QueryRow(sqlStatement, user.FirstName, user.LastName, user.Email, hash.SHA256(user.Password)).Scan(&id); err != nil {
-		var pqErr = new(pq.Error)
+		pqErr := new(pq.Error)
 		if errors.As(err, &pqErr) && pqErr.Code.Name() == uniqueViolationErrCode {
 			return "", globals.ErrDuplicateEmail
 		}
@@ -63,4 +63,18 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (r Repo) Delete(user entities.User) error {
+	const sqlStatement = `UPDATE "user" SET deleted_at = NOW() WHERE id=($1) AND deleted_at IS NULL RETURNING id`
+
+	if err := r.DB.QueryRow(sqlStatement, user.ID).Scan(&user.ID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return globals.ErrNotFound
+		}
+
+		return fmt.Errorf("internal error while scanning row: %w", err)
+	}
+
+	return nil
 }

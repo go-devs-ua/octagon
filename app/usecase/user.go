@@ -43,3 +43,14 @@ func (u User) GetUser(id string) (*entities.User, error) {
 
 	return user, nil
 }
+
+// Delete represents business logic
+// and will take care of deleting user.
+func (u User) Delete(user entities.User) error {
+	err := u.Repo.Delete(user)
+	if err != nil {
+		return fmt.Errorf("error while deleting user in database: %w", err)
+	}
+
+	return nil
+}

@@ -106,3 +106,46 @@ func (uh UserHandler) GetUserByID() http.Handler {
 		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
 	})
 }
+
+// DeleteUser will handle user creation.
+func (uh UserHandler) DeleteUser() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var user entities.User
+
+		if err := json.NewDecoder(req.Body).Decode(&user); err != nil {
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
+			uh.logger.Errorf("Failed decoding JSON from request %+v: %+v", req, err)
+
+			return
+		}
+
+		defer func() {
+			if err := req.Body.Close(); err != nil {
+				uh.logger.Warnf("Failed closing request %+v: %+v", req, err)
+			}
+		}()
+
+		if err := user.ValidateUUID(); err != nil {
+			uh.logger.Warnf("Invalid ID in the request: %s", user)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
+
+			return
+		}
+
+		if err := uh.usecase.Delete(user); err != nil {
+			if errors.Is(err, globals.ErrNotFound) {
+				uh.logger.Debugw("No user found.", "ID", user.ID)
+				WriteJSONResponse(w, http.StatusNotFound, Response{Message: MsgNotFound, Details: err.Error()}, uh.logger)
+
+				return
+			}
+			uh.logger.Errorw("Internal error while deleting user.", "ID", user.ID, "error", err.Error())
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
+
+			return
+		}
+
+		WriteJSONResponse(w, http.StatusNoContent, nil, uh.logger)
+		uh.logger.Debugw("User successfully deleted", "ID", user.ID)
+	})
+}
