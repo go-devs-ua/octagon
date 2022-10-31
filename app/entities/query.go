@@ -2,7 +2,8 @@ package entities
 
 import (
 	"fmt"
-	"regexp"
+	"strconv"
+	"strings"
 )
 
 // QueryParams represent request query params
@@ -13,28 +14,24 @@ type QueryParams struct {
 	Sort   string
 }
 
-const (
-	numericArgsMask = `^[0-9]+$`
-	sortArgsMask    = `^(first_name|last_name|created_at)([,]*(first_name|last_name|created_at))*$`
-)
-
-var (
-	numericArgsRegex = regexp.MustCompile(numericArgsMask)
-	sortArgsRegex    = regexp.MustCompile(sortArgsMask)
-)
-
 // Validate checks if QueryParameter fields are valid.
 func (qp QueryParams) Validate() error {
-	if !numericArgsRegex.MatchString(qp.Limit) && qp.Limit != "" {
-		return fmt.Errorf("limit argument does not match with regex: `%s`", numericArgsMask)
+	if _, err := strconv.Atoi(qp.Limit); err != nil && qp.Limit != "" {
+		return fmt.Errorf("limit argument has to be a number")
 	}
 
-	if !numericArgsRegex.MatchString(qp.Offset) && qp.Offset != "" {
-		return fmt.Errorf("offset argument does not match with regex: `%s`", numericArgsMask)
+	if _, err := strconv.Atoi(qp.Offset); err != nil && qp.Offset != "" {
+		return fmt.Errorf("offset argument has to be a number")
 	}
 
-	if !sortArgsRegex.MatchString(qp.Sort) && qp.Sort != "" {
-		return fmt.Errorf("sort arguments does not match with regex: `%s`", sortArgsMask)
+	allowedSortArgs := []string{"first_name", "last_name", "created_at", ","}
+
+	for _, arg := range allowedSortArgs {
+		qp.Sort = strings.ReplaceAll(qp.Sort, arg, "")
+	}
+
+	if len(qp.Sort) > 0 {
+		return fmt.Errorf("sort argument `%v` does not fit list: %v", qp.Sort, allowedSortArgs)
 	}
 
 	return nil
