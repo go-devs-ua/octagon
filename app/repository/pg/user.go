@@ -69,12 +69,12 @@ func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) 
 			SELECT id, first_name, last_name, created_at
 			FROM "user" 
 			WHERE deleted_at IS NULL
-			ORDER BY $1
-			OFFSET $2 
-			LIMIT $3 
+			ORDER BY CASE WHEN $1 = '' THEN 'first_name, last_name' ELSE $1 END
+			LIMIT CASE WHEN $2 = 0 THEN NULL ELSE $2 END
+			OFFSET $3
 	`
 
-	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Offset, params.Limit)
+	rows, err := r.DB.Query(sqlStatement, params.Sort, params.Limit, params.Offset)
 
 	if err != nil {
 		var pqErr = new(pq.Error)
