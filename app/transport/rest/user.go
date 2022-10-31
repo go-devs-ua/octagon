@@ -133,13 +133,6 @@ func (uh UserHandler) GetUserByID() http.Handler {
 	})
 }
 
-// QueryParams represent request query params.
-type QueryParams struct {
-	Offset string `schema:"offset"`
-	Limit  string `schema:"limit"`
-	Sort   string `schema:"sort"`
-}
-
 // GetUsers retrieves all entities.User by given parameters.
 func (uh UserHandler) GetUsers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
