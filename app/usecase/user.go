@@ -9,12 +9,12 @@ import (
 )
 
 type User struct {
-	Repo UserRepository
+	Repo Repository
 }
 
 // NewUser is a famous  trick with accepting
 // interfaces and returning struct.
-func NewUser(repo UserRepository) User {
+func NewUser(repo Repository) User {
 	return User{Repo: repo}
 }
 
@@ -33,9 +33,8 @@ func (u User) SignUp(user entities.User) (string, error) {
 	return id, nil
 }
 
-// GetUser represents business logic
-// and will take care of finding user.
-func (u User) GetUser(id string) (*entities.User, error) {
+// GetByID takes care of finding user by ID.
+func (u User) GetByID(id string) (*entities.User, error) {
 	user, err := u.Repo.FindUser(id)
 	if err != nil {
 		return nil, fmt.Errorf("error while searching user in database: %w", err)
@@ -44,12 +43,22 @@ func (u User) GetUser(id string) (*entities.User, error) {
 	return user, nil
 }
 
+// GetAll retrieves all suitable users from repository.
+func (u User) GetAll(params entities.QueryParams) ([]entities.User, error) {
+	users, err := u.Repo.GetAllUsers(params)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching users from database: %w", err)
+	}
+
+	return users, nil
+}
+
 // Delete represents business logic
 // and will take care of deleting user.
 func (u User) Delete(user entities.User) error {
-	err := u.Repo.Delete(user)
+	err := u.Repo.DeleteUser(user)
 	if err != nil {
-		return fmt.Errorf("error while deleting user in database: %w", err)
+		return fmt.Errorf("error while deleting user from database: %w", err)
 	}
 
 	return nil
