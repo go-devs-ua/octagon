@@ -3,6 +3,9 @@ ifeq (migrate,$(firstword $(MAKECMDGOALS)))
   $(eval $(DIRECTION):;@:)
 endif
 
-.PHONY: migrate 
+.PHONY: migrate run
 migrate:
 	@go run cmd/migrations/main.go -migrate $(DIRECTION)
+
+run:
+	@go run cmd/rest/main.go
