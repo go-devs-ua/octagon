@@ -17,12 +17,37 @@ type CreateUserResponse struct {
 	ID string `json:"id"`
 }
 
+// User represents model of entities.User
+// specific to transport layer.
 type User struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	CreatedAt string `json:"created_at"`
+}
+
+// UsersResponse holds on array of Users are going to be rendered.
+type UsersResponse struct {
+	Results []User `json:"results"`
+}
+
+func makeUsersRESTful(userArr []entities.User) []User {
+	var users = make([]User, 0, len(userArr))
+
+	for _, u := range userArr {
+		user := User{
+			ID:        u.ID,
+			Email:     u.Email,
+			FirstName: u.FirstName,
+			LastName:  u.LastName,
+			CreatedAt: u.CreatedAt,
+		}
+
+		users = append(users, user)
+	}
+
+	return users
 }
 
 // CreateUser will handle user creation.
@@ -82,7 +107,7 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		entUser, err := uh.usecase.GetUser(id)
+		user, err := uh.usecase.GetByID(id)
 		if err != nil {
 			if errors.Is(err, globals.ErrNotFound) {
 				uh.logger.Debugw("No user found.", "ID", id)
@@ -96,14 +121,42 @@ func (uh UserHandler) GetUserByID() http.Handler {
 			return
 		}
 
-		user := User{
-			ID:        entUser.ID,
-			FirstName: entUser.FirstName,
-			LastName:  entUser.LastName,
-			Email:     entUser.Email,
-			CreatedAt: entUser.CreatedAt,
+		userResp := User{
+			ID:        user.ID,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt,
 		}
-		WriteJSONResponse(w, http.StatusOK, user, uh.logger)
+		WriteJSONResponse(w, http.StatusOK, userResp, uh.logger)
+	})
+}
+
+// GetAllUsers retrieves all entities.User by given parameters.
+func (uh UserHandler) GetAllUsers() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var params entities.QueryParams
+
+		params.Offset = req.URL.Query().Get("offset")
+		params.Limit = req.URL.Query().Get("limit")
+		params.Sort = req.URL.Query().Get("sort")
+
+		if err := params.Validate(); err != nil {
+			uh.logger.Errorf("Failed validating query: %+v", err)
+			WriteJSONResponse(w, http.StatusBadRequest, Response{Message: MsgBadRequest, Details: err.Error()}, uh.logger)
+
+			return
+		}
+
+		users, err := uh.usecase.GetAll(params)
+		if err != nil {
+			uh.logger.Errorf("Failed fetching users from repository: %+v", err)
+			WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr, Details: "could not fetch users"}, uh.logger)
+
+			return
+		}
+
+		WriteJSONResponse(w, http.StatusOK, UsersResponse{Results: makeUsersRESTful(users)}, uh.logger)
 	})
 }
 

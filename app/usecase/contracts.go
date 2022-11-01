@@ -8,10 +8,11 @@ import (
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-// UserRepository interface can be implemented
+// Repository interface can be implemented
 // in any kind of repositories like Postgres, MySQL etc.
-type UserRepository interface {
+type Repository interface {
 	AddUser(entities.User) (string, error)
 	FindUser(string) (*entities.User, error)
-	Delete(entities.User) error
+	GetAllUsers(entities.QueryParams) ([]entities.User, error)
+	DeleteUser(entities.User) error
 }

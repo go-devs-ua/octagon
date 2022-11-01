@@ -25,8 +25,7 @@ func WithLogRequest(logger *lgr.Logger) Middleware {
 			logger.Debugw("Request:",
 				"Method", req.Method,
 				"URL", req.URL,
-				"User-Agent", req.UserAgent(),
-			)
+				"User-Agent", req.UserAgent())
 			h.ServeHTTP(w, req)
 		})
 	}
