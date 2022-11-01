@@ -22,7 +22,7 @@ func WrapMiddleware(h http.Handler, logger *lgr.Logger, middleware ...Middleware
 // WithLogRequest will log detailed request info.
 func WithLogRequest(h http.Handler, logger *lgr.Logger) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger.Infow("Request:",
+		logger.Debugw("Request:",
 			"Method", req.Method,
 			"URL", req.URL,
 			"User-Agent", req.UserAgent(),

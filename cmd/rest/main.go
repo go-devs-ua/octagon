@@ -49,6 +49,8 @@ func Run() error {
 	}
 
 	srv := rest.NewServer(config, handlers, logger)
+	logger.Infof("Server starts on port:%s", config.Server.Port)
+
 	if err := srv.Run(); err != nil {
 		logger.Errorf("Failed loading server: %+v", err)
 

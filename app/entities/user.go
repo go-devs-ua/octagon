@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
@@ -13,12 +15,13 @@ type User struct {
 	LastName  string `json:"last_name"`
 	Password  string `json:"password"`
 	CreatedAt string `json:"created_at"`
+	DeletedAt string `json:"deleted_at"`
 }
 
 const (
 	nameMask = `^[\p{L}&\s-\\'’.]{2,256}$`
 	mailMask = `(?i)^(?:[a-z\d!#$%&'*+/=?^_\x60{|}~-]+(?:\.[a-z\d!#$%&'*+/=?^_\x60{|}~-]+)*)@(?:(?:[a-z\d](?:[a-z\d-]*[a-z\d])?\.)+[a-z\d](?:[a-z\d-]*[a-z\d])?)$` //nolint:lll // Regexp line can`t be changed.
-	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec // "Potential hardcoded credentials" regexp can`t be changed.
+	passMask = `^[[:graph:]]{8,256}$`                                                                                                                              //nolint:gosec,lll // "Potential hardcoded credentials" regexp can`t be changed.
 )
 
 var (
@@ -83,6 +86,15 @@ func checkMail(email string) error {
 func checkPass(password string) error {
 	if valid := passRegex.MatchString(password); !valid {
 		return fmt.Errorf("password does not match with regex: `%s`", passMask)
+	}
+
+	return nil
+}
+
+func (u User) ValidateUUID() error {
+	_, err := uuid.Parse(u.ID)
+	if err != nil {
+		return fmt.Errorf("invalid uuid: %w", err)
 	}
 
 	return nil

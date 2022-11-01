@@ -5,8 +5,12 @@ info:
   version: 0.0.1
 servers:
   - url: http://localhost:8080
+
+#
 paths:
+  ##
   /users:
+    ###
     post:
       tags:
         - users
@@ -18,45 +22,173 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/CreateUserRequest"
       responses:
         "201": { $ref: "#/components/responses/created" }
         "400": { $ref: "#/components/responses/badRequest" }
         "409": { $ref: "#/components/responses/conflict" }
         "500": { $ref: "#/components/responses/internalServerError" }
+    ###
+    get:
+      tags:
+        - users
+      summary: Gets all users
+      description: Retrieves not-sensitive data from users by given parameters
+      parameters:
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200": { $ref: "#/components/responses/okResults" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+    ###
+    delete:
+      tags:
+        - users
+      summary: Deletes user by ID
+      description: For delete user by ID. Request should by consist of ID in UUID format. We use soft delete. Response should be consist of 204 status without body.
+      requestBody:
+        required: true
+        description: Passes user ID to delete user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteUserRequest"
+      responses:
+        "204": { $ref: "#/components/responses/noContent" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "404": { $ref: "#/components/responses/notFound" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+  ##
+  /users/{id}:
+    ###
+    get:
+      tags:
+        - users
+      summary: Returns user
+      description: The endpoint returns an user by the ID if the ID exists in the database.  Request consists of the ID specified in the URL. Response consists of a status code and of a response body. The response body may consist an error message or an entity of rest.User
+      parameters:
+        - $ref: "#/components/parameters/ID"
+      responses:
+        "200": { $ref: "#/components/responses/ok" }
+        "400": { $ref: "#/components/responses/badRequest" }
+        "404": { $ref: "#/components/responses/notFound" }
+        "500": { $ref: "#/components/responses/internalServerError" }
+
+#
 components:
+  ##
   responses:
+    ###
+    ok:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserResponse"
+    ###
+    notFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ###
     created:
-      description: Successful created user.
+      description: Successful created user
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/CreateUserResponse"
+    ###
     badRequest:
-      description: Bad Request.
+      description: Bad Request
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    ###
     conflict:
-      description: User provided email that already exists.
+      description: User provided email that already exists
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    ###
     internalServerError:
-      description: Unexpected error.
+      description: Unexpected error
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+    ###
+    noContent:
+      description: User was deleted successfully. No content found
+    ##
+    okResults:
+      description: Successful users fetching
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserResponse"
+  ##
+  parameters:
+    ###
+    Offset:
+      name: offset
+      in: query
+      description: Limits the number of users on the page
+      required: true
+      schema:
+        type: integer
+    ###
+    Limit:
+      name: limit
+      in: query
+      description: Specifies the number of the users to be displayed
+      required: true
+      schema:
+        type: integer
+    ###
+    Sort:
+      name: sort
+      in: query
+      description: Sorting options for result array that could be passed sequentially
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - first_name
+            - last_name
+            - created_at
+          default: first_name,last_name
+        minItems: 1
+        uniqueItems: true
+      style: simple
+    ###
+    ID:
+      name: id
+      in: path
+      description: ID of user to use
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+      style: simple
+
+  ##
   schemas:
-    User:
+    ###
+    CreateUserRequest:
       type: object
       required:
         - email
-        - firstname
-        - lastname
+        - first_name
+        - last_name
         - password
       properties:
         email:
@@ -64,12 +196,12 @@ components:
             description: must contains '@' and must be unique,
             type: string,
             format: email,
-            maxLength: 256,
+            maxLength: 320,
             uniqueItems: true,
             example: john@email.com,
           }
-        firstName: { type: string, example: John }
-        lastName: { type: string, example: Doe }
+        first_name: { type: string, example: John }
+        last_name: { type: string, example: Doe }
         password:
           {
             description: only ASCII symbols,
@@ -79,6 +211,69 @@ components:
             maxLength: 256,
             example: "123456Aa",
           }
+    ###
+    DeleteUserRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          {
+            description: uuid,
+            type: string,
+            format: uuid,
+            example: "c0f01e3a-2dc3-4ea2-8d99-893b443697f9",
+          }
+    ###
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+        - created_at
+      properties:
+        id:
+          {
+            description: unique identifier of the user entity,
+            type: string,
+            format: id,
+            uniqueItems: true,
+            example: "297a80a4-ea77-4f9e-8d0c-ca03cb263625",
+          }
+        email:
+          {
+            description: must contains '@' and must be unique,
+            type: string,
+            format: email,
+            maxLength: 320,
+            uniqueItems: true,
+            example: john@email.com,
+          }
+        first_name: { type: string, example: John }
+        last_name: { type: string, example: Doe }
+        created_at:
+          {
+            description: Indicates date and time of user creation,
+            type: string,
+            format: created_at,
+            example: "2022-10-23T10:47:28.896701Z",
+          }
+    ###
+    CreateUserResponse:
+      type: object
+      required:
+        - id
+      properties:
+        ID:
+          {
+            description: uuid,
+            type: string,
+            format: uuid,
+            example: "c0f01e3a-2dc3-4ea2-8d99-893b443697f9",
+          }
+    ###
     ErrorResponse:
       type: object
       required:
@@ -89,3 +284,13 @@ components:
           type: integer
         message:
           type: string
+    ###
+    GetAllUsersResponse:
+      type: object
+      required:
+        - results
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponse"

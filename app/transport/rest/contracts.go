@@ -6,5 +6,8 @@ import (
 
 // UserUsecase represents User use-case layer.
 type UserUsecase interface {
-	Signup(entities.User) (string, error)
+	SignUp(entities.User) (string, error)
+	GetAll(entities.QueryParams) ([]entities.User, error)
+	GetByID(id string) (*entities.User, error)
+	Delete(entities.User) error
 }
