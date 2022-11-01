@@ -9,4 +9,5 @@ type UserUsecase interface {
 	SignUp(entities.User) (string, error)
 	GetAll(entities.QueryParams) ([]entities.User, error)
 	GetByID(id string) (*entities.User, error)
+	Delete(entities.User) error
 }

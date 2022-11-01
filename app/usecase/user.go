@@ -47,8 +47,19 @@ func (u User) GetByID(id string) (*entities.User, error) {
 func (u User) GetAll(params entities.QueryParams) ([]entities.User, error) {
 	users, err := u.Repo.GetAllUsers(params)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching users: %w", err)
+		return nil, fmt.Errorf("error fetching users from database: %w", err)
 	}
 
 	return users, nil
+}
+
+// Delete represents business logic
+// and will take care of deleting user.
+func (u User) Delete(user entities.User) error {
+	err := u.Repo.DeleteUser(user)
+	if err != nil {
+		return fmt.Errorf("error while deleting user from database: %w", err)
+	}
+
+	return nil
 }

@@ -14,4 +14,5 @@ type Repository interface {
 	AddUser(entities.User) (string, error)
 	FindUser(string) (*entities.User, error)
 	GetAllUsers(entities.QueryParams) ([]entities.User, error)
+	DeleteUser(entities.User) error
 }
