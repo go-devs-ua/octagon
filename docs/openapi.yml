@@ -30,6 +30,8 @@ paths:
         "500": { $ref: "#/components/responses/internalServerError" }
     ###
     get:
+      tags:
+        - users
       summary: Gets all users
       description: Retrieves not-sensitive data from users by given parameters
       parameters:
@@ -42,6 +44,8 @@ paths:
         "500": { $ref: "#/components/responses/internalServerError" }
     ###
     delete:
+      tags:
+        - users
       summary: Deletes user by ID
       description: For delete user by ID. Request should by consist of ID in UUID format. We use soft delete. Response should be consist of 204 status without body.
       requestBody:
@@ -60,6 +64,8 @@ paths:
   /users/{id}:
     ###
     get:
+      tags:
+        - users
       summary: Returns user
       description: The endpoint returns an user by the ID if the ID exists in the database.  Request consists of the ID specified in the URL. Response consists of a status code and of a response body. The response body may consist an error message or an entity of rest.User
       parameters:
