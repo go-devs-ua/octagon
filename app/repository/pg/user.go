@@ -75,7 +75,7 @@ func (r Repo) FindUser(id string) (*entities.User, error) {
 // GetAllUsers retrieves list of users from database.
 func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) {
 	const SQL = `
-			SELECT id, first_name, last_name, created_at
+			SELECT id, email, first_name, last_name, created_at
 			FROM "user" 
 			WHERE deleted_at IS NULL
 			ORDER BY CASE WHEN $1 = '' THEN 'first_name, last_name' ELSE $1 END
@@ -95,7 +95,7 @@ func (r Repo) GetAllUsers(params entities.QueryParams) ([]entities.User, error) 
 	for rows.Next() {
 		var user entities.User
 
-		if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.CreatedAt); err != nil {
 			return nil, fmt.Errorf("error occurred while scaning object from query: %w", err)
 		}
 
