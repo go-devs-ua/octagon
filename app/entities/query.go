@@ -53,6 +53,7 @@ func (set Set) String() string {
 	)
 
 	str.WriteString("{")
+
 	for k, _ := range set {
 		str.WriteString(k)
 		if i != end {
@@ -60,6 +61,7 @@ func (set Set) String() string {
 		}
 		i++
 	}
+
 	str.WriteString("}")
 
 	return str.String()
