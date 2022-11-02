@@ -48,8 +48,8 @@ func (srv *Server) Run() error {
 }
 
 func attachUserEndpoints(router *mux.Router, handlers Handlers) {
-	router.Path("/users").Methods(http.MethodPost).Handler(handlers.UserHandler.CreateUser())
-	router.Path("/users").Methods(http.MethodGet).Handler(handlers.UserHandler.GetAllUsers())
-	router.Path("/users/{id}").Methods(http.MethodGet).Handler(handlers.UserHandler.GetUserByID())
-	router.Path("/users").Methods(http.MethodDelete).Handler(handlers.UserHandler.DeleteUser())
+	router.Path("/users").Methods(http.MethodPost).HandlerFunc(handlers.UserHandler.CreateUser)
+	router.Path("/users").Methods(http.MethodGet).HandlerFunc(handlers.UserHandler.GetAllUsers)
+	router.Path("/users/{id}").Methods(http.MethodGet).HandlerFunc(handlers.UserHandler.GetUserByID)
+	router.Path("/users").Methods(http.MethodDelete).HandlerFunc(handlers.UserHandler.DeleteUser)
 }
