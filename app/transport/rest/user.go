@@ -125,6 +125,7 @@ func (uh UserHandler) GetUserByID(w http.ResponseWriter, req *http.Request) {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 	}
+
 	WriteJSONResponse(w, http.StatusOK, userResp, uh.logger)
 }
 
@@ -185,6 +186,7 @@ func (uh UserHandler) DeleteUser(w http.ResponseWriter, req *http.Request) {
 
 			return
 		}
+
 		uh.logger.Errorw("Internal error while deleting user.", "ID", user.ID, "error", err.Error())
 		WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
