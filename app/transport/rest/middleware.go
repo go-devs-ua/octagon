@@ -9,8 +9,8 @@ import (
 // Middleware is simple decorator.
 type Middleware func(http.Handler, *lgr.Logger) http.Handler
 
-// WrapMiddleware will build middleware chain.
-func WrapMiddleware(h http.Handler, logger *lgr.Logger, middlewares ...Middleware) http.Handler {
+// WrapMiddlewares will build middleware chain.
+func WrapMiddlewares(h http.Handler, logger *lgr.Logger, middlewares ...Middleware) http.Handler {
 	for _, mw := range middlewares {
 		h = mw(h, logger)
 	}
