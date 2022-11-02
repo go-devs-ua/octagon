@@ -32,14 +32,12 @@ func (qp QueryParams) Validate() error {
 		return fmt.Errorf("offset argument has to be a number")
 	}
 
-	allowedSortArgs := []string{",", "first_name", "last_name", "created_at"}
+	allowedSortArgs := map[string]bool{"first_name": true, "last_name": true, "created_at": true}
 
-	for _, arg := range allowedSortArgs {
-		qp.Sort = strings.ReplaceAll(qp.Sort, arg, "")
-	}
-
-	if len(qp.Sort) > 0 {
-		return fmt.Errorf("sort argument `%v` does not fit list: %+v", qp.Sort, allowedSortArgs[1:])
+	for _, arg := range strings.Split(qp.Sort, ",") {
+		if _, ok := allowedSortArgs[arg]; !ok {
+			return fmt.Errorf("`%s` does not match tupple of allowed sort arguments: %+v", arg, allowedSortArgs)
+		}
 	}
 
 	return nil
