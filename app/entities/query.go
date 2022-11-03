@@ -32,37 +32,17 @@ func (qp QueryParams) Validate() error {
 		return fmt.Errorf("offset argument has to be a number")
 	}
 
-	allowedSortArgs := Set{"first_name": {}, "last_name": {}, "created_at": {}}
+	allowedSortArgs := []string{"first_name", "last_name", "created_at"}
 
-	for _, arg := range strings.Split(qp.Sort, ",") {
-		if _, ok := allowedSortArgs[arg]; !ok {
-			return fmt.Errorf("`%s` does not match allowed sort arguments: %v", arg, allowedSortArgs)
-		}
+	const sep = ","
+
+	for _, arg := range append(allowedSortArgs, sep) {
+		qp.Sort = strings.ReplaceAll(qp.Sort, arg, "")
+	}
+
+	if len(qp.Sort) > 0 {
+		return fmt.Errorf("`%s` does not match allowed sort arguments: %v", qp.Sort, strings.Join(allowedSortArgs, sep+" "))
 	}
 
 	return nil
-}
-
-type Set map[string]struct{}
-
-func (set Set) String() string {
-	var (
-		end = len(set) - 1
-		str strings.Builder
-		i   int
-	)
-
-	str.WriteString("{")
-
-	for k, _ := range set {
-		str.WriteString(k)
-		if i != end {
-			str.WriteString(", ")
-		}
-		i++
-	}
-
-	str.WriteString("}")
-
-	return str.String()
 }
