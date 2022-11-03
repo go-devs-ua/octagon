@@ -1,11 +1,9 @@
 package rest
 
 const (
-	MsgInternalSeverErr   = "Internal server error"
-	MsgBadRequest         = "Bad request"
-	MsgNotFound           = "Not found"
-	MsgTimeOut            = "Connection timeout"
-	handlerTimeoutSeconds = 30
-	readTimeoutSeconds    = 2
-	writeTimeoutSeconds   = 5
+	MsgInternalSeverErr = "Internal server error"
+	MsgBadRequest       = "Bad request"
+	MsgNotFound         = "Not found"
+	readTimeoutSeconds  = 2
+	writeTimeoutSeconds = 5
 )

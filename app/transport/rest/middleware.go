@@ -2,7 +2,6 @@ package rest
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-devs-ua/octagon/lgr"
 )
@@ -10,9 +9,9 @@ import (
 // Middleware is simple decorator.
 type Middleware func(http.Handler, *lgr.Logger) http.Handler
 
-// WrapMiddleware will build middleware chain.
-func WrapMiddleware(h http.Handler, logger *lgr.Logger, middleware ...Middleware) http.Handler {
-	for _, mw := range middleware {
+// WrapMiddlewares will build middleware chain.
+func WrapMiddlewares(h http.Handler, logger *lgr.Logger, middlewares ...Middleware) http.Handler {
+	for _, mw := range middlewares {
 		h = mw(h, logger)
 	}
 
@@ -27,16 +26,6 @@ func WithLogRequest(h http.Handler, logger *lgr.Logger) http.Handler {
 			"URL", req.URL,
 			"User-Agent", req.UserAgent(),
 		)
-		h.ServeHTTP(w, req)
-	})
-}
-
-// WithHandlerTimeout set handler timeout.
-func WithHandlerTimeout(h http.Handler, logger *lgr.Logger) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		logger.Debugw("Handler timeout was set.",
-			MsgTimeOut, handlerTimeoutSeconds*time.Second)
-		h = http.TimeoutHandler(h, handlerTimeoutSeconds*time.Second, MsgTimeOut)
 		h.ServeHTTP(w, req)
 	})
 }

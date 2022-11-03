@@ -22,11 +22,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 	router := new(mux.Router)
 
 	attachUserEndpoints(router, handlers)
-
-	handler := WrapMiddleware(router, logger,
-		WithLogRequest,
-		WithHandlerTimeout,
-	)
+	handler := WrapMiddlewares(router, logger, WithLogRequest)
 
 	return &Server{
 		Server: &http.Server{
