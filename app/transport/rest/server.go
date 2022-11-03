@@ -23,14 +23,12 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 	attachUserEndpoints(router, handlers)
 
-	handler := WrapMiddleware(router,
-		WithLogRequest(logger),
-	)
+	handler := WrapMiddlewares(router, logger, WithLogRequest)
 
 	return &Server{
 		Server: &http.Server{
 			Addr:         opt.Server.Host + ":" + opt.Server.Port,
-			Handler:      http.TimeoutHandler(handler, handlerTimeoutSeconds*time.Second, MsgTimeOut),
+			Handler:      handler,
 			ReadTimeout:  readTimeoutSeconds * time.Second,
 			WriteTimeout: writeTimeoutSeconds * time.Second,
 		},
