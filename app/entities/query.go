@@ -34,14 +34,14 @@ func (qp QueryParams) Validate() error {
 
 	allowedSortArgs := []string{"first_name", "last_name", "created_at"}
 
-	const sep = ","
+	const separator = ","
 
-	for _, arg := range append(allowedSortArgs, sep) {
+	for _, arg := range append(allowedSortArgs, separator) {
 		qp.Sort = strings.ReplaceAll(qp.Sort, arg, "")
 	}
 
 	if len(qp.Sort) > 0 {
-		return fmt.Errorf("`%s` does not match allowed sort arguments: %v", qp.Sort, strings.Join(allowedSortArgs, sep+" "))
+		return fmt.Errorf("`%s` does not match allowed sort arguments: %v", qp.Sort, strings.Join(allowedSortArgs, separator+" "))
 	}
 
 	return nil
