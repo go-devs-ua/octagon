@@ -4,6 +4,8 @@ import (
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
+//go:generate mockgen -source=./contracts.go -destination=./mock_usecase.go -package=rest
+
 // UserUsecase represents User use-case layer.
 type UserUsecase interface {
 	SignUp(entities.User) (string, error)
