@@ -137,9 +137,6 @@ func (uh UserHandler) GetAllUsers(w http.ResponseWriter, req *http.Request) {
 	params.Offset = req.URL.Query().Get("offset")
 	params.Limit = req.URL.Query().Get("limit")
 	params.Sort = req.URL.Query().Get("sort")
-	// params.Offset = "10"
-	// params.Limit = "5"
-	// params.Sort = "first_name"
 
 	if err := params.Validate(); err != nil {
 		uh.logger.Errorf("Failed validating query: %+v", err)
