@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -155,7 +156,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 						},
 					}, nil)
 			},
-			expectedStatusCode: 400,
+			expectedStatusCode: 200,
 			expectedResponsetBody: `{
 				"results": [
 					{
@@ -173,6 +174,20 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 						"created_at": "2022-11-05T22:28:36.679554Z"
 					}
 				]
+			}`,
+		},
+		"internal-server-error": {
+			params: entities.QueryParams{
+				Offset: "0",
+				Limit:  "1",
+			},
+			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
+				u.EXPECT().GetAll(params).Return(nil, errors.New("Internal error"))
+			},
+			expectedStatusCode: 500,
+			expectedResponsetBody: `{
+				"message": "Internal server error",
+				"details": "could not fetch users"
 			}`,
 		},
 	}
