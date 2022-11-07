@@ -17,43 +17,105 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 		t.FailNow()
 	}
 
-	type mockBehaviour func(u *MockUserUsecase, params entities.QueryParams, users []entities.User)
+	type UserUsecase func(u *MockUserUsecase, params entities.QueryParams, users []entities.User)
 
 	tests := map[string]struct {
 		params                entities.QueryParams
-		mockBehaviour         mockBehaviour
+		GetAll                UserUsecase
 		expectedStatusCode    int
 		expectedResponsetBody string
 	}{
 		"succes": {
 			params: entities.QueryParams{
-				Offset: "10000",
+				Offset: "0",
 				Limit:  "5",
-				Sort:   "first_name",
 			},
-			mockBehaviour: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
-				u.EXPECT().GetAll(params).Return(users, nil)
+			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
+				u.EXPECT().GetAll(params).Return(
+					[]entities.User{
+						{
+							ID:        "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
+							FirstName: "John1",
+							LastName:  "Doe",
+							Email:     "john1@examlpe.com",
+							Password:  "qwerty",
+							CreatedAt: "2022-11-05T22:28:36.679554Z",
+						},
+						{
+							ID:        "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
+							FirstName: "John2",
+							LastName:  "Doe",
+							Email:     "john2@examlpe.com",
+							Password:  "qwerty",
+							CreatedAt: "2022-11-05T22:28:36.679554Z",
+						},
+					}, nil)
 			},
-			expectedResponsetBody: `{"results":[]}`,
-			expectedStatusCode:    200,
+			expectedStatusCode: 200,
+			expectedResponsetBody: `{
+				"results": [
+					{
+						"id": "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
+						"email": "john1@examlpe.com",
+						"first_name": "John1",
+						"last_name": "Doe",
+						"created_at": "2022-11-05T22:28:36.679554Z"
+					},
+					{
+						"id": "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
+						"email": "john2@examlpe.com",
+						"first_name": "John2",
+						"last_name": "Doe",
+						"created_at": "2022-11-05T22:28:36.679554Z"
+					}
+				]
+			}`,
 		},
 		"invalid-offset": {
 			params: entities.QueryParams{
 				Offset: "bad",
 				Limit:  "5",
-				Sort:   "first_name",
 			},
-			mockBehaviour:         nil,
+			expectedStatusCode:    400,
+			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
+		},
+		"extralong-offset": {
+			params: entities.QueryParams{
+				Offset: "10000000000000000000000000000000000000000",
+				Limit:  "5",
+			},
+			expectedStatusCode:    400,
+			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
+		},
+		"negative-offset": {
+			params: entities.QueryParams{
+				Offset: "-1",
+				Limit:  "5",
+			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
 		},
 		"invalid-Limit": {
 			params: entities.QueryParams{
-				Offset: "10",
+				Offset: "0",
 				Limit:  "bad",
-				Sort:   "first_name",
 			},
-			mockBehaviour:         nil,
+			expectedStatusCode:    400,
+			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
+		},
+		"negative-Limit": {
+			params: entities.QueryParams{
+				Offset: "0",
+				Limit:  "-1",
+			},
+			expectedStatusCode:    400,
+			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
+		},
+		"extralong-Limit": {
+			params: entities.QueryParams{
+				Offset: "0",
+				Limit:  "1000000000000000000000000000000000000000000000",
+			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
 		},
@@ -63,9 +125,55 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 				Sort:   "first_name_bad",
 			},
-			mockBehaviour:         nil,
 			expectedStatusCode:    400,
 			expectedResponsetBody: "{\"details\": \"sort argument `_bad` does not fit list: [first_name last_name created_at ,]\", \"message\": \"Bad request\"}",
+		},
+		"sorting-by-first_name": {
+			params: entities.QueryParams{
+				Offset: "10",
+				Limit:  "5",
+				Sort:   "first_name",
+			},
+			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
+				u.EXPECT().GetAll(params).Return(
+					[]entities.User{
+						{
+							ID:        "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
+							FirstName: "B",
+							LastName:  "Doe",
+							Email:     "john1@examlpe.com",
+							Password:  "qwerty",
+							CreatedAt: "2022-11-05T22:28:36.679554Z",
+						},
+						{
+							ID:        "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
+							FirstName: "A",
+							LastName:  "Doe",
+							Email:     "john2@examlpe.com",
+							Password:  "qwerty",
+							CreatedAt: "2022-11-05T22:28:36.679554Z",
+						},
+					}, nil)
+			},
+			expectedStatusCode: 400,
+			expectedResponsetBody: `{
+				"results": [
+					{
+						"id": "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
+						"email": "john1@examlpe.com",
+						"first_name": "A",
+						"last_name": "Doe",
+						"created_at": "2022-11-05T22:28:36.679554Z"
+					},
+					{
+						"id": "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
+						"email": "john2@examlpe.com",
+						"first_name": "B",
+						"last_name": "Doe",
+						"created_at": "2022-11-05T22:28:36.679554Z"
+					}
+				]
+			}`,
 		},
 	}
 
@@ -78,8 +186,8 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			usecase := NewMockUserUsecase(ctrl)
 			users := []entities.User{}
 
-			if tt.mockBehaviour != nil {
-				tt.mockBehaviour(usecase, tt.params, users)
+			if tt.GetAll != nil {
+				tt.GetAll(usecase, tt.params, users)
 			}
 
 			uh := UserHandler{
@@ -91,9 +199,10 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 
 			url := "/users?offset=" + tt.params.Offset + "&limit=" + tt.params.Limit + "&sort=" + tt.params.Sort
 
-			// Test server.
+			// Do testing.
 			uh.GetAllUsers(resp, httptest.NewRequest(http.MethodGet, url, nil))
-			// fmt.Println("----------------", resp.Body.String())
+
+			// Check results of testing.
 			require.Equal(t, tt.expectedStatusCode, resp.Code)
 			require.JSONEq(t, tt.expectedResponsetBody, resp.Body.String())
 		})
