@@ -1,16 +1,17 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"path"
 	"testing"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/lgr"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetUserByID(t *testing.T) {
@@ -22,14 +23,12 @@ func TestGetUserByID(t *testing.T) {
 	tests := map[string]struct {
 		id                   string
 		expectedStatusCode   int
-		expectedErr          error
 		expectedResponseBody string
 		getByIDFunc          UserUsecase
 	}{
 		"success": {
 			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
 			expectedStatusCode: http.StatusOK,
-			expectedErr:        nil,
 			expectedResponseBody: `
 									{
 										"id": "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
@@ -46,8 +45,68 @@ func TestGetUserByID(t *testing.T) {
 						FirstName: "Jon",
 						LastName:  "Doe",
 						Email:     "john@emasadfasilsdf.com",
-						CreatedAt: "2022-11-01T16:31:40.400825Z",
-					}, nil
+						CreatedAt: "2022-11-01T16:31:40.400825Z"}, nil
+				}},
+		},
+		"invalid_short_id": {
+			id:                 "1234",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponseBody: `
+									{
+										"message": "Bad request",
+										"details": "invalid UUID length: 4"
+									}
+								   `,
+			getByIDFunc: nil,
+		},
+		"invalid_long_id": {
+			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4fasfd771asdfadfsfadsaa6703a6b-c054-4ebd-b782-2a96bd4f771aa6703a6b-c054-4ebd-b782-2a96bd4f771aa670",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponseBody: `
+									{
+										"message": "Bad request",
+										"details": "invalid UUID length: 128"
+									}
+								   `,
+			getByIDFunc: nil,
+		},
+		"zero_id": {
+			id:                 "",
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponseBody: `
+									{
+										"message": "Bad request",
+										"details": "invalid UUID length: 0"
+									}
+								   `,
+			getByIDFunc: nil,
+		},
+		"wrong_id": {
+			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
+			expectedStatusCode: http.StatusNotFound,
+			expectedResponseBody: `
+									{
+										"message": "Not found",
+										"details": "no user found in DB"
+									}
+								   `,
+			getByIDFunc: &UserUsecaseMock{
+				GetByIDFunc: func(string) (*entities.User, error) {
+					return nil, globals.ErrNotFound
+				}},
+		},
+		"unexpected_error": {
+			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedResponseBody: `
+									{
+										"message": "Internal server error",
+										"details": ""
+									}
+								   `,
+			getByIDFunc: &UserUsecaseMock{
+				GetByIDFunc: func(string) (*entities.User, error) {
+					return nil, errors.New("unexpected error")
 				}},
 		},
 	}
@@ -59,18 +118,17 @@ func TestGetUserByID(t *testing.T) {
 				logger:  logger,
 			}
 
-			rec := httptest.NewRecorder()
-			resp := rec.Result()
-			defer resp.Body.Close()
+			resp := httptest.NewRecorder()
+			defer resp.Result().Body.Close()
 
 			req := httptest.NewRequest(http.MethodGet, path.Join("/users", tt.id), nil)
 			req = mux.SetURLVars(req, map[string]string{"id": tt.id})
 
-			uh.GetUserByID(rec, req)
+			uh.GetUserByID(resp, req)
 
-			assert.Equal(t, resp.StatusCode, tt.expectedStatusCode)
+			require.Equal(t, resp.Code, tt.expectedStatusCode)
 
-			assert.JSONEq(t, tt.expectedResponseBody, rec.Body.String())
+			require.JSONEq(t, tt.expectedResponseBody, resp.Body.String())
 		})
 	}
 }
