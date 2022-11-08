@@ -16,12 +16,22 @@ type QueryParams struct {
 
 // Validate checks if QueryParameter fields are valid.
 func (qp QueryParams) Validate() error {
-	if _, err := strconv.Atoi(qp.Limit); err != nil {
+	limit, err := strconv.Atoi(qp.Limit)
+	if err != nil {
 		return fmt.Errorf("limit argument has to be a number")
 	}
 
-	if _, err := strconv.Atoi(qp.Offset); err != nil {
+	if limit < 0 {
+		return fmt.Errorf("limit argument has to be a positive number")
+	}
+
+	offset, err := strconv.Atoi(qp.Offset)
+	if err != nil {
 		return fmt.Errorf("offset argument has to be a number")
+	}
+
+	if offset < 0 {
+		return fmt.Errorf("offset argument has to be a positive number")
 	}
 
 	allowedSortArgs := []string{"first_name", "last_name", "created_at", ","}
@@ -31,7 +41,7 @@ func (qp QueryParams) Validate() error {
 	}
 
 	if len(qp.Sort) > 0 {
-		return fmt.Errorf("sort argument `%v` does not fit list: %v", qp.Sort, allowedSortArgs)
+		return fmt.Errorf("sort argument '%v' does not fit list: %v", qp.Sort, allowedSortArgs)
 	}
 
 	return nil
