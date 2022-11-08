@@ -18,21 +18,21 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 		t.FailNow()
 	}
 
-	type UserUsecase func(u *MockUserUsecase, params entities.QueryParams, users []entities.User)
-
 	tests := map[string]struct {
 		params                entities.QueryParams
-		GetAll                UserUsecase
 		expectedStatusCode    int
 		expectedResponsetBody string
+		usecaseBuilder        func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase
 	}{
 		"succes": {
 			params: entities.QueryParams{
 				Offset: "0",
 				Limit:  "5",
 			},
-			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
-				u.EXPECT().GetAll(params).Return(
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().GetAll(params).Return(
 					[]entities.User{
 						{
 							ID:        "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
@@ -50,7 +50,9 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 							Password:  "qwerty",
 							CreatedAt: "2022-11-05T22:28:36.679554Z",
 						},
-					}, nil)
+					}, nil).Times(1)
+
+				return mock
 			},
 			expectedStatusCode: 200,
 			expectedResponsetBody: `{
@@ -77,6 +79,10 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Offset: "bad",
 				Limit:  "5",
 			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
+			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
 		},
@@ -84,6 +90,10 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			params: entities.QueryParams{
 				Offset: "10000000000000000000000000000000000000000",
 				Limit:  "5",
+			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
@@ -93,13 +103,21 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Offset: "-1",
 				Limit:  "5",
 			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
+			},
 			expectedStatusCode:    400,
-			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
+			expectedResponsetBody: `{"details":"offset argument has to be a positive number", "message":"Bad request"}`,
 		},
 		"invalid-Limit": {
 			params: entities.QueryParams{
 				Offset: "0",
 				Limit:  "bad",
+			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
@@ -109,13 +127,21 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Offset: "0",
 				Limit:  "-1",
 			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
+			},
 			expectedStatusCode:    400,
-			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
+			expectedResponsetBody: `{"details":"limit argument has to be a positive number", "message":"Bad request"}`,
 		},
 		"extralong-Limit": {
 			params: entities.QueryParams{
 				Offset: "0",
 				Limit:  "1000000000000000000000000000000000000000000000",
+			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
@@ -126,8 +152,12 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 				Sort:   "first_name_bad",
 			},
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				return mock
+			},
 			expectedStatusCode:    400,
-			expectedResponsetBody: "{\"details\": \"sort argument `_bad` does not fit list: [first_name last_name created_at ,]\", \"message\": \"Bad request\"}",
+			expectedResponsetBody: `{"details": "sort argument '_bad' does not fit list: [first_name last_name created_at ,]", "message": "Bad request"}`,
 		},
 		"sorting-by-first_name": {
 			params: entities.QueryParams{
@@ -135,8 +165,10 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 				Sort:   "first_name",
 			},
-			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
-				u.EXPECT().GetAll(params).Return(
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().GetAll(params).Return(
 					[]entities.User{
 						{
 							ID:        "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
@@ -154,7 +186,9 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 							Password:  "qwerty",
 							CreatedAt: "2022-11-05T22:28:36.679554Z",
 						},
-					}, nil)
+					}, nil).Times(1)
+
+				return mock
 			},
 			expectedStatusCode: 200,
 			expectedResponsetBody: `{
@@ -181,8 +215,11 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Offset: "0",
 				Limit:  "1",
 			},
-			GetAll: func(u *MockUserUsecase, params entities.QueryParams, users []entities.User) {
-				u.EXPECT().GetAll(params).Return(nil, errors.New("Internal error"))
+			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				mock.EXPECT().GetAll(params).Return(nil, errors.New("Internal error"))
+
+				return mock
 			},
 			expectedStatusCode: 500,
 			expectedResponsetBody: `{
@@ -198,28 +235,20 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			usecase := NewMockUserUsecase(ctrl)
-			users := []entities.User{}
+			usecase := tt.usecaseBuilder(ctrl, tt.params)
 
-			if tt.GetAll != nil {
-				tt.GetAll(usecase, tt.params, users)
-			}
+			uh := NewUserHandler(usecase, logger)
 
-			uh := UserHandler{
-				usecase: usecase,
-				logger:  logger,
-			}
-
-			resp := httptest.NewRecorder()
+			response := httptest.NewRecorder()
 
 			url := "/users?offset=" + tt.params.Offset + "&limit=" + tt.params.Limit + "&sort=" + tt.params.Sort
 
 			// Do testing.
-			uh.GetAllUsers(resp, httptest.NewRequest(http.MethodGet, url, nil))
+			uh.GetAllUsers(response, httptest.NewRequest(http.MethodGet, url, nil))
 
 			// Check results of testing.
-			require.Equal(t, tt.expectedStatusCode, resp.Code)
-			require.JSONEq(t, tt.expectedResponsetBody, resp.Body.String())
+			require.Equal(t, tt.expectedStatusCode, response.Code)
+			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
 		})
 	}
 }
