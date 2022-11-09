@@ -2,8 +2,8 @@ package rest
 
 import (
 	"errors"
-	"net/http"
 	"net/http/httptest"
+	"path"
 	"testing"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -159,57 +159,6 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details": "sort argument '_bad' does not fit list: [first_name last_name created_at ,]", "message": "Bad request"}`,
 		},
-		"sorting-by-first_name": {
-			params: entities.QueryParams{
-				Offset: "10",
-				Limit:  "5",
-				Sort:   "first_name",
-			},
-			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-
-				mock.EXPECT().GetAll(params).Return(
-					[]entities.User{
-						{
-							ID:        "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
-							FirstName: "B",
-							LastName:  "Doe",
-							Email:     "john1@examlpe.com",
-							Password:  "qwerty",
-							CreatedAt: "2022-11-05T22:28:36.679554Z",
-						},
-						{
-							ID:        "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
-							FirstName: "A",
-							LastName:  "Doe",
-							Email:     "john2@examlpe.com",
-							Password:  "qwerty",
-							CreatedAt: "2022-11-05T22:28:36.679554Z",
-						},
-					}, nil).Times(1)
-
-				return mock
-			},
-			expectedStatusCode: 200,
-			expectedResponsetBody: `{
-				"results": [
-					{
-						"id": "931add34-1f6d-4c06-b0e8-c37ac1ca614c",
-						"email": "john1@examlpe.com",
-						"first_name": "A",
-						"last_name": "Doe",
-						"created_at": "2022-11-05T22:28:36.679554Z"
-					},
-					{
-						"id": "4fddf9a4-fbd1-4083-98aa-e4d0e584e7bb",
-						"email": "john2@examlpe.com",
-						"first_name": "B",
-						"last_name": "Doe",
-						"created_at": "2022-11-05T22:28:36.679554Z"
-					}
-				]
-			}`,
-		},
 		"internal-server-error": {
 			params: entities.QueryParams{
 				Offset: "0",
@@ -241,10 +190,18 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 
 			response := httptest.NewRecorder()
 
-			url := "/users?offset=" + tt.params.Offset + "&limit=" + tt.params.Limit + "&sort=" + tt.params.Sort
+			request := httptest.NewRequest("GET", path.Join("/users"), nil)
+
+			q := request.URL.Query()
+
+			q.Add("offset", tt.params.Offset)
+			q.Add("limit", tt.params.Limit)
+			q.Add("sort", tt.params.Sort)
+
+			request.URL.RawQuery = q.Encode()
 
 			// Do testing.
-			uh.GetAllUsers(response, httptest.NewRequest(http.MethodGet, url, nil))
+			uh.GetAllUsers(response, request)
 
 			// Check results of testing.
 			require.Equal(t, tt.expectedStatusCode, response.Code)
