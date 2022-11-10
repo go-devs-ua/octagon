@@ -25,8 +25,7 @@ func TestGetUserByID(t *testing.T) {
 		id                   string
 		expectedStatusCode   int
 		expectedResponseBody string
-		expectedUser         *entities.User
-		expectedErr          error
+		getByIdFunc          func(*gomock.Controller, string) *MockUserUsecase
 	}{
 		"success": {
 			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
@@ -38,13 +37,20 @@ func TestGetUserByID(t *testing.T) {
 				"email":    "john@emasadfasilsdf.com", 
 				"created_at": "2022-11-01T16:31:40.400825Z"	
 			}`,
-			expectedUser: &entities.User{
-				ID:        "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
-				FirstName: "Jon",
-				LastName:  "Doe",
-				Email:     "john@emasadfasilsdf.com",
-				CreatedAt: "2022-11-01T16:31:40.400825Z"},
-			expectedErr: nil,
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				mock.EXPECT().
+					GetByID(gomock.Eq(id)).
+					Return(&entities.User{
+						ID:        "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
+						FirstName: "Jon",
+						LastName:  "Doe",
+						Email:     "john@emasadfasilsdf.com",
+						CreatedAt: "2022-11-01T16:31:40.400825Z"}, nil).
+					Times(1)
+
+				return mock
+			},
 		},
 		"invalid_short_id": {
 			id:                 "1234",
@@ -53,8 +59,9 @@ func TestGetUserByID(t *testing.T) {
 				"message": "Bad request", 
 				"details": "invalid UUID length: 4"
 			}`,
-			expectedUser: nil,
-			expectedErr:  nil,
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				return nil
+			},
 		},
 		"invalid_long_id": {
 			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4fasfd771asdfadfsfadsaa6703a6b-c054-4ebd-b782-2a96bd4f771aa6703a6b-c054-4ebd-b782-2a96bd4f771aa670",
@@ -63,8 +70,9 @@ func TestGetUserByID(t *testing.T) {
 				"message": "Bad request", 
 				"details": "invalid UUID length: 128"
 			}`,
-			expectedUser: nil,
-			expectedErr:  nil,
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				return nil
+			},
 		},
 		"zero_id": {
 			id:                 "",
@@ -73,8 +81,9 @@ func TestGetUserByID(t *testing.T) {
 				"message": "Bad request", 
 				"details": "invalid UUID length: 0" 
 			}`,
-			expectedUser: nil,
-			expectedErr:  nil,
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				return nil
+			},
 		},
 		"wrong_id": {
 			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
@@ -83,8 +92,14 @@ func TestGetUserByID(t *testing.T) {
 				"message": "Not found",
 				"details": "no user found in DB"
 			} `,
-			expectedUser: nil,
-			expectedErr:  globals.ErrNotFound,
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				mock.EXPECT().
+					GetByID(gomock.Eq(id)).
+					Return(nil, globals.ErrNotFound)
+
+				return mock
+			},
 		},
 		"unexpected_error": {
 			id:                 "a6703a6b-c054-4ebd-b782-2a96bd4f771a",
@@ -93,8 +108,14 @@ func TestGetUserByID(t *testing.T) {
 				"message": "Internal server error", 
 				"details": ""
 			}`,
-			expectedUser: nil,
-			expectedErr:  errors.New("unexpected error"),
+			getByIdFunc: func(ctrl *gomock.Controller, id string) *MockUserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+				mock.EXPECT().
+					GetByID(gomock.Eq(id)).
+					Return(nil, errors.New("unexpected error"))
+
+				return mock
+			},
 		},
 	}
 
@@ -103,19 +124,8 @@ func TestGetUserByID(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			usecase := NewMockUserUsecase(ctrl)
-			usecase.EXPECT().
-				GetByID(gomock.Eq(tt.id)).
-				Return(tt.expectedUser, tt.expectedErr).
-				Times(func() int {
-					if tt.expectedUser == nil && tt.expectedErr == nil {
-						return 0
-					}
-					return 1
-				}())
-
 			uh := UserHandler{
-				usecase: usecase,
+				usecase: tt.getByIdFunc(ctrl, tt.id),
 				logger:  logger,
 			}
 
