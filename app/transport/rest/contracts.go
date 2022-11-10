@@ -4,7 +4,7 @@ import (
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-//go:generate moq -out user_usecase_mock_test.go . UserUsecase
+//go:generate mockgen -source=contracts.go -destination=mock_user_usecase_test.go -package=rest
 
 // UserUsecase represents User use-case layer.
 type UserUsecase interface {

@@ -8,8 +8,6 @@ import (
 	"github.com/go-devs-ua/octagon/app/entities"
 )
 
-//go:generate moq -out mock_repository_test.go . Repository
-
 // Repository interface can be implemented
 // in any kind of repositories like Postgres, MySQL etc.
 type Repository interface {
