@@ -80,8 +80,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
@@ -92,8 +91,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a number", "message":"Bad request"}`,
@@ -104,8 +102,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "5",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"offset argument has to be a positive number", "message":"Bad request"}`,
@@ -116,8 +113,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "bad",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
@@ -128,8 +124,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "-1",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a positive number", "message":"Bad request"}`,
@@ -140,8 +135,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Limit:  "1000000000000000000000000000000000000000000000",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details":"limit argument has to be a number", "message":"Bad request"}`,
@@ -153,8 +147,7 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 				Sort:   "first_name_bad",
 			},
 			usecaseBuilder: func(ctrl *gomock.Controller, params entities.QueryParams) UserUsecase {
-				mock := NewMockUserUsecase(ctrl)
-				return mock
+				return nil
 			},
 			expectedStatusCode:    400,
 			expectedResponsetBody: `{"details": "sort argument '_bad' does not fit list: [first_name last_name created_at ,]", "message": "Bad request"}`,
