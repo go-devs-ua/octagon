@@ -33,7 +33,7 @@ type UsersResponse struct {
 }
 
 func makeUsersRESTful(userArr []entities.User) []User {
-	var users = make([]User, 0, len(userArr))
+	users := make([]User, 0, len(userArr))
 
 	for _, u := range userArr {
 		user := User{
