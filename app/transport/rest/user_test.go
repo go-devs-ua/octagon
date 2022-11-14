@@ -2,8 +2,10 @@ package rest
 
 import (
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/go-devs-ua/octagon/app/entities"
@@ -199,6 +201,50 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			// Check results of testing.
 			require.Equal(t, tt.expectedStatusCode, response.Code)
 			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
+		})
+	}
+}
+
+func TestUserHandler_DeleteUser(t *testing.T) {
+	logger, err := lgr.New("INFO")
+	if err != nil {
+		t.FailNow()
+	}
+
+	tests := map[string]struct {
+		body               string
+		usecaseConstructor func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode int
+	}{
+		"success": {
+			body: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(nil).Times(1)
+
+				return mock
+			},
+			expectedStatusCode: 204,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+
+			uh := UserHandler{
+				usecase: tt.usecaseConstructor(ctrl),
+				logger:  logger,
+			}
+
+			resp := httptest.NewRecorder()
+			uh.DeleteUser(resp, httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.body)))
+			if resp.Code != tt.expectedStatusCode {
+				t.Fail()
+			}
 		})
 	}
 }
