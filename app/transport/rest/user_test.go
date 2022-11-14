@@ -2,6 +2,9 @@ package rest
 
 import (
 	"errors"
+	"github.com/go-devs-ua/octagon/app/globals"
+	"github.com/gorilla/mux"
+	"net/http"
 	"net/http/httptest"
 	"path"
 	"testing"
@@ -197,6 +200,94 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			uh.GetAllUsers(response, request)
 
 			// Check results of testing.
+			require.Equal(t, tt.expectedStatusCode, response.Code)
+			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
+		})
+	}
+}
+
+func TestUserHandler_GetUserByID(t *testing.T) {
+	logger, err := lgr.New(lgr.InfoLevel)
+	if err != nil {
+		t.Fatal("cannot initialize logger")
+	}
+
+	tests := map[string]struct {
+		id                    string
+		usecaseBuilder        func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode    int
+		expectedResponsetBody string
+	}{
+		"success": {
+			id: "91e3dcf7-34a6-4646-bd37-383cc949da93",
+			usecaseBuilder: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().GetByID("91e3dcf7-34a6-4646-bd37-383cc949da93").Return(&entities.User{
+					ID:        "91e3dcf7-34a6-4646-bd37-383cc949da93",
+					FirstName: "John",
+					LastName:  "Dou",
+					Email:     "j.dou@test.com",
+					CreatedAt: "2022-01-01 00:00:10",
+				}, nil).Times(1)
+
+				return mock
+			},
+			expectedStatusCode: http.StatusOK,
+			expectedResponsetBody: `{"id":"91e3dcf7-34a6-4646-bd37-383cc949da93", "first_name":"John", "last_name":"Dou", 
+									"email":"j.dou@test.com", "created_at":"2022-01-01 00:00:10"}`,
+		},
+		"invalid_uuid": {
+			id:                    "00000000--000-0000-0000-000000000000",
+			usecaseBuilder:        func(ctrl *gomock.Controller) UserUsecase { return nil },
+			expectedStatusCode:    http.StatusBadRequest,
+			expectedResponsetBody: `{"message": "Bad request", "details": "invalid UUID format"}`,
+		},
+		"user_not_found": {
+			id: "00000000-0000-0000-0000-000000000000",
+			usecaseBuilder: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().GetByID("00000000-0000-0000-0000-000000000000").Return(nil,
+					globals.ErrNotFound).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:    http.StatusNotFound,
+			expectedResponsetBody: `{"message": "Not found", "details": "no user found in DB"}`,
+		},
+		"internal_error": {
+			id: "10000000-0000-0000-0000-000000000000",
+			usecaseBuilder: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().GetByID("10000000-0000-0000-0000-000000000000").Return(nil,
+					globals.ErrDuplicateEmail).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:    http.StatusInternalServerError,
+			expectedResponsetBody: `{"message": "Internal server error", "details": ""}`,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			uh := UserHandler{
+				usecase: tt.usecaseBuilder(ctrl),
+				logger:  logger,
+			}
+
+			response := httptest.NewRecorder()
+
+			request := httptest.NewRequest(http.MethodGet, "*", nil)
+			request = mux.SetURLVars(request, map[string]string{"id": tt.id})
+
+			uh.GetUserByID(response, request)
+
 			require.Equal(t, tt.expectedStatusCode, response.Code)
 			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
 		})
