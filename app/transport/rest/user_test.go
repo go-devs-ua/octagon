@@ -38,7 +38,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return mock
 			},
 			expResponseBody: "",
-			expStatusCode:   204,
+			expStatusCode:   http.StatusNoContent,
 		},
 		"invalid_undefined_id": {
 			requestBody: `{"id": "dca5947d-3dfc-49f1-bc09-dd53ce7e71cc"}`,
@@ -51,7 +51,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return mock
 			},
 			expResponseBody: `{"message":"Not found","details":"no user found in DB"}`,
-			expStatusCode:   404,
+			expStatusCode:   http.StatusNotFound,
 		},
 		"invalid_bad_id_too_long": {
 			requestBody: `{"id": "1acef78b-55ef-43b1-8c2b-c9e36c9c11111"}`,
@@ -59,7 +59,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return nil
 			},
 			expResponseBody: `{"message":"Bad request","details":"invalid uuid: invalid UUID length: 37"}`,
-			expStatusCode:   400,
+			expStatusCode:   http.StatusBadRequest,
 		},
 		"invalid_bad_id_too_short": {
 			requestBody: `{"id": "1acef78b-55ef-43b1-8c2b-c9e36c9c280"}`,
@@ -67,7 +67,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return nil
 			},
 			expResponseBody: `{"message":"Bad request","details":"invalid uuid: invalid UUID length: 35"}`,
-			expStatusCode:   400,
+			expStatusCode:   http.StatusBadRequest,
 		},
 		"invalid_bad_id_bad_symbpls": {
 			requestBody: `{"id": "%acef78b-55ef-43b1-8c2b-c9e36c9c2807"}`,
@@ -75,7 +75,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return nil
 			},
 			expResponseBody: `{"message":"Bad request","details":"invalid uuid: invalid UUID format"}`,
-			expStatusCode:   400,
+			expStatusCode:   http.StatusBadRequest,
 		},
 		"invalid_internal_server_error": {
 			requestBody: `{"id": "dca5947d-3dfc-49f1-bc09-dd53ce7e71cc"}`,
@@ -88,7 +88,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				return mock
 			},
 			expResponseBody: `{"message":"Internal server error","details":""}`,
-			expStatusCode:   500,
+			expStatusCode:   http.StatusInternalServerError,
 		},
 	}
 
