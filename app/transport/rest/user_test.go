@@ -209,14 +209,15 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 func TestUserHandler_DeleteUser(t *testing.T) {
 	logger, err := lgr.New("INFO")
 	if err != nil {
+		t.Logf("error during initialiasing logger: %v", err)
 		t.FailNow()
 	}
 
 	tests := map[string]struct {
-		requestBody           string
-		usecaseConstructor    func(ctrl *gomock.Controller) UserUsecase
-		expectedStatusCode    int
-		expectedResponsetBody string
+		requestBody          string
+		usecaseConstructor   func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode   int
+		expectedErrorMessage string
 	}{
 		"success": {
 			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
@@ -236,11 +237,8 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
 				return nil
 			},
-			expectedStatusCode: http.StatusBadRequest,
-			expectedResponsetBody: `{
-										"message": "Bad request",
-										"details": "invalid uuid: invalid UUID length: 41"
-									}`,
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedErrorMessage: MsgBadRequest,
 		},
 		"user_not_found_BD": {
 			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
@@ -253,11 +251,8 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 
 				return mock
 			},
-			expectedStatusCode: http.StatusNotFound,
-			expectedResponsetBody: `{
-										"message": "Not found",
-										"details": "no user found in DB"
-									}`,
+			expectedStatusCode:   http.StatusNotFound,
+			expectedErrorMessage: globals.ErrNotFound.Error(),
 		},
 		"internal_server_error": {
 			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
@@ -270,13 +265,9 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 
 				return mock
 			},
-			expectedStatusCode: http.StatusInternalServerError,
-			expectedResponsetBody: `{
-										"message": "internal server error",
-										"details": ""
-									}`,
-		},
-	}
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedErrorMessage: "Internal server error",
+		}}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
@@ -292,6 +283,10 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			uh.DeleteUser(resp, request)
 
 			require.Equal(t, tt.expectedStatusCode, resp.Code)
+			if name != "success" {
+				require.Contains(t, resp.Body.String(), tt.expectedErrorMessage)
+			}
+
 		})
 	}
 }
