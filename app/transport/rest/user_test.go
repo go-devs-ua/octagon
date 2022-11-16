@@ -228,6 +228,7 @@ func TestUserHandler_GetUserByID(t *testing.T) {
 					FirstName: "John",
 					LastName:  "Dou",
 					Email:     "j.dou@test.com",
+					Password:  "12345678Qwerty",
 					CreatedAt: "2022-01-01 00:00:10",
 				}, nil).Times(1)
 
@@ -262,7 +263,7 @@ func TestUserHandler_GetUserByID(t *testing.T) {
 				mock := NewMockUserUsecase(ctrl)
 
 				mock.EXPECT().GetByID("10000000-0000-0000-0000-000000000000").Return(nil,
-					globals.ErrDuplicateEmail).Times(1)
+					errors.New("internal error while processing test")).Times(1)
 
 				return mock
 			},
