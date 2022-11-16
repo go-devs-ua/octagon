@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/lgr"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -212,12 +213,13 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		body               string
-		usecaseConstructor func(ctrl *gomock.Controller) UserUsecase
-		expectedStatusCode int
+		requestBody           string
+		usecaseConstructor    func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode    int
+		expectedResponsetBody string
 	}{
 		"success": {
-			body: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
 				mock := NewMockUserUsecase(ctrl)
 
@@ -227,10 +229,54 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 
 				return mock
 			},
-			expectedStatusCode: 204,
+			expectedStatusCode: http.StatusNoContent,
+		},
+		"invalid_uuid_test": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f7011111"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				return nil
+			},
+			expectedStatusCode: http.StatusBadRequest,
+			expectedResponsetBody: `{
+										"message": "Bad request",
+										"details": "invalid uuid: invalid UUID length: 41"
+									}`,
+		},
+		"user_not_found_BD": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(globals.ErrNotFound).Times(1)
+
+				return mock
+			},
+			expectedStatusCode: http.StatusNotFound,
+			expectedResponsetBody: `{
+										"message": "Not found",
+										"details": "no user found in DB"
+									}`,
+		},
+		"internal_server_error": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(errors.New("internal error")).Times(1)
+
+				return mock
+			},
+			expectedStatusCode: http.StatusInternalServerError,
+			expectedResponsetBody: `{
+										"message": "internal server error",
+										"details": ""
+									}`,
 		},
 	}
-
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
@@ -241,10 +287,11 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			}
 
 			resp := httptest.NewRecorder()
-			uh.DeleteUser(resp, httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.body)))
-			if resp.Code != tt.expectedStatusCode {
-				t.Fail()
-			}
+			request := httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.requestBody))
+
+			uh.DeleteUser(resp, request)
+
+			require.Equal(t, tt.expectedStatusCode, resp.Code)
 		})
 	}
 }
