@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// List of levels for Logger
 const (
 	InfoLevel  = "INFO"
 	DebugLevel = "DEBUG"
@@ -54,34 +55,34 @@ func (l *Logger) Flush() {
 }
 
 // Methods above will implement all needful logging behavior.
-func (l *Logger) Errorf(format string, val ...any) {
+func (l *Logger) Errorf(format string, val ...interface{}) {
 	l.log.Errorf(format, val...)
 }
 
-func (l *Logger) Errorw(format string, val ...any) {
+func (l *Logger) Errorw(format string, val ...interface{}) {
 	l.log.Errorw(format, val...)
 }
 
-func (l *Logger) Debugf(format string, val ...any) {
+func (l *Logger) Debugf(format string, val ...interface{}) {
 	l.log.Debugf(format, val...)
 }
 
-func (l *Logger) Debugw(format string, val ...any) {
+func (l *Logger) Debugw(format string, val ...interface{}) {
 	l.log.Debugw(format, val...)
 }
 
-func (l *Logger) Infof(format string, val ...any) {
+func (l *Logger) Infof(format string, val ...interface{}) {
 	l.log.Infof(format, val...)
 }
 
-func (l *Logger) Warnf(format string, val ...any) {
+func (l *Logger) Warnf(format string, val ...interface{}) {
 	l.log.Warnf(format, val...)
 }
 
-func (l *Logger) Warnw(format string, val ...any) {
+func (l *Logger) Warnw(format string, val ...interface{}) {
 	l.log.Warnw(format, val...)
 }
 
-func (l *Logger) Infow(msg string, keyVal ...any) {
+func (l *Logger) Infow(msg string, keyVal ...interface{}) {
 	l.log.Infow(msg, keyVal...)
 }
