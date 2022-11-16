@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// List of levels for Logger
+// List of levels for Logger.
 const (
 	InfoLevel  = "INFO"
 	DebugLevel = "DEBUG"
