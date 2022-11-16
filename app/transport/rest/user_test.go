@@ -2,11 +2,14 @@ package rest
 
 import (
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/go-devs-ua/octagon/app/entities"
+	"github.com/go-devs-ua/octagon/app/globals"
 	"github.com/go-devs-ua/octagon/lgr"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -199,6 +202,91 @@ func TestUserHandler_GetAllUsers(t *testing.T) {
 			// Check results of testing.
 			require.Equal(t, tt.expectedStatusCode, response.Code)
 			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
+		})
+	}
+}
+
+func TestUserHandler_DeleteUser(t *testing.T) {
+	logger, err := lgr.New("INFO")
+	if err != nil {
+		t.Logf("error during initialiasing logger: %v", err)
+		t.FailNow()
+	}
+
+	tests := map[string]struct {
+		requestBody          string
+		usecaseConstructor   func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode   int
+		expectedErrorMessage string
+	}{
+		"success": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(nil).Times(1)
+
+				return mock
+			},
+			expectedStatusCode: http.StatusNoContent,
+		},
+		"invalid_uuid_test": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f7011111"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedErrorMessage: MsgBadRequest,
+		},
+		"user_not_found_BD": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(globals.ErrNotFound).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:   http.StatusNotFound,
+			expectedErrorMessage: globals.ErrNotFound.Error(),
+		},
+		"internal_server_error": {
+			requestBody: `{"id": "e7c361a0-031f-4fc5-b769-116533761f70"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().Delete(entities.User{
+					ID: "e7c361a0-031f-4fc5-b769-116533761f70",
+				}).Return(errors.New("internal error")).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedErrorMessage: "Internal server error",
+		}}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+
+			uh := UserHandler{
+				usecase: tt.usecaseConstructor(ctrl),
+				logger:  logger,
+			}
+
+			resp := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.requestBody))
+
+			uh.DeleteUser(resp, request)
+
+			require.Equal(t, tt.expectedStatusCode, resp.Code)
+			if name != "success" {
+				require.Contains(t, resp.Body.String(), tt.expectedErrorMessage)
+			}
+
 		})
 	}
 }
