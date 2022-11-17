@@ -40,7 +40,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 			expResponseBody: "",
 			expStatusCode:   http.StatusNoContent,
 		},
-		"invalid_undefined_id": {
+		"invalid_notexisted_id": {
 			requestBody: `{"id": "dca5947d-3dfc-49f1-bc09-dd53ce7e71cc"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
 				mock := NewMockUserUsecase(ctrl)
@@ -100,7 +100,7 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				usecase: tt.usecaseConstructor(ctrl),
 				logger:  logger,
 			}
-
+			defer ctrl.Finish()
 			resp := httptest.NewRecorder()
 			uh.DeleteUser(resp, httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.requestBody)))
 			require.Equal(t, tt.expStatusCode, resp.Code)
