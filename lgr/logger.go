@@ -7,6 +7,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+const (
+	InfoLevel  = "INFO"
+	DebugLevel = "DEBUG"
+)
+
 // Logger represents logger.
 type Logger struct{ log *zap.SugaredLogger }
 

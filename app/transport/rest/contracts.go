@@ -5,6 +5,8 @@ import (
 )
 
 //go:generate mockgen -source=./contracts.go -destination=./mock_usecase_test.go -package=rest
+// for VSCode (copy&paste in CL):
+// mockgen -source contracts.go -destination mock_usecase_test.go -package rest
 
 // UserUsecase represents User use-case layer.
 type UserUsecase interface {
