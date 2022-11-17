@@ -2,12 +2,13 @@ package rest
 
 import (
 	"errors"
-	"github.com/go-devs-ua/octagon/app/globals"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"path"
 	"testing"
+
+	"github.com/go-devs-ua/octagon/app/globals"
+	"github.com/gorilla/mux"
 
 	"github.com/go-devs-ua/octagon/app/entities"
 	"github.com/go-devs-ua/octagon/lgr"
@@ -291,6 +292,165 @@ func TestUserHandler_GetUserByID(t *testing.T) {
 
 			require.Equal(t, tt.expectedStatusCode, response.Code)
 			require.JSONEq(t, tt.expectedResponsetBody, response.Body.String())
+		})
+	}
+}
+
+func TestUserHandler_CreateUser(t *testing.T) {
+	const (
+		//If we use const (nameMask, mailMask,passMask) from entities.user in our expectedResponseBody we got an error
+		//"JSON parsing error: invalid character 'p' in string escape code" (where chacter 'p' is some character after symbol \
+		//in regex). That`s why we create and use escaped version of this const
+		nameMask = `^[\\p{L}&\\s-\\\\'’.]{2,256}$`
+		mailMask = `(?i)^(?:[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+(?:\\.[a-z\\d!#$%&'*+/=?^_\\x60{|}~-]+)*)@(?:(?:[a-z\\d](?:[a-z\\d-]*[a-z\\d])?\\.)+[a-z\\d](?:[a-z\\d-]*[a-z\\d])?)$`
+		passMask = `^[[:graph:]]{8,256}$`
+		//maybe for test cases with too long domain or local part in email we should create separate variable for requestBody?
+		longLocalPartEmail       = "1234567890123456789012345678901234567890123456789012345678901234567890@gmail.com"
+		lenOfLongLocalPartEmail  = "70"
+		longDomainPartEmail      = "1234567890@12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890.com"
+		lenOfLongDomainPartEmail = "264"
+	)
+
+	logger, err := lgr.New("INFO")
+	if err != nil {
+		t.FailNow()
+	}
+
+	tests := map[string]struct {
+		requestBody          string
+		usecaseConstructor   func(ctrl *gomock.Controller) UserUsecase
+		expectedStatusCode   int
+		expectedResponseBody string
+	}{
+		"success": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().SignUp(entities.User{
+					Email:     "johngold@gmail.com",
+					FirstName: "John",
+					LastName:  "Gold",
+					Password:  "123456789Qw",
+				}).Return("91e3dcf7-34a6-4646-bd37-383cc949da93", nil).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:   http.StatusCreated,
+			expectedResponseBody: `{"id":"91e3dcf7-34a6-4646-bd37-383cc949da93"}`,
+		},
+		"failed_decoding": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"unexpected EOF"}`,
+		},
+		"first_name_validation_failed": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"J","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"invalid first name: name does not match with regex: ` + "`" + nameMask + "`" + `"}`,
+		},
+		"last_name_validation_failed": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"**","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"invalid last name: name does not match with regex: ` + "`" + nameMask + "`" + `"}`,
+		},
+		"too_long_local_part_of_email": {
+			requestBody: `{"email":"` + longLocalPartEmail + `","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"local part of email contains too many bytes: ` + lenOfLongLocalPartEmail + `"}`,
+		},
+		"too_long_domain_part_of_email": {
+			requestBody: `{"email":"` + longDomainPartEmail + `","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"domain part of email contains too many bytes: ` + lenOfLongDomainPartEmail + `"}`,
+		},
+		"email_does_not_match_with_regex": {
+			requestBody: `{"email":"johngoldgmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"email does not match with regex: ` + "`" + mailMask + "`" + `"}`,
+		},
+		"password_validation_failed": {
+			requestBody: `{"email":"john@goldgmail.com","first_name":"John","last_name":"Gold","password":"gotcha!"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+
+				return nil
+			},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"message":"Bad request","details":"password does not match with regex: ` + "`" + passMask + "`" + `"}`,
+		},
+		"email_duplicate": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().SignUp(entities.User{
+					Email:     "johngold@gmail.com",
+					FirstName: "John",
+					LastName:  "Gold",
+					Password:  "123456789Qw",
+				}).Return("", globals.ErrDuplicateEmail).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:   http.StatusConflict,
+			expectedResponseBody: `{"message":"Bad request","details":"email is already taken"}`,
+		},
+		"internal_server_error": {
+			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
+			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
+				mock := NewMockUserUsecase(ctrl)
+
+				mock.EXPECT().SignUp(entities.User{
+					Email:     "johngold@gmail.com",
+					FirstName: "John",
+					LastName:  "Gold",
+					Password:  "123456789Qw",
+				}).Return("", errors.New("Internal error")).Times(1)
+
+				return mock
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedResponseBody: `{"message":"Internal server error","details":""}`,
+		},
+	}
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+
+			uh := UserHandler{
+				usecase: tt.usecaseConstructor(ctrl),
+				logger:  logger,
+			}
+
+			response := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodPost, "/users", nil)
+			uh.CreateUser(response, request)
+			require.Equal(t, tt.expectedStatusCode, response.Code)
+			require.JSONEq(t, tt.expectedResponseBody, response.Body.String())
 		})
 	}
 }
