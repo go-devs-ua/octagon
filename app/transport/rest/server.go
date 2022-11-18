@@ -36,7 +36,7 @@ func NewServer(opt cfg.Options, handlers Handlers, logger *lgr.Logger) *Server {
 
 // Run will run our server.
 func (srv *Server) Run() error {
-	if err := srv.ListenAndServe(); err != nil { //nolint:typecheck
+	if err := srv.ListenAndServe(); err != nil {
 		return fmt.Errorf("error loading the server: %w", err)
 	}
 

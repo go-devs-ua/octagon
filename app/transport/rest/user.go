@@ -33,7 +33,7 @@ type UsersResponse struct {
 }
 
 func makeUsersRESTful(userArr []entities.User) []User {
-	var users = make([]User, 0, len(userArr))
+	users := make([]User, 0, len(userArr))
 
 	for _, u := range userArr {
 		user := User{
@@ -112,6 +112,7 @@ func (uh UserHandler) GetUserByID(w http.ResponseWriter, req *http.Request) {
 
 			return
 		}
+
 		uh.logger.Errorw("Internal error while searching user.", "ID", id, "error", err.Error())
 		WriteJSONResponse(w, http.StatusInternalServerError, Response{Message: MsgInternalSeverErr}, uh.logger)
 
