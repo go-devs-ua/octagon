@@ -383,9 +383,9 @@ func TestUserHandler_DeleteUser(t *testing.T) {
 				usecase: tt.usecaseConstructor(ctrl),
 				logger:  logger,
 			}
-			defer ctrl.Finish()
 			resp := httptest.NewRecorder()
 			uh.DeleteUser(resp, httptest.NewRequest(http.MethodDelete, "*", strings.NewReader(tt.requestBody)))
+			ctrl.Finish()
 			require.Equal(t, tt.expStatusCode, resp.Code)
 			if len(tt.expResponseBody) > 0 {
 				require.JSONEq(t, tt.expResponseBody, resp.Body.String())
