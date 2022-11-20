@@ -350,7 +350,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"first_name_validation_failed": {
 			requestBody: `{"email":"johngold@gmail.com","first_name":"J","last_name":"Gold","password":"123456789Qw"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -359,7 +358,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"last_name_validation_failed": {
 			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"**","password":"123456789Qw"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -368,7 +366,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"too_long_local_part_of_email": {
 			requestBody: `{"email":"` + longLocalPartEmail + `","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -377,7 +374,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"too_long_domain_part_of_email": {
 			requestBody: `{"email":"` + longDomainPartEmail + `","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -386,7 +382,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"email_does_not_match_with_regex": {
 			requestBody: `{"email":"johngoldgmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -395,7 +390,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"password_validation_failed": {
 			requestBody: `{"email":"john@goldgmail.com","first_name":"John","last_name":"Gold","password":"gotcha!"}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
