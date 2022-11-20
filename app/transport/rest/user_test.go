@@ -342,7 +342,6 @@ func TestUserHandler_CreateUser(t *testing.T) {
 		"failed_decoding": {
 			requestBody: `{"email":"johngold@gmail.com","first_name":"John","last_name":"Gold","password":"123456789Qw}`,
 			usecaseConstructor: func(ctrl *gomock.Controller) UserUsecase {
-
 				return nil
 			},
 			expectedStatusCode:   http.StatusBadRequest,
