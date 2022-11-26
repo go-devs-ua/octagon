@@ -1,0 +1,63 @@
+# docker-compose.yml 
+version: '3.8'
+
+services:
+    db:
+      image: postgres:13
+      environment:
+        POSTGRES_USER: db_user
+        POSTGRES_PASSWORD: dbpassword
+        POSTGRES_DB: octagon_db
+        PGDATA: /data/postgres
+        TZ: "Europe/Kiev"
+        PGTZ: "Europe/Kiev"
+      volumes:
+        - octagon-db:/data/postgres
+      ports:
+        - "5432:5432"
+      networks:
+        - octagon-net
+      restart: unless-stopped
+      healthcheck:
+        test: pg_isready -U db_user -d octagon_db
+        interval: 2s
+        timeout: 2s
+        retries: 5
+
+    octagon:
+      build: .
+      container_name: octagon
+      restart: unless-stopped
+      networks:
+          - octagon-net
+      ports:
+        - 8080:8080
+      depends_on:
+        db:
+          condition: service_healthy
+
+    migrate:
+      image: migrate/migrate
+      depends_on:
+        db:
+          condition: service_healthy
+      volumes:
+        - ./migrations:/migrations
+      networks:
+          - octagon-net
+      command:
+        [
+          "-path",
+          "/migrations",
+          "-database",
+          "postgres://db_user:dbpassword@db:5432/octagon_db?sslmode=disable",
+          "up",
+          "2"
+        ]
+
+
+networks:
+  octagon-net:
+
+volumes:
+  octagon-db:
